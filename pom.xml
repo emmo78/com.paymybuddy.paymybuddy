@@ -16,29 +16,33 @@
 	<groupId>com.paymybuddy</groupId>
 	<artifactId>paymybuddy</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>paymybuddy</name>
-	<description>payMyBuddy Web App</description>
+	<name>PayMyBuddy</name>
+	<description>PayMyBuddy Web App</description>
 	<packaging>jar</packaging>
 	
 	<properties>
-			<!-- Indicate encoding and project in Java 1.8 -->
+		<!-- Indicate encoding and project in Java 1.8 -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- https://docs.spring.io/spring-boot/docs/1.2.3.RELEASE/reference/html/using-boot-build-systems.html#using-boot-maven-java-version -->
 		<java.version>11</java.version>
-		<!-- for sonarcloud -->
-		<sonar.organization>emmo78</sonar.organization>
-		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<dependencies>
-			<!-- https://docs.spring.io/spring-boot/docs/1.2.3.RELEASE/reference/html/using-boot-build-systems.html#using-boot-starter-poms -->
-		<dependency>
+		<!-- https://docs.spring.io/spring-boot/docs/1.2.3.RELEASE/reference/html/using-boot-build-systems.html#using-boot-starter-poms -->
+		<!--<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<!-- Exclude Logback for logging -->
+		    <exclusions>
+    		    <exclusion>
+            		<groupId>org.springframework.boot</groupId>
+            		<artifactId>spring-boot-starter-logging</artifactId>
+        		</exclusion>
+    		</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -51,7 +55,7 @@
         		</exclusion>
     		</exclusions>
 		</dependency>
-		<!-- Include Log4j2 for logging -->
+		<!-- Include Log4j2 for logging, needs log4j2.xml in main/resources-->
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-log4j2</artifactId>
@@ -191,7 +195,7 @@
 					<reportSet><!-- by default, id = "default" -->
 						<reports><!-- select non-aggregate reports -->
 							<report>javadoc</report>
-							<report>test-javadoc</report>
+							<!--<report>test-javadoc</report>-->
 						</reports>
 					</reportSet>
 					<reportSet><!-- aggregate reportSet, to define in poms having modules -->
@@ -209,7 +213,7 @@
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>4.7.2.0</version>
+				<version>4.7.2.1</version>
 			</plugin>
 			
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-report-plugin -->

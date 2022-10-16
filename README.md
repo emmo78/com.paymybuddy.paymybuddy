@@ -51,7 +51,7 @@ To run the tests from maven, go to the folder that contains the pom.xml file and
 - $ mvn site 		→ put project reports in ./target/site/index.html  
 					( JavaDocs, SpotBugs, Surefire & Failsafe Reports, Jacoco & JaCoCo IT Reports)
 - $ mvn surefire-report:report → surefire report in	./target/site/ surefire-report
-- https://sonarcloud.io/project/overview?id=
+- https://sonarcloud.io/summary/overall?id=com.paymybuddy.paymybuddy
 
 
 
