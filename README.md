@@ -4,12 +4,10 @@ The purpose of this application is to
 ## Model Class Diagram UML
 
 ![Alt text](./UML/payMyBuddyUML-ModelClasses.png)
-<img src="./UML/payMyBuddyUML-ModelClasses.png">
 
 ## MLD
 
 ![Alt text](./UML/payMyBuddyUML-MPD.png)
-<img src="./UML/payMyBuddyUML-MPD.png">
 
 ## SQL - MPD
 
