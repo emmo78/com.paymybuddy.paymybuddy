@@ -11,38 +11,38 @@ The purpose of this application is to
 
 ## SQL - MPD
 
-CREATE DATABASE paymybuddy;
-USE paymybuddy;
+CREATE DATABASE paymybuddy;  
+USE paymybuddy;  
 
-CREATE TABLE registered(
-   email VARCHAR(320) NOT NULL,
-   password VARCHAR(25) NOT NULL,
-   first_name VARCHAR(30) NOT NULL,
-   last_name VARCHAR(30) NOT NULL,
-   birth_date DATE NOT NULL,
-   iban VARCHAR(34),
-   balance REAL,
-   PRIMARY KEY(email)
-);
+CREATE TABLE registered(  
+   email VARCHAR(320) NOT NULL,  
+   password VARCHAR(25) NOT NULL,  
+   first_name VARCHAR(30) NOT NULL,  
+   last_name VARCHAR(30) NOT NULL,  
+   birth_date DATE NOT NULL,  
+   iban VARCHAR(34),  
+   balance REAL,  
+   PRIMARY KEY(email)  
+);  
 
-CREATE TABLE connection(
-   email_add VARCHAR(320) NOT NULL,
-   email_added VARCHAR(320) NOT NULL,
-   PRIMARY KEY(email_add, email_added),
-   FOREIGN KEY(email_add) REFERENCES registered(email),
-   FOREIGN KEY(email_added) REFERENCES registered(email)
-);
+CREATE TABLE connection(  
+   email_add VARCHAR(320) NOT NULL,  
+   email_added VARCHAR(320) NOT NULL,  
+   PRIMARY KEY(email_add, email_added),  
+   FOREIGN KEY(email_add) REFERENCES registered(email),  
+   FOREIGN KEY(email_added) REFERENCES registered(email)  
+);  
 
-CREATE TABLE transaction(
-   id BIGINT UNSIGNED AUTO_INCREMENT,
-   date_time DATETIME NOT NULL,
-   amount DOUBLE NOT NULL,
-   email_sender VARCHAR(320),
-   email_receiver VARCHAR(320),
-   PRIMARY KEY(id),
-   FOREIGN KEY(email_sender) REFERENCES registered(email),
-   FOREIGN KEY(email_receiver ) REFERENCES registered(email)
-);
+CREATE TABLE transaction(  
+   id BIGINT UNSIGNED AUTO_INCREMENT,  
+   date_time DATETIME NOT NULL,  
+   amount DOUBLE NOT NULL,  
+   email_sender VARCHAR(320),  
+   email_receiver VARCHAR(320),  
+   PRIMARY KEY(id),  
+   FOREIGN KEY(email_sender) REFERENCES registered(email),  
+   FOREIGN KEY(email_receiver ) REFERENCES registered(email)  
+);  
 
 ## Prerequisites
 
