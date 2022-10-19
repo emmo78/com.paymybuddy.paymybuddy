@@ -3,11 +3,11 @@ The purpose of this application is to
 
 ## Model Class Diagram UML
 
-![Alt text](./UML/payMyBuddyUML-ModelClasses.png)
+![UML Model Classes](./UML/payMyBuddyUML-ModelClasses.png)
 
 ## MLD
 
-![Alt text](./UML/payMyBuddyUML-MPD.png)
+![MLD](./UML/payMyBuddyUML-MPD.png)
 
 ## SQL - MPD
 
