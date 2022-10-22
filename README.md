@@ -3,11 +3,11 @@ The purpose of this application is to
 
 ## Model Class Diagram UML
 
-![UML Model Classes](./UML/payMyBuddyUML-ModelClasses.png)
+![UML Model Classes](./UML/payMyBuddyUML-ModelClasses.svg)
 
 ## MLD
 
-![MLD](./UML/payMyBuddyUML-MPD.png)
+![MLD](./UML/payMyBuddyUML-MPD.svg)
 
 ## SQL - MPD
 
@@ -34,12 +34,12 @@ CREATE TABLE connection(
 );  
 
 CREATE TABLE transaction(  
-   id BIGINT UNSIGNED AUTO_INCREMENT,  
+   transaction_id BIGINT AUTO_INCREMENT,  
    date_time DATETIME NOT NULL,  
    amount DOUBLE NOT NULL,  
    email_sender VARCHAR(320),  
    email_receiver VARCHAR(320),  
-   PRIMARY KEY(id),  
+   PRIMARY KEY(transaction_id),  
    FOREIGN KEY(email_sender) REFERENCES registered(email),  
    FOREIGN KEY(email_receiver ) REFERENCES registered(email)  
 );  

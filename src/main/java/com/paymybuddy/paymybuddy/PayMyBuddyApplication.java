@@ -11,7 +11,7 @@ import org.springframework.context.annotation.PropertySource;
  */
 
 @SpringBootApplication
-@PropertySource({"file:db.properties"})
+@PropertySource({"file:./db.properties"})
 public class PayMyBuddyApplication {
 
 	public static void main(String[] args) {
