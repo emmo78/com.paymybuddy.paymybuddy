@@ -5,11 +5,14 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.Getter;
@@ -19,7 +22,7 @@ import lombok.Setter;
 @Table(name = "transaction")
 @Getter
 @Setter
-public class Transaction implements Serializable{
+public class Transaction implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -33,14 +36,15 @@ public class Transaction implements Serializable{
 	@Column(name = "amont")
 	private double amont;
 	
-	@Column(name = "email_sender")
-	private String emailSender;
+	@ManyToOne(cascade = CascadeType.MERGE)
+	@JoinColumn(name="email_sender")
+	private Registered sender;
 	
-	@Column(name = "email_receiver")
-	private String emailReceiver;
-	
+	@ManyToOne(cascade = CascadeType.MERGE)
+	@JoinColumn(name="email_receiver")
+	private Registered receiver;
+
 	public double getMonetization() {
 		return BigDecimal.valueOf(amont * 0.005).setScale(2, RoundingMode.HALF_UP).doubleValue();
 	}
-	
 }
