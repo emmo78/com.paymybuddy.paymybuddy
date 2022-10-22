@@ -46,7 +46,7 @@ CREATE TABLE transaction(
 
 ## Prerequisites
 
-### What things you need to install the software and how to install them
+### What things you need to install the software
 
 - Java 11
 - apache Maven
@@ -54,8 +54,10 @@ CREATE TABLE transaction(
 
 ### Properties : ./src/main/resources/application.properties :
 
+does not contain SGBD login and passwd saved in "./db.properties" put in "./.gitignore" 
+
 ### Log4J2 : ./src/main/resources/log4j2-spring.xml
-log file  = ./logs/       .log
+log file  = ./logs/PayMyBuddy-log4j2.log with RollBack
 
 ## Installing
 
