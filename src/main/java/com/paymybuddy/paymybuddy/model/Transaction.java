@@ -15,11 +15,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "transaction")
+@DynamicInsert
+@DynamicUpdate
 @Getter
 @Setter
 public class Transaction implements Serializable {
@@ -37,14 +42,18 @@ public class Transaction implements Serializable {
 	@Column(name = "amont")
 	private double amont;
 
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "email_sender")
 	private Registered sender;
 
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "email_receiver")
 	private Registered receiver;
 
+	public Transaction() {
+		super();
+	}
+	
 	public Transaction(Date dateTime, double amont) {
 		super();
 		this.dateTime = dateTime;

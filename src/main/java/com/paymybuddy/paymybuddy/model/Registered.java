@@ -17,12 +17,17 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "registered")
+@DynamicInsert
+@DynamicUpdate
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -65,6 +70,10 @@ public class Registered implements Serializable {
 
 	@OneToMany(mappedBy = "receiver", cascade = CascadeType.REFRESH)
 	private List<Transaction> receivedTransactions = new ArrayList<>();
+	
+	public Registered() {
+		super();
+	}
 
 	public Registered(String email, String password, String firstName, String lastName, Date birthDate, String iban) {
 		super();
