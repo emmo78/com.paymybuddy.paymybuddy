@@ -40,8 +40,8 @@ CREATE TABLE transaction(
    email_sender VARCHAR(320),  
    email_receiver VARCHAR(320),  
    PRIMARY KEY(transaction_id),  
-   FOREIGN KEY(email_sender) REFERENCES registered(email),  
-   FOREIGN KEY(email_receiver ) REFERENCES registered(email)  
+   FOREIGN KEY(email_sender) REFERENCES registered(email) ON DELETE SET NULL,  
+   FOREIGN KEY(email_receiver ) REFERENCES registered(email) ON DELETE SET NULL  
 );  
 
 ## Prerequisites

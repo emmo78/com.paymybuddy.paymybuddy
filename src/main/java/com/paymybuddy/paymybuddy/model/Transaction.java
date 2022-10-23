@@ -39,14 +39,14 @@ public class Transaction implements Serializable {
 	@Column(name = "date_time")
 	private Date dateTime;
 
-	@Column(name = "amont")
-	private double amont;
+	@Column(name = "amount")
+	private double amount;
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "email_sender")
 	private Registered sender;
 
-	@ManyToOne(cascade = CascadeType.PERSIST)
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "email_receiver")
 	private Registered receiver;
 
@@ -54,13 +54,13 @@ public class Transaction implements Serializable {
 		super();
 	}
 	
-	public Transaction(Date dateTime, double amont) {
+	public Transaction(Date dateTime, double amount) {
 		super();
 		this.dateTime = dateTime;
-		this.amont = amont;
+		this.amount = amount;
 	}
 	
 	public double getMonetization() {
-		return BigDecimal.valueOf(amont * 0.005).setScale(2, RoundingMode.HALF_UP).doubleValue();
+		return BigDecimal.valueOf(amount * 0.005).setScale(2, RoundingMode.HALF_UP).doubleValue();
 	}
 }
