@@ -2,15 +2,14 @@ package com.paymybuddy.paymybuddy.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -119,8 +118,8 @@ class TransactionRepositoryTest {
 	}
 	
 	@Test
-	@DisplayName("Test getFeeSum for a given month and a given registered sender should return")
-	void testGetFeeSum() {
+	@DisplayName("Test feeSumForARegisteredBetweenDate should return 10")
+	void testFeeSumForARegisteredBetweenDateShouldReturnTen() {
 		//GIVEN
 		Calendar dateTransaction = GregorianCalendar.getInstance();
 		dateTransaction.set(Calendar.DATE, 1); //set date at the begin of month
@@ -171,11 +170,12 @@ class TransactionRepositoryTest {
 		transactionBtoC = transactionRepository.save(transactionBtoC);
 		
 		//WHEN
-		long result = transactionRepository.feeSumForARegistered(beginDate, endDate, "aaa@aaa.com");
+		long result = transactionRepository.feeSumForARegisteredBetweenDate(beginDate, endDate, "aaa@aaa.com");
 		
 		//THEN
 		assertThat(result).isEqualTo(10);
 	}
+	
 	
 
 }
