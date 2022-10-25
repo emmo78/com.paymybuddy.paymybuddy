@@ -2,7 +2,9 @@ package com.paymybuddy.paymybuddy.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Date;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -31,9 +33,9 @@ class RegisteredRepositoryTest {
 
 	@BeforeEach
 	public void setUpPerTest() {
-		registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", new Date(), "aaaIban");
-		registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", new Date(), "bbbIban");
-		registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", new Date(), "cccIban");
+		registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", Date.valueOf(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "aaaIban");
+		registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", Date.valueOf(LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "bbbIban");
+		registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", Date.valueOf(LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "cccIban");
 		registeredRepository.save(registeredA);
 		registeredRepository.save(registeredB);
 		registeredRepository.save(registeredC);
