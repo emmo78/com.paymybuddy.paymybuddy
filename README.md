@@ -7,7 +7,7 @@ The purpose of this application is to
 
 ## MLD
 
-![MLD](./UML/payMyBuddyUML-MPD.svg)
+![MLD](./UML/payMyBuddyUML-MLD.svg)
 
 ## SQL - MPD
 
@@ -36,12 +36,13 @@ CREATE TABLE connection(
 CREATE TABLE transaction(  
    transaction_id BIGINT AUTO_INCREMENT,  
    date_time DATETIME NOT NULL,  
-   amount DOUBLE NOT NULL,  
+   amount DOUBLE NOT NULL,
+   fee DOUBLE NOT NULL,
    email_sender VARCHAR(320),  
    email_receiver VARCHAR(320),  
    PRIMARY KEY(transaction_id),  
-   FOREIGN KEY(email_sender) REFERENCES registered(email),  
-   FOREIGN KEY(email_receiver ) REFERENCES registered(email)  
+   FOREIGN KEY(email_sender) REFERENCES registered(email) ON DELETE SET NULL,  
+   FOREIGN KEY(email_receiver ) REFERENCES registered(email) ON DELETE SET NULL  
 );  
 
 ## Prerequisites

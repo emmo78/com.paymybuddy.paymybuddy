@@ -1,8 +1,8 @@
 package com.paymybuddy.paymybuddy.model;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,12 +17,17 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "registered")
+@DynamicInsert
+@DynamicUpdate
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -65,6 +70,10 @@ public class Registered implements Serializable {
 
 	@OneToMany(mappedBy = "receiver", cascade = CascadeType.REFRESH)
 	private List<Transaction> receivedTransactions = new ArrayList<>();
+	
+	public Registered() {
+		super();
+	}
 
 	public Registered(String email, String password, String firstName, String lastName, Date birthDate, String iban) {
 		super();

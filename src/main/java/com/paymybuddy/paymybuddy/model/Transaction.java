@@ -3,7 +3,7 @@ package com.paymybuddy.paymybuddy.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Date;
+import java.sql.Timestamp;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,11 +15,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "transaction")
+@DynamicInsert
+@DynamicUpdate
 @Getter
 @Setter
 public class Transaction implements Serializable {
@@ -32,10 +37,13 @@ public class Transaction implements Serializable {
 	private long transactionId;
 
 	@Column(name = "date_time")
-	private Date dateTime;
+	private Timestamp dateTime;
 
-	@Column(name = "amont")
-	private double amont;
+	@Column(name = "amount")
+	private double amount;
+	
+	@Column(name = "fee")
+	private double fee;
 
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "email_sender")
@@ -45,13 +53,18 @@ public class Transaction implements Serializable {
 	@JoinColumn(name = "email_receiver")
 	private Registered receiver;
 
-	public Transaction(Date dateTime, double amont) {
+	public Transaction() {
 		super();
-		this.dateTime = dateTime;
-		this.amont = amont;
 	}
 	
-	public double getMonetization() {
-		return BigDecimal.valueOf(amont * 0.005).setScale(2, RoundingMode.HALF_UP).doubleValue();
+	public Transaction(Timestamp dateTime, double amount) {
+		super();
+		this.dateTime = dateTime;
+		this.amount = amount;
+		monetize();
+	}
+	
+	public void monetize() {
+		fee = BigDecimal.valueOf(amount * 0.005).setScale(2, RoundingMode.HALF_UP).doubleValue();
 	}
 }
