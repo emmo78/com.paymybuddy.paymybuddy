@@ -1,8 +1,8 @@
 package com.paymybuddy.paymybuddy.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +23,6 @@ import org.hibernate.annotations.DynamicUpdate;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Table(name = "registered")

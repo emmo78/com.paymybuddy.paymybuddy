@@ -48,6 +48,7 @@ class TransactionRepositoryIT {
 		registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", Date.valueOf(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "aaaIban");
 		registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", Date.valueOf(LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "bbbIban");
 		registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", Date.valueOf(LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "cccIban");
+
 		registeredRepository.save(registeredA);
 		registeredRepository.save(registeredB);
 		registeredRepository.save(registeredC);
@@ -192,9 +193,9 @@ class TransactionRepositoryIT {
 	}
 
 	@Test
-	@DisplayName("Test findAllTransactionByIdSortedDescByDatePageOfThree should return expected pages")
+	@DisplayName("Test findAllTransactionsByIdSenderOrReceiver should return expected pages")
 	@Transactional
-	public void testFindAllTransactionByIdSortedDescByDatePageOfThreeShouldReturnExpectedPages() {
+	public void testFindAllTransactionsByIdSenderOrReceiverShouldReturnExpectedPages() {
 		// GIVEN
 		Calendar dateTransaction = GregorianCalendar.getInstance();
 		dateTransaction.set(Calendar.DATE, 1); // set date at the begin of month
@@ -202,14 +203,14 @@ class TransactionRepositoryIT {
 													// -1) sets the calendar to 01/12/2021
 		List<Transaction> transactionsBExpected = new ArrayList<>();
 		for (int i = 1; i <= 5; i++) { // loops 5 times
-			Transaction transactionAtoB = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // 100+200+300+400
+			Transaction transactionAtoB = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // 100+200+300+400+500
 			transactionAtoB = transactionRepository.save(transactionAtoB);
 			registeredA.addSendedTransaction(transactionAtoB);
 			registeredB.addReceivedTransaction(transactionAtoB);
 			transactionAtoB = transactionRepository.save(transactionAtoB);
 			transactionsBExpected.add(transactionAtoB);
 			dateTransaction.add(Calendar.HOUR_OF_DAY, 1);
-			Transaction transactionBtoC = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // Expected fee sum = 5*2
+			Transaction transactionBtoC = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i);
 			transactionBtoC = transactionRepository.save(transactionBtoC);
 			registeredB.addSendedTransaction(transactionBtoC);
 			registeredC.addReceivedTransaction(transactionBtoC);
@@ -225,7 +226,7 @@ class TransactionRepositoryIT {
 		// WHEN
 		Page<Transaction> pageTransaction;
 		do {
-			pageTransaction = transactionRepository.findAllTransactionByIdSortedDescByDatePageOfThree("bbb@bbb.com", pageRequest);
+			pageTransaction = transactionRepository.findAllTransactionsByIdSenderOrReceiver("bbb@bbb.com", pageRequest);
 			pagesTransactionsBResult.add(pageTransaction);
 			pageRequest = pageTransaction.nextOrLastPageable();
 		} while (pageTransaction.hasNext());
@@ -235,9 +236,6 @@ class TransactionRepositoryIT {
 		assertThat(pagesTransactionsBResult.get(1).getContent()).containsExactlyElementsOf(transactionsBExpected.subList(3, 6));
 		assertThat(pagesTransactionsBResult.get(2).getContent()).containsExactlyElementsOf(transactionsBExpected.subList(6, 9));
 		assertThat(pagesTransactionsBResult.get(3).getContent()).containsExactlyElementsOf(transactionsBExpected.subList(9, 10));
-
-
-		
 		
 	}
 }

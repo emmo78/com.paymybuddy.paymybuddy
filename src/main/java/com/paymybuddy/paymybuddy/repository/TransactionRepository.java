@@ -18,5 +18,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 	@Query(value = "SELECT * FROM transaction t WHERE t.email_sender = :email OR t.email_receiver = :email",
 			countQuery = "SELECT COUNT(*) FROM transaction t WHERE t.email_sender = :email OR t.email_receiver = :email",
 			nativeQuery = true)
-	Page<Transaction> findAllTransactionByIdSortedDescByDatePageOfThree(@Param("email") String email, Pageable pageRequest);
+	Page<Transaction> findAllTransactionsByIdSenderOrReceiver(@Param("email") String email, Pageable pageRequest);
 }

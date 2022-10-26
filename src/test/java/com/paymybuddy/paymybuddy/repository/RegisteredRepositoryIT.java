@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,6 +20,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.paymybuddy.paymybuddy.model.Registered;
 
@@ -30,14 +36,22 @@ class RegisteredRepositoryIT {
 	Registered registeredA;
 	Registered registeredB;
 	Registered registeredC;
+	Registered registeredD;
+	Registered registeredE;
+
 
 	@BeforeEach
 	public void setUpPerTest() {
 		registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", Date.valueOf(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "aaaIban");
 		registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", Date.valueOf(LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "bbbIban");
 		registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", Date.valueOf(LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "cccIban");
+		registeredD = new Registered("ddd@ddd.com", "dddPasswd", "Ddd", "DDD", Date.valueOf(LocalDate.parse("04/04/1994", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "dddIban");
+		registeredE = new Registered("eee@ddd.com", "eeePasswd", "Eee", "DDD", Date.valueOf(LocalDate.parse("05/05/1994", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "eeeIban");
+
 		registeredRepository.save(registeredA);
 		registeredRepository.save(registeredB);
+		registeredRepository.save(registeredD);
+		registeredRepository.save(registeredE);
 		registeredRepository.save(registeredC);
 	}
 
@@ -47,12 +61,14 @@ class RegisteredRepositoryIT {
 		registeredA = null;
 		registeredB = null;
 		registeredC = null;
+		registeredD = null;
+		registeredE = null;
 	}
 
 	@Test
 	@DisplayName("registeredA connects B and C should fill their sets")
 	@Transactional
-	void registeredAconnectsBandCShouldFillTheirSets() {
+	public void registeredAconnectsBandCShouldFillTheirSets() {
 		// GIVEN
 		Set<Registered> addConnectionsExpectedA = new HashSet<>();
 		addConnectionsExpectedA.add(registeredB);
@@ -86,7 +102,7 @@ class RegisteredRepositoryIT {
 	@Test
 	@DisplayName("registeredB disconnects added A and C should remove them from their sets")
 	@Transactional
-	void registeredBDisconnectsAddedAandCShouldRemoveThemFromTheirSets() {
+	public void registeredBDisconnectsAddedAandCShouldRemoveThemFromTheirSets() {
 		// GIVEN
 		Set<Registered> addConnectionsExpectedA = new HashSet<>();
 		addConnectionsExpectedA.add(registeredC);
@@ -127,4 +143,31 @@ class RegisteredRepositoryIT {
 		registeredBResultOpt.ifPresent(registeredBResult -> assertThat(registeredBResult.getAddedConnections()).hasSize(0));
 		registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddConnections()).hasSize(0));
 	}
+	
+	@Test
+	@DisplayName("test findAllNotConnectedToId should return expected pages")
+	@Transactional
+	public void testFindAllNotConnectedToIdShouldReturnExpectedPages() {
+		
+		//GIVEN
+		registeredA.addConnection(registeredB);
+		registeredRepository.save(registeredA);
+		List<Registered> registerdNotConnectedToAExpected = new ArrayList<>();
+		registerdNotConnectedToAExpected.add(registeredC);
+		registerdNotConnectedToAExpected.add(registeredD);
+		registerdNotConnectedToAExpected.add(registeredE);
+		Pageable pageRequest = PageRequest.of(0, 5, Sort.by("last_name", "first_name").ascending());
+
+		
+		//WHERE
+		Page<Registered> pageRegisteredResult = registeredRepository.findAllNotConnectedToId("aaa@aaa.com", pageRequest);
+		
+		//THEN
+		assertThat(pageRegisteredResult.getContent()).containsExactlyElementsOf(registerdNotConnectedToAExpected); 
+
+
+
+
+	}
+	
 }
