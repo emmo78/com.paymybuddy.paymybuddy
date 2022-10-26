@@ -22,7 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.paymybuddy.paymybuddy.model.Registered;
 
 @SpringBootTest
-class RegisteredRepositoryTest {
+class RegisteredRepositoryIT {
 
 	@Autowired
 	RegisteredRepository registeredRepository;
