@@ -59,7 +59,7 @@ public class Registered implements Serializable {
 	private double balance = 0;
 
 	@ManyToMany(cascade = CascadeType.MERGE)
-	@JoinTable(name = "connection", joinColumns = @JoinColumn(name = "email_add", referencedColumnName = "email", nullable = false), inverseJoinColumns = @JoinColumn(name = "email_added", referencedColumnName = "email", nullable = false))
+	@JoinTable(name = "connection", joinColumns = @JoinColumn(name = "email_added", referencedColumnName = "email", nullable = false), inverseJoinColumns = @JoinColumn(name = "email_add", referencedColumnName = "email", nullable = false))
 	private Set<Registered> addConnections = new HashSet<>();
 	
 	@ManyToMany(cascade = CascadeType.MERGE, mappedBy ="addConnections")

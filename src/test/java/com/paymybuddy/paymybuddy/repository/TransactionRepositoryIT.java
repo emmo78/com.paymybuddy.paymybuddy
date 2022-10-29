@@ -193,9 +193,9 @@ class TransactionRepositoryIT {
 	}
 
 	@Test
-	@DisplayName("Test findAllTransactionsByIdSenderOrReceiver should return expected pages")
+	@DisplayName("Test findAllTransactionsByEmailSenderOrReceiver should return expected pages")
 	@Transactional
-	public void testFindAllTransactionsByIdSenderOrReceiverShouldReturnExpectedPages() {
+	public void testFindAllTransactionsByEmailSenderOrReceiverShouldReturnExpectedPages() {
 		// GIVEN
 		Calendar dateTransaction = GregorianCalendar.getInstance();
 		dateTransaction.set(Calendar.DATE, 1); // set date at the begin of month
@@ -226,7 +226,7 @@ class TransactionRepositoryIT {
 		// WHEN
 		Page<Transaction> pageTransaction;
 		do {
-			pageTransaction = transactionRepository.findAllTransactionsByIdSenderOrReceiver("bbb@bbb.com", pageRequest);
+			pageTransaction = transactionRepository.findAllTransactionsByEmailSenderOrReceiver("bbb@bbb.com", pageRequest);
 			pagesTransactionsBResult.add(pageTransaction);
 			pageRequest = pageTransaction.nextOrLastPageable();
 		} while (pageTransaction.hasNext());

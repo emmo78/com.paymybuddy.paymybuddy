@@ -39,7 +39,6 @@ class RegisteredRepositoryIT {
 	Registered registeredD;
 	Registered registeredE;
 
-
 	@BeforeEach
 	public void setUpPerTest() {
 		registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", Date.valueOf(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "aaaIban");
@@ -50,9 +49,9 @@ class RegisteredRepositoryIT {
 
 		registeredRepository.save(registeredA);
 		registeredRepository.save(registeredB);
-		registeredRepository.save(registeredD);
-		registeredRepository.save(registeredE);
-		registeredRepository.save(registeredC);
+		registeredRepository.save(registeredE); // No respect of Alphabetical order
+		registeredRepository.save(registeredD); // To test Sort Ascending
+		registeredRepository.save(registeredC); // by LastName then FirstName
 	}
 
 	@AfterEach
@@ -143,31 +142,62 @@ class RegisteredRepositoryIT {
 		registeredBResultOpt.ifPresent(registeredBResult -> assertThat(registeredBResult.getAddedConnections()).hasSize(0));
 		registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddConnections()).hasSize(0));
 	}
-	
+
 	@Test
-	@DisplayName("test findAllNotConnectedToId should return expected pages")
+	@DisplayName("test findAllConnectedToEmail should return expected pages")
 	@Transactional
-	public void testFindAllNotConnectedToIdShouldReturnExpectedPages() {
-		
-		//GIVEN
-		registeredA.addConnection(registeredB);
+	public void testFindAllConnectedToEmailShouldReturnExpectedPages() {
+
+		// GIVEN
+		registeredA.addConnection(registeredE);
+		registeredA.addConnection(registeredD);
+		registeredA.addConnection(registeredC);
 		registeredRepository.save(registeredA);
+		registeredC.addConnection(registeredA);
+		registeredC.addConnection(registeredB);
+		registeredC.addConnection(registeredD);
+		registeredRepository.save(registeredC);
+		registeredD.addConnection(registeredA);
+		registeredRepository.save(registeredD);
+		
+		List<Registered> registerdConnectedToAExpected = new ArrayList<>();
+		registerdConnectedToAExpected.add(registeredC);
+		registerdConnectedToAExpected.add(registeredD);
+		registerdConnectedToAExpected.add(registeredE);
+		Pageable pageRequest = PageRequest.of(0, 5, Sort.by("last_name", "first_name").ascending());
+		
+		// WHERE
+		Page<Registered> pageRegisteredResult = registeredRepository.findAllConnectedToEmail("aaa@aaa.com", pageRequest);
+		
+		// THEN
+		assertThat(pageRegisteredResult.getContent()).containsExactlyElementsOf(registerdConnectedToAExpected);	
+
+	}
+
+	@Test
+	@DisplayName("test findAllNotConnectedToEmail should return expected pages")
+	@Transactional
+	public void testFindAllNotConnectedToEmailShouldReturnExpectedPages() {
+
+		// GIVEN
+		registeredA.addConnection(registeredB);
+		registeredA.addConnection(registeredC);
+		registeredRepository.save(registeredA);
+		registeredC.addConnection(registeredB);
+		registeredC.addConnection(registeredD);
+		registeredRepository.save(registeredC);
+		registeredD.addConnection(registeredA);
+		registeredRepository.save(registeredD);
 		List<Registered> registerdNotConnectedToAExpected = new ArrayList<>();
-		registerdNotConnectedToAExpected.add(registeredC);
 		registerdNotConnectedToAExpected.add(registeredD);
 		registerdNotConnectedToAExpected.add(registeredE);
 		Pageable pageRequest = PageRequest.of(0, 5, Sort.by("last_name", "first_name").ascending());
 
-		
-		//WHERE
-		Page<Registered> pageRegisteredResult = registeredRepository.findAllNotConnectedToId("aaa@aaa.com", pageRequest);
-		
-		//THEN
-		assertThat(pageRegisteredResult.getContent()).containsExactlyElementsOf(registerdNotConnectedToAExpected); 
+		// WHERE
+		Page<Registered> pageRegisteredResult = registeredRepository.findAllNotConnectedToEmail("aaa@aaa.com", pageRequest);
 
-
-
-
+		// THEN		
+		assertThat(pageRegisteredResult.getContent()).containsExactlyElementsOf(registerdNotConnectedToAExpected);
 	}
-	
+
 }
