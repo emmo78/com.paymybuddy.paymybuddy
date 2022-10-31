@@ -36,8 +36,8 @@ CREATE TABLE connection(
 CREATE TABLE transaction(  
    transaction_id BIGINT AUTO_INCREMENT,  
    date_time DATETIME NOT NULL,  
-   amount DOUBLE NOT NULL,
-   fee DOUBLE NOT NULL,
+   amount DOUBLE NOT NULL,  
+   fee DOUBLE NOT NULL,  
    email_sender VARCHAR(320),  
    email_receiver VARCHAR(320),  
    PRIMARY KEY(transaction_id),  

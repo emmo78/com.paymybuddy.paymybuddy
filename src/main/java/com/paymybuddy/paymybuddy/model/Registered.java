@@ -72,11 +72,9 @@ public class Registered implements Serializable {
 	private List<Transaction> receivedTransactions = new ArrayList<>();
 	
 	public Registered() {
-		super();
 	}
 
 	public Registered(String email, String password, String firstName, String lastName, Date birthDate, String iban) {
-		super();
 		this.email = email;
 		this.password = password;
 		this.firstName = firstName;

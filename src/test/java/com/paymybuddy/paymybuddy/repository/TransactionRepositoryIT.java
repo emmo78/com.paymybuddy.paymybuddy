@@ -33,7 +33,7 @@ import com.paymybuddy.paymybuddy.model.Transaction;
 class TransactionRepositoryIT {
 
 	@Autowired
-	TransactionRepository transactionRepository;
+	private TransactionRepository transactionRepository;
 
 	// Needed for testing
 	@Autowired
@@ -97,10 +97,10 @@ class TransactionRepositoryIT {
 	}
 
 	@Test
-	@DisplayName("After sended to B and C A remove from application, FK for A should be null")
+	@DisplayName("After A sended to B and C all remove from application, FK for all should be null")
 	// @Transactional - object references an unsaved transient instance - save the
 	// transient instance before flushing
-	void afterSendedToBandCAremoveFromApplicationSoHisFKShouldBeNull() {
+	void afterASendedToBandCAllremoveFromApplicationSoAllFKShouldBeNull() {
 		// GIVEN
 		Transaction transactionAtoB = new Transaction(Timestamp.valueOf(LocalDateTime.now()), 100);
 		transactionAtoB = transactionRepository.save(transactionAtoB);
@@ -117,10 +117,13 @@ class TransactionRepositoryIT {
 
 		// WHEN
 		registeredRepository.deleteById("aaa@aaa.com");
+		registeredRepository.deleteById("bbb@bbb.com");
+		registeredRepository.deleteById("ccc@ccc.com");
 
 		// THEN
 		assertThat(transactionRepository.count()).isEqualTo(2L);
 		transactionRepository.findAll().forEach(transaction -> assertThat(transaction.getSender()).isNull());
+		transactionRepository.findAll().forEach(transaction -> assertThat(transaction.getReceiver()).isNull());
 	}
 
 	@Test
@@ -135,28 +138,25 @@ class TransactionRepositoryIT {
 		Calendar dateMonthLimit = (GregorianCalendar) dateTransaction.clone();
 		dateMonthLimit.set(Calendar.HOUR_OF_DAY, 0);
 		dateMonthLimit.set(Calendar.MINUTE, 0);
-		dateMonthLimit.set(Calendar.SECOND, 0);		
+		dateMonthLimit.set(Calendar.SECOND, 0);
+		dateMonthLimit.set(Calendar.MILLISECOND, 0);		
 		Timestamp beginDate = new Timestamp(dateMonthLimit.getTimeInMillis());
-
-		dateMonthLimit.set(Calendar.DATE, dateMonthLimit.getActualMaximum(Calendar.DATE)); // Go to the last day of Month
-		dateMonthLimit.set(Calendar.HOUR_OF_DAY, 23);
-		dateMonthLimit.set(Calendar.MINUTE, 59);
-		dateMonthLimit.set(Calendar.SECOND, 59);
+		dateMonthLimit.add(Calendar.MONTH, 1);
 		Timestamp endDate = new Timestamp(dateMonthLimit.getTimeInMillis());
 		for (int i = 1; i <= 4; i++) { // loops 4 times
-			Transaction transactionAtoB = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // 100+200+300+400
+			Transaction transactionAtoB = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // 100+200+300+400 = 1000 fee = 5 A
 			transactionAtoB = transactionRepository.save(transactionAtoB);
 			registeredA.addSendedTransaction(transactionAtoB);
 			registeredB.addReceivedTransaction(transactionAtoB);
 			transactionAtoB = transactionRepository.save(transactionAtoB);
 
-			Transaction transactionAtoC = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // SUM = 1000
+			Transaction transactionAtoC = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // 100+200+300+400 = 1000 fee = 5 A
 			transactionAtoC = transactionRepository.save(transactionAtoC);
 			registeredA.addSendedTransaction(transactionAtoC);
 			registeredC.addReceivedTransaction(transactionAtoC);
 			transactionAtoC = transactionRepository.save(transactionAtoC);
 
-			Transaction transactionBtoC = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // Expected fee sum = 5*2
+			Transaction transactionBtoC = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // 100+200+300+400 = 1000 fee = 5 B
 			transactionBtoC = transactionRepository.save(transactionBtoC);
 			registeredB.addSendedTransaction(transactionBtoC);
 			registeredC.addReceivedTransaction(transactionBtoC);
@@ -187,9 +187,10 @@ class TransactionRepositoryIT {
 
 		// WHEN
 		double result = transactionRepository.feeSumForARegisteredBetweenDate(beginDate, endDate, "aaa@aaa.com");
-
+		double resultAll = transactionRepository.feeSumBetweenDate(beginDate, endDate);
 		// THEN
 		assertThat(result).isEqualTo(10.0);
+		assertThat(resultAll).isEqualTo(15.0);
 	}
 
 	@Test

@@ -57,11 +57,9 @@ public class Transaction implements Serializable {
 	private Registered receiver;
 
 	public Transaction() {
-		super();
 	}
 	
 	public Transaction(Timestamp dateTime, double amount) {
-		super();
 		this.dateTime = dateTime;
 		this.amount = amount;
 		monetize();

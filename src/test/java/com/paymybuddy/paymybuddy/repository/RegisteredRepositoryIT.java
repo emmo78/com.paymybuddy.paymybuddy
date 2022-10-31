@@ -31,7 +31,7 @@ import com.paymybuddy.paymybuddy.model.Registered;
 class RegisteredRepositoryIT {
 
 	@Autowired
-	RegisteredRepository registeredRepository;
+	private RegisteredRepository registeredRepository;
 
 	Registered registeredA;
 	Registered registeredB;
