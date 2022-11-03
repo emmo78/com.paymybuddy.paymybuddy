@@ -2,8 +2,6 @@ package com.paymybuddy.paymybuddy.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,9 +43,9 @@ class TransactionRepositoryIT {
 
 	@BeforeEach
 	public void setUpPerTest() {
-		registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", Date.valueOf(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "aaaIban");
-		registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", Date.valueOf(LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "bbbIban");
-		registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", Date.valueOf(LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "cccIban");
+		registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+		registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
+		registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "cccIban");
 
 		registeredRepository.save(registeredA);
 		registeredRepository.save(registeredB);
@@ -68,12 +66,12 @@ class TransactionRepositoryIT {
 	@Transactional
 	void transactionsASendToBAndCMergeCascadeShouldUpdateTheirList() {
 		// GIVEN
-		Transaction transactionAtoB = new Transaction(Timestamp.valueOf(LocalDateTime.now()), 100);
+		Transaction transactionAtoB = new Transaction(LocalDateTime.now(), 100);
 		transactionAtoB = transactionRepository.save(transactionAtoB);
 		registeredA.addSendedTransaction(transactionAtoB);
 		registeredB.addReceivedTransaction(transactionAtoB);
 
-		Transaction transactionAtoC = new Transaction(Timestamp.valueOf(LocalDateTime.now()), 200);
+		Transaction transactionAtoC = new Transaction(LocalDateTime.now(), 200);
 		transactionAtoC = transactionRepository.save(transactionAtoC);
 		registeredA.addSendedTransaction(transactionAtoC);
 		registeredC.addReceivedTransaction(transactionAtoC);
@@ -102,12 +100,12 @@ class TransactionRepositoryIT {
 	// transient instance before flushing
 	void afterASendedToBandCAllremoveFromApplicationSoAllFKShouldBeNull() {
 		// GIVEN
-		Transaction transactionAtoB = new Transaction(Timestamp.valueOf(LocalDateTime.now()), 100);
+		Transaction transactionAtoB = new Transaction(LocalDateTime.now(), 100);
 		transactionAtoB = transactionRepository.save(transactionAtoB);
 		registeredA.addSendedTransaction(transactionAtoB);
 		registeredB.addReceivedTransaction(transactionAtoB);
 
-		Transaction transactionAtoC = new Transaction(Timestamp.valueOf(LocalDateTime.now()), 200);
+		Transaction transactionAtoC = new Transaction(LocalDateTime.now(), 200);
 		transactionAtoC = transactionRepository.save(transactionAtoC);
 		registeredA.addSendedTransaction(transactionAtoC);
 		registeredC.addReceivedTransaction(transactionAtoC);
@@ -140,23 +138,26 @@ class TransactionRepositoryIT {
 		dateMonthLimit.set(Calendar.MINUTE, 0);
 		dateMonthLimit.set(Calendar.SECOND, 0);
 		dateMonthLimit.set(Calendar.MILLISECOND, 0);		
-		Timestamp beginDate = new Timestamp(dateMonthLimit.getTimeInMillis());
+		LocalDateTime beginDate = LocalDateTime.ofInstant(dateMonthLimit.toInstant(), dateMonthLimit.getTimeZone().toZoneId()); //(dateMonthLimit);
 		dateMonthLimit.add(Calendar.MONTH, 1);
-		Timestamp endDate = new Timestamp(dateMonthLimit.getTimeInMillis());
+		LocalDateTime endDate = LocalDateTime.ofInstant(dateMonthLimit.toInstant(), dateMonthLimit.getTimeZone().toZoneId());
+		LocalDateTime dateTimeTransaction = null;
 		for (int i = 1; i <= 4; i++) { // loops 4 times
-			Transaction transactionAtoB = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // 100+200+300+400 = 1000 fee = 5 A
+			dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), dateTransaction.getTimeZone().toZoneId());
+			
+			Transaction transactionAtoB = new Transaction(dateTimeTransaction, 100 * i); // 100+200+300+400 = 1000 fee = 5 A
 			transactionAtoB = transactionRepository.save(transactionAtoB);
 			registeredA.addSendedTransaction(transactionAtoB);
 			registeredB.addReceivedTransaction(transactionAtoB);
 			transactionAtoB = transactionRepository.save(transactionAtoB);
 
-			Transaction transactionAtoC = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // 100+200+300+400 = 1000 fee = 5 A
+			Transaction transactionAtoC = new Transaction(dateTimeTransaction, 100 * i); // 100+200+300+400 = 1000 fee = 5 A
 			transactionAtoC = transactionRepository.save(transactionAtoC);
 			registeredA.addSendedTransaction(transactionAtoC);
 			registeredC.addReceivedTransaction(transactionAtoC);
 			transactionAtoC = transactionRepository.save(transactionAtoC);
 
-			Transaction transactionBtoC = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // 100+200+300+400 = 1000 fee = 5 B
+			Transaction transactionBtoC = new Transaction(dateTimeTransaction, 100 * i); // 100+200+300+400 = 1000 fee = 5 B
 			transactionBtoC = transactionRepository.save(transactionBtoC);
 			registeredB.addSendedTransaction(transactionBtoC);
 			registeredC.addReceivedTransaction(transactionBtoC);
@@ -167,19 +168,20 @@ class TransactionRepositoryIT {
 		}
 		dateTransaction.set(Calendar.DATE, 4);
 		dateTransaction.add(Calendar.MONTH, 1);
-		Transaction transactionAtoB = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 500);
+		dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), dateTransaction.getTimeZone().toZoneId());
+		Transaction transactionAtoB = new Transaction(dateTimeTransaction, 500);
 		transactionAtoB = transactionRepository.save(transactionAtoB);
 		registeredA.addSendedTransaction(transactionAtoB);
 		registeredB.addReceivedTransaction(transactionAtoB);
 		transactionAtoB = transactionRepository.save(transactionAtoB);
 
-		Transaction transactionAtoC = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 500);
+		Transaction transactionAtoC = new Transaction(dateTimeTransaction, 500);
 		transactionAtoC = transactionRepository.save(transactionAtoC);
 		registeredA.addSendedTransaction(transactionAtoC);
 		registeredC.addReceivedTransaction(transactionAtoC);
 		transactionAtoC = transactionRepository.save(transactionAtoC);
 
-		Transaction transactionBtoC = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 500);
+		Transaction transactionBtoC = new Transaction(dateTimeTransaction, 500);
 		transactionBtoC = transactionRepository.save(transactionBtoC);
 		registeredB.addSendedTransaction(transactionBtoC);
 		registeredC.addReceivedTransaction(transactionBtoC);
@@ -204,14 +206,17 @@ class TransactionRepositoryIT {
 													// -1) sets the calendar to 01/12/2021
 		List<Transaction> transactionsBExpected = new ArrayList<>();
 		for (int i = 1; i <= 5; i++) { // loops 5 times
-			Transaction transactionAtoB = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i); // 100+200+300+400+500
+			LocalDateTime dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), dateTransaction.getTimeZone().toZoneId());
+			Transaction transactionAtoB = new Transaction(dateTimeTransaction, 100 * i); // 100+200+300+400+500
 			transactionAtoB = transactionRepository.save(transactionAtoB);
 			registeredA.addSendedTransaction(transactionAtoB);
 			registeredB.addReceivedTransaction(transactionAtoB);
 			transactionAtoB = transactionRepository.save(transactionAtoB);
 			transactionsBExpected.add(transactionAtoB);
+			
 			dateTransaction.add(Calendar.HOUR_OF_DAY, 1);
-			Transaction transactionBtoC = new Transaction(new Timestamp(dateTransaction.getTimeInMillis()), 100 * i);
+			dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), dateTransaction.getTimeZone().toZoneId());
+			Transaction transactionBtoC = new Transaction(dateTimeTransaction, 100 * i);
 			transactionBtoC = transactionRepository.save(transactionBtoC);
 			registeredB.addSendedTransaction(transactionBtoC);
 			registeredC.addReceivedTransaction(transactionBtoC);

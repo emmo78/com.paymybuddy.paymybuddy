@@ -2,7 +2,6 @@ package com.paymybuddy.paymybuddy.dto.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -25,7 +24,7 @@ class RegisterdDTOServiceImplTest {
 	@DisplayName("test registeredToDTO should not map password")
 	public void registeredToDTOTestShouldNotMapPassword() {
 		//GIVEN
-		Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", Date.valueOf(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "aaaIban");
+		Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("21/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 		
 		//WHEN
 		RegisteredDTO registeredDTOResult = registerdDTOService.registeredToDTO(registered);
@@ -43,7 +42,7 @@ class RegisterdDTOServiceImplTest {
 						null,
 						"Aaa",
 						"AAA",
-						Date.valueOf(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy"))),
+						"21/01/1991",
 						"aaaIban",
 						0.0);
 	}
@@ -52,7 +51,7 @@ class RegisterdDTOServiceImplTest {
 	@DisplayName("test registeredToForListDTO should not map password")
 	public void registeredToForListDTOTestShouldNotMapPassword() {
 		//GIVEN
-		Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", Date.valueOf(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "aaaIban");
+		Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("21/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 		
 		//WHEN
 		RegisteredForListDTO registeredForListDTOResult = registerdDTOService.registeredToForListDTO(registered);
@@ -77,7 +76,7 @@ class RegisterdDTOServiceImplTest {
 		registeredDTO.setPassword("aaaPasswd");
 		registeredDTO.setFirstName("Aaa");
 		registeredDTO.setLastName("AAA");
-		registeredDTO.setBirthDate(Date.valueOf(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+		registeredDTO.setBirthDate("21/01/1991");
 		registeredDTO.setIban("aaaIban");
 		registeredDTO.setBalance(0.0);
 
@@ -97,7 +96,7 @@ class RegisterdDTOServiceImplTest {
 						"aaaPasswd",
 						"Aaa",
 						"AAA",
-						Date.valueOf(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy"))),
+						LocalDate.parse("21/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")),
 						"aaaIban",
 						0.0);
 	}

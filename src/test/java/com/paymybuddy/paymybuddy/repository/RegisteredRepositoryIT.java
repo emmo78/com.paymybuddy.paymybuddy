@@ -2,7 +2,6 @@ package com.paymybuddy.paymybuddy.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -41,11 +40,11 @@ class RegisteredRepositoryIT {
 
 	@BeforeEach
 	public void setUpPerTest() {
-		registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", Date.valueOf(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "aaaIban");
-		registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", Date.valueOf(LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "bbbIban");
-		registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", Date.valueOf(LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "cccIban");
-		registeredD = new Registered("ddd@ddd.com", "dddPasswd", "Ddd", "DDD", Date.valueOf(LocalDate.parse("04/04/1994", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "dddIban");
-		registeredE = new Registered("eee@ddd.com", "eeePasswd", "Eee", "DDD", Date.valueOf(LocalDate.parse("05/05/1994", DateTimeFormatter.ofPattern("dd/MM/yyyy"))), "eeeIban");
+		registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+		registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
+		registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "cccIban");
+		registeredD = new Registered("ddd@ddd.com", "dddPasswd", "Ddd", "DDD", LocalDate.parse("04/04/1994", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "dddIban");
+		registeredE = new Registered("eee@ddd.com", "eeePasswd", "Eee", "DDD", LocalDate.parse("05/05/1994", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "eeeIban");
 
 		registeredRepository.save(registeredA);
 		registeredRepository.save(registeredB);

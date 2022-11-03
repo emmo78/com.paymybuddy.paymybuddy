@@ -3,7 +3,7 @@ package com.paymybuddy.paymybuddy.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -40,7 +40,7 @@ public class Transaction implements Serializable {
 	private long transactionId;
 
 	@Column(name = "date_time")
-	private Timestamp dateTime;
+	private LocalDateTime dateTime;
 
 	@Column(name = "amount")
 	private double amount;
@@ -59,7 +59,7 @@ public class Transaction implements Serializable {
 	public Transaction() {
 	}
 	
-	public Transaction(Timestamp dateTime, double amount) {
+	public Transaction(LocalDateTime dateTime, double amount) {
 		this.dateTime = dateTime;
 		this.amount = amount;
 		monetize();

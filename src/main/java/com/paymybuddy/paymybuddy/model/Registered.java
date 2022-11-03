@@ -1,7 +1,7 @@
 package com.paymybuddy.paymybuddy.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +50,7 @@ public class Registered implements Serializable {
 	private String lastName;
 
 	@Column(name = "birth_date")
-	private Date birthDate;
+	private LocalDate birthDate;
 
 	@Column(name = "iban")
 	private String iban;
@@ -74,7 +74,7 @@ public class Registered implements Serializable {
 	public Registered() {
 	}
 
-	public Registered(String email, String password, String firstName, String lastName, Date birthDate, String iban) {
+	public Registered(String email, String password, String firstName, String lastName, LocalDate birthDate, String iban) {
 		this.email = email;
 		this.password = password;
 		this.firstName = firstName;
