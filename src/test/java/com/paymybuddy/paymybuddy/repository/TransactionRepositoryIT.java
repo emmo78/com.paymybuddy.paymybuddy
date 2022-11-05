@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -138,12 +139,12 @@ class TransactionRepositoryIT {
 		dateMonthLimit.set(Calendar.MINUTE, 0);
 		dateMonthLimit.set(Calendar.SECOND, 0);
 		dateMonthLimit.set(Calendar.MILLISECOND, 0);		
-		LocalDateTime beginDate = LocalDateTime.ofInstant(dateMonthLimit.toInstant(), dateMonthLimit.getTimeZone().toZoneId()); //(dateMonthLimit);
+		LocalDateTime beginDate = LocalDateTime.ofInstant(dateMonthLimit.toInstant(), ZoneId.systemDefault()); //(dateMonthLimit);
 		dateMonthLimit.add(Calendar.MONTH, 1);
-		LocalDateTime endDate = LocalDateTime.ofInstant(dateMonthLimit.toInstant(), dateMonthLimit.getTimeZone().toZoneId());
+		LocalDateTime endDate = LocalDateTime.ofInstant(dateMonthLimit.toInstant(), ZoneId.systemDefault());
 		LocalDateTime dateTimeTransaction = null;
 		for (int i = 1; i <= 4; i++) { // loops 4 times
-			dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), dateTransaction.getTimeZone().toZoneId());
+			dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), ZoneId.systemDefault());
 			
 			Transaction transactionAtoB = new Transaction(dateTimeTransaction, 100 * i); // 100+200+300+400 = 1000 fee = 5 A
 			transactionAtoB = transactionRepository.save(transactionAtoB);
@@ -168,7 +169,7 @@ class TransactionRepositoryIT {
 		}
 		dateTransaction.set(Calendar.DATE, 4);
 		dateTransaction.add(Calendar.MONTH, 1);
-		dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), dateTransaction.getTimeZone().toZoneId());
+		dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), ZoneId.systemDefault());
 		Transaction transactionAtoB = new Transaction(dateTimeTransaction, 500);
 		transactionAtoB = transactionRepository.save(transactionAtoB);
 		registeredA.addSendedTransaction(transactionAtoB);
@@ -206,7 +207,7 @@ class TransactionRepositoryIT {
 													// -1) sets the calendar to 01/12/2021
 		List<Transaction> transactionsBExpected = new ArrayList<>();
 		for (int i = 1; i <= 5; i++) { // loops 5 times
-			LocalDateTime dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), dateTransaction.getTimeZone().toZoneId());
+			LocalDateTime dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), ZoneId.systemDefault());
 			Transaction transactionAtoB = new Transaction(dateTimeTransaction, 100 * i); // 100+200+300+400+500
 			transactionAtoB = transactionRepository.save(transactionAtoB);
 			registeredA.addSendedTransaction(transactionAtoB);
@@ -215,7 +216,7 @@ class TransactionRepositoryIT {
 			transactionsBExpected.add(transactionAtoB);
 			
 			dateTransaction.add(Calendar.HOUR_OF_DAY, 1);
-			dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), dateTransaction.getTimeZone().toZoneId());
+			dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), ZoneId.systemDefault());
 			Transaction transactionBtoC = new Transaction(dateTimeTransaction, 100 * i);
 			transactionBtoC = transactionRepository.save(transactionBtoC);
 			registeredB.addSendedTransaction(transactionBtoC);

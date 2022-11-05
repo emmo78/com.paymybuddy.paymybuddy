@@ -12,4 +12,6 @@ import lombok.Setter;
 @ConfigurationProperties(prefix = "com.paymybuddy.paymybuddy")
 public class DateTimePatternProperties {
 	private String dateStringPattern;
+	private String dateTimeStringPattern;
+	private String localLanguage;
 }

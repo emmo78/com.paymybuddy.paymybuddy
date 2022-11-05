@@ -17,5 +17,5 @@ public class RegisteredDTO {
 	private String lastName;
 	private String birthDate;
 	private String iban;
-	private double balance;
+	private String balance;
 }

@@ -1,30 +1,43 @@
 package com.paymybuddy.paymybuddy.dto.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
 import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.model.Registered;
 
 @SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class RegisterdDTOServiceImplTest {
 	
 	@Autowired
-	private RegisteredDTOService registerdDTOService;
+	@InjectMocks
+	private RegisteredDTOServiceImpl registerdDTOService;
+	
+	@Mock
+	private DateTimePatternProperties dateStringPattern;
 	
 	@Test
 	@DisplayName("test registeredToDTO should not map password")
 	public void registeredToDTOTestShouldNotMapPassword() {
 		//GIVEN
-		Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("21/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+		Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+		when(dateStringPattern.getDateStringPattern()).thenReturn("MM/dd/yyyy");
+		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
 		
 		//WHEN
 		RegisteredDTO registeredDTOResult = registerdDTOService.registeredToDTO(registered);
@@ -42,16 +55,16 @@ class RegisterdDTOServiceImplTest {
 						null,
 						"Aaa",
 						"AAA",
-						"21/01/1991",
+						"01/21/1991",
 						"aaaIban",
-						0.0);
+						"0.00");
 	}
 	
 	@Test
 	@DisplayName("test registeredToForListDTO should not map password")
 	public void registeredToForListDTOTestShouldNotMapPassword() {
 		//GIVEN
-		Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("21/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+		Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
 		
 		//WHEN
 		RegisteredForListDTO registeredForListDTOResult = registerdDTOService.registeredToForListDTO(registered);
@@ -76,9 +89,10 @@ class RegisterdDTOServiceImplTest {
 		registeredDTO.setPassword("aaaPasswd");
 		registeredDTO.setFirstName("Aaa");
 		registeredDTO.setLastName("AAA");
-		registeredDTO.setBirthDate("21/01/1991");
+		registeredDTO.setBirthDate("01/21/1991");
 		registeredDTO.setIban("aaaIban");
-		registeredDTO.setBalance(0.0);
+		registeredDTO.setBalance("0.00");
+		when(dateStringPattern.getDateStringPattern()).thenReturn("MM/dd/yyyy");
 
 		//WHEN
 		Registered registeredResult = registerdDTOService.registeredFromDTO(registeredDTO);
@@ -96,7 +110,7 @@ class RegisterdDTOServiceImplTest {
 						"aaaPasswd",
 						"Aaa",
 						"AAA",
-						LocalDate.parse("21/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+						LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
 						"aaaIban",
 						0.0);
 	}
