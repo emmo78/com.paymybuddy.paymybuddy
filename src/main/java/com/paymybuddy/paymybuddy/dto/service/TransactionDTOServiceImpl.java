@@ -24,40 +24,61 @@ public class TransactionDTOServiceImpl implements TransactionDTOService {
 	private DateTimePatternProperties dateStringPattern;
 	
 	@Override
-	public TransactionDTO transactionToDTO(Transaction transaction) {
+	public TransactionDTO transactionToDTOSender(Transaction transaction) {
 		Converter<LocalDateTime, String> dateTimeToString = new AbstractConverter<LocalDateTime, String>() {
 			@Override
 			protected String convert(LocalDateTime dateTimme) {
 				return dateTimme.format(DateTimeFormatter.ofPattern(dateStringPattern.getDateTimeStringPattern()));
 			}	
 		};
-		Converter<Double, String> doubleToString = new AbstractConverter<Double, String>() {
+		Converter<Double, String> amountToNegString = new AbstractConverter<Double, String>() {
 			@Override
-			protected String convert(Double balance) {
-				return String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", balance);
+			protected String convert(Double amount) {
+				amount = 0 - amount;
+				return String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", amount);
 			}
 		};
+		Converter<Double, String> feeToString = new AbstractConverter<Double, String>() {
+			@Override
+			protected String convert(Double fee) {
+				return String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", fee);
+			}
+		};
+
 		modelMapper.typeMap(Transaction.class, TransactionDTO.class).addMappings(mapper -> {
 			mapper.using(dateTimeToString).map(Transaction::getDateTime, TransactionDTO::setDateTime);
-			mapper.using(doubleToString).map(Transaction::getAmount, TransactionDTO::setAmount);
-			mapper.using(doubleToString).map(Transaction::getFee, TransactionDTO::setFee);
+			mapper.using(amountToNegString).map(Transaction::getAmount, TransactionDTO::setAmount);
+			mapper.using(feeToString).map(Transaction::getFee, TransactionDTO::setFee);
 			mapper.skip(TransactionDTO::setReceiver);
 		});
-		return modelMapper.map(transaction, TransactionDTO.class);
-	}
-
-	@Override
-	public TransactionDTO transactionToDTOSender(Transaction transaction) {
-		TransactionDTO transactionDTO = transactionToDTO(transaction);
+		TransactionDTO transactionDTO = modelMapper.map(transaction, TransactionDTO.class);
 		transactionDTO.setReceiver(false);
 		return transactionDTO;
 	}
 
 	@Override
 	public TransactionDTO transactionToDTOReceiver(Transaction transaction) {
-		TransactionDTO transactionDTO = transactionToDTO(transaction);
+		Converter<LocalDateTime, String> dateTimeToString = new AbstractConverter<LocalDateTime, String>() {
+			@Override
+			protected String convert(LocalDateTime dateTimme) {
+				return dateTimme.format(DateTimeFormatter.ofPattern(dateStringPattern.getDateTimeStringPattern()));
+			}	
+		};
+		Converter<Double, String> amountToString = new AbstractConverter<Double, String>() {
+			@Override
+			protected String convert(Double amount) {
+				return String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", amount);
+			}
+		};
+		modelMapper.typeMap(Transaction.class, TransactionDTO.class).addMappings(mapper -> {
+			mapper.using(dateTimeToString).map(Transaction::getDateTime, TransactionDTO::setDateTime);
+			mapper.using(amountToString).map(Transaction::getAmount, TransactionDTO::setAmount);
+			mapper.skip(TransactionDTO::setFee);
+			mapper.skip(TransactionDTO::setReceiver);
+		});
+		TransactionDTO transactionDTO = modelMapper.map(transaction, TransactionDTO.class);
+		transactionDTO.setFee("0.00");
 		transactionDTO.setReceiver(true);
 		return transactionDTO;
 	}
-
 }

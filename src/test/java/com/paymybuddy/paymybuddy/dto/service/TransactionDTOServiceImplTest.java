@@ -36,8 +36,8 @@ public class TransactionDTOServiceImplTest {
 	private DateTimePatternProperties dateStringPattern;
 
 	@Test
-	@DisplayName("test transactionToDTO should convert Date Time and Double to en String")
-	public void transactionToDTOTestShouldConvertDateTimeAndDoubleToEnString() {
+	@DisplayName("test transactionToDTOSender should have receiver false and negative amount")
+	public void transactionToDTOSenderTestShouldHaveReceiverFalseAndNegativeAmount() {
 		//GIVEN
 		Calendar calTransaction = new GregorianCalendar(2022, 9, 23, 18, 43, 55); //Month value is 0-based. e.g., 0 for January.
 		LocalDateTime dateTimeTransaction = LocalDateTime.ofInstant(calTransaction.toInstant(), ZoneId.systemDefault());
@@ -50,7 +50,7 @@ public class TransactionDTOServiceImplTest {
 		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
 
 		//WHEN
-		TransactionDTO transactionDTOresult = transactionDTOService.transactionToDTO(transaction);
+		TransactionDTO transactionDTOresult = transactionDTOService.transactionToDTOSender(transaction);
 		
 		//THEN
 		assertThat(transactionDTOresult).extracting(
@@ -58,38 +58,30 @@ public class TransactionDTOServiceImplTest {
 				TransactionDTO::getAmount,
 				TransactionDTO::getFee,
 				TransactionDTO::getEmailSender,
-				TransactionDTO::getEmailReceiver
+				TransactionDTO::getEmailReceiver,
+				TransactionDTO::isReceiver
 				).containsExactly(
 						"10/23/2022 18:43:55",
-						"100.00",
+						"-100.00",
 						"0.50",
 						"aaa@aaa.com",
-						"bbb@bbb.com"
+						"bbb@bbb.com",
+						false
 				);
 	}
 	
-	@Test
-	@DisplayName("test transactionToDTOSender should have receiver false")
-	public void transactionToDTOSenderTestShouldHaveReceiverFalse() {
-		//GIVEN
-		LocalDateTime dateTimeTransaction = LocalDateTime.now();
-		Transaction transaction = new Transaction(dateTimeTransaction, 100);
-		when(dateStringPattern.getDateTimeStringPattern()).thenReturn("MM/dd/yyyy HH:mm:ss");
-		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
-
-		//WHEN
-		TransactionDTO transactionDTOresult = transactionDTOService.transactionToDTOSender(transaction);
-		
-		//THEN
-		assertThat(transactionDTOresult.isReceiver()).isFalse();
-	}
 
 	@Test
-	@DisplayName("test transactionToDTOReceiver should have receiver true")
-	public void transactionToDTOReceiverTestShouldHaveReceiverTrue() {
+	@DisplayName("test transactionToDTOReceiver should have receiver true and fee to zero")
+	public void transactionToDTOReceiverTestShouldHaveReceiverTrueAndFeeZero() {
 		//GIVEN
-		LocalDateTime dateTimeTransaction = LocalDateTime.now();
+		Calendar calTransaction = new GregorianCalendar(2022, 9, 23, 18, 43, 55); //Month value is 0-based. e.g., 0 for January.
+		LocalDateTime dateTimeTransaction = LocalDateTime.ofInstant(calTransaction.toInstant(), ZoneId.systemDefault());
+		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+		Registered registeredBReceiver = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "bbbIban");
 		Transaction transaction = new Transaction(dateTimeTransaction, 100);
+		transaction.setSender(registeredASender);
+		transaction.setReceiver(registeredBReceiver);
 		when(dateStringPattern.getDateTimeStringPattern()).thenReturn("MM/dd/yyyy HH:mm:ss");
 		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
 
@@ -97,7 +89,21 @@ public class TransactionDTOServiceImplTest {
 		TransactionDTO transactionDTOresult = transactionDTOService.transactionToDTOReceiver(transaction);
 		
 		//THEN
-		assertThat(transactionDTOresult.isReceiver()).isTrue();
+		assertThat(transactionDTOresult).extracting(
+				TransactionDTO::getDateTime,
+				TransactionDTO::getAmount,
+				TransactionDTO::getFee,
+				TransactionDTO::getEmailSender,
+				TransactionDTO::getEmailReceiver,
+				TransactionDTO::isReceiver
+				).containsExactly(
+						"10/23/2022 18:43:55",
+						"100.00",
+						"0.00",
+						"aaa@aaa.com",
+						"bbb@bbb.com",
+						true
+				);
 	}
 
 }
