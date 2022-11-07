@@ -1,5 +1,7 @@
 package com.paymybuddy.paymybuddy.dto.service;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -27,28 +29,22 @@ public class TransactionDTOServiceImpl implements TransactionDTOService {
 	public TransactionDTO transactionToDTOSender(Transaction transaction) {
 		Converter<LocalDateTime, String> dateTimeToString = new AbstractConverter<LocalDateTime, String>() {
 			@Override
-			protected String convert(LocalDateTime dateTimme) {
-				return dateTimme.format(DateTimeFormatter.ofPattern(dateStringPattern.getDateTimeStringPattern()));
+			protected String convert(LocalDateTime dateTime) {
+				return dateTime.format(DateTimeFormatter.ofPattern(dateStringPattern.getDateTimeStringPattern()));
 			}	
 		};
-		Converter<Double, String> amountToNegString = new AbstractConverter<Double, String>() {
+		Converter<Double, String> amountFeeToNegString = new AbstractConverter<Double, String>() {
 			@Override
-			protected String convert(Double amount) {
-				amount = 0 - amount;
-				return String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", amount);
-			}
-		};
-		Converter<Double, String> feeToString = new AbstractConverter<Double, String>() {
-			@Override
-			protected String convert(Double fee) {
-				return String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", fee);
+			protected String convert(Double amountFee) {
+				amountFee = 0 - amountFee;
+				return String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", amountFee);
 			}
 		};
 
 		modelMapper.typeMap(Transaction.class, TransactionDTO.class).addMappings(mapper -> {
 			mapper.using(dateTimeToString).map(Transaction::getDateTime, TransactionDTO::setDateTime);
-			mapper.using(amountToNegString).map(Transaction::getAmount, TransactionDTO::setAmount);
-			mapper.using(feeToString).map(Transaction::getFee, TransactionDTO::setFee);
+			mapper.using(amountFeeToNegString).map(Transaction::getAmount, TransactionDTO::setAmount);
+			mapper.using(amountFeeToNegString).map(Transaction::getFee, TransactionDTO::setFee);
 			mapper.skip(TransactionDTO::setReceiver);
 		});
 		TransactionDTO transactionDTO = modelMapper.map(transaction, TransactionDTO.class);
@@ -81,4 +77,31 @@ public class TransactionDTOServiceImpl implements TransactionDTOService {
 		transactionDTO.setReceiver(true);
 		return transactionDTO;
 	}
+	@Override
+	public Transaction transactionFromNewTransactionDTO(TransactionDTO transactionDTO) {
+		Converter<String, Double> stringToDouble = new AbstractConverter<String, Double>() {
+			@Override
+			protected Double convert(String amountString) {
+				Double amount = null;
+				try { 
+					amount = NumberFormat.getInstance(new Locale(dateStringPattern.getLocalLanguage())).parse(amountString).doubleValue();
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return amount;
+			}
+		};
+		modelMapper.typeMap(TransactionDTO.class, Transaction.class).addMappings(mapper -> {
+			mapper.using(stringToDouble).map(TransactionDTO::getAmount, Transaction::setAmount);
+			mapper.skip(Transaction::setDateTime);
+			mapper.skip(Transaction::setFee);
+		});
+		Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
+		transaction.setDateTime(LocalDateTime.now());
+		transaction.monetize();
+		return transaction;
+	}
+	
+	
 }

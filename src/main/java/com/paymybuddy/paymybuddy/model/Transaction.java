@@ -20,6 +20,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -29,6 +30,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor
 public class Transaction implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -56,9 +58,6 @@ public class Transaction implements Serializable {
 	@JoinColumn(name = "email_receiver")
 	private Registered receiver;
 
-	public Transaction() {
-	}
-	
 	public Transaction(LocalDateTime dateTime, double amount) {
 		this.dateTime = dateTime;
 		this.amount = amount;

@@ -15,8 +15,8 @@ public interface RegisteredService {
 	RegisteredDTO updateRegistered(RegisteredDTO registeredDTO);
 	void removeRegistered(String email);
 	Page<RegisteredForListDTO> getAllRegistered(Pageable pageRequest); // for admin
-	Page<RegisteredForListDTO> getAllConnectedToARegistered(Pageable pageRequest);
-	Page<RegisteredForListDTO> getAllNotConnectedToARegistered(Pageable pageRequest);
+	Page<RegisteredForListDTO> getAllConnectedToARegistered(String email, Pageable pageRequest);
+	Page<RegisteredForListDTO> getAllNotConnectedToARegistered(String email, Pageable pageRequest);
 	Optional<String> getRegisteredIban(String email);
 	String saveUpdateRegisteredIban(String email, String iban);
 	void resetRegisteredPassword(String email);

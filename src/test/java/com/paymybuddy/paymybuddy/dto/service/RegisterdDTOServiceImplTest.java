@@ -36,6 +36,7 @@ class RegisterdDTOServiceImplTest {
 	public void registeredToDTOTestShouldNotMapPassword() {
 		//GIVEN
 		Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+		registered.setBalance(100);
 		when(dateStringPattern.getDateStringPattern()).thenReturn("MM/dd/yyyy");
 		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
 		
@@ -57,7 +58,7 @@ class RegisterdDTOServiceImplTest {
 						"AAA",
 						"01/21/1991",
 						"aaaIban",
-						"0.00");
+						"100.00");
 	}
 	
 	@Test
@@ -91,7 +92,7 @@ class RegisterdDTOServiceImplTest {
 		registeredDTO.setLastName("AAA");
 		registeredDTO.setBirthDate("01/21/1991");
 		registeredDTO.setIban("aaaIban");
-		registeredDTO.setBalance("0.00");
+		registeredDTO.setBalance("100.00");
 		when(dateStringPattern.getDateStringPattern()).thenReturn("MM/dd/yyyy");
 
 		//WHEN
@@ -112,7 +113,7 @@ class RegisterdDTOServiceImplTest {
 						"AAA",
 						LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
 						"aaaIban",
-						0.0);
+						100d);
 	}
 
 }

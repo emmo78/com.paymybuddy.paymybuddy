@@ -22,6 +22,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -31,6 +32,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor
 public class Registered implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -71,9 +73,6 @@ public class Registered implements Serializable {
 	@OneToMany(mappedBy = "receiver", cascade = CascadeType.REFRESH)
 	private List<Transaction> receivedTransactions = new ArrayList<>();
 	
-	public Registered() {
-	}
-
 	public Registered(String email, String password, String firstName, String lastName, LocalDate birthDate, String iban) {
 		this.email = email;
 		this.password = password;

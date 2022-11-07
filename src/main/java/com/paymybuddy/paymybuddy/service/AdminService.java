@@ -7,5 +7,5 @@ public interface AdminService {
 	//will use TransanctionRepository : feeSumForARegisteredBetweenDate(beginDate: Timestamp, endDate: Timestamp, email: String): double;
 	//and see TransactionRepositoryIT : testFeeSumForARegisteredBetweenDateShouldReturnTen() for example using Calendar
 	double getAllFeesSumForAPeriod(LocalDate beginDate, LocalDate endDate);
-	//will use TransanctionRepository : feeSumBetweenDate(beginDate: Timestamp, endDate: Timestamp): double;
+	//will use TransactionRepository : feeSumBetweenDate(beginDate: Timestamp, endDate: Timestamp): double;
 }

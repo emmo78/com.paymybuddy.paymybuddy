@@ -1,12 +1,14 @@
 package com.paymybuddy.paymybuddy.dto.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -63,13 +65,12 @@ public class TransactionDTOServiceImplTest {
 				).containsExactly(
 						"10/23/2022 18:43:55",
 						"-100.00",
-						"0.50",
+						"-0.50",
 						"aaa@aaa.com",
 						"bbb@bbb.com",
 						false
 				);
 	}
-	
 
 	@Test
 	@DisplayName("test transactionToDTOReceiver should have receiver true and fee to zero")
@@ -105,5 +106,31 @@ public class TransactionDTOServiceImplTest {
 						true
 				);
 	}
-
+	
+	@Test
+	@DisplayName("test transactionFromNewTransactionDTO should have LocalDateTime.now() and fee")
+	public void transactionFromNewTransactionDTOTestShouldHaveLocalDateTimeNowAndFee() {
+		//GIVEN
+		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+		transactionDTO.setAmount("100.00");
+		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
+		
+		//WHEN
+		Transaction transactionExpected = transactionDTOService.transactionFromNewTransactionDTO(transactionDTO);
+		
+		//THEN
+		assertThat(transactionExpected).extracting(
+				Transaction::getAmount,
+				Transaction::getFee,
+				transaction -> transaction.getSender().getEmail(),
+				transaction -> transaction.getReceiver().getEmail()
+				).containsExactly(
+						100d,
+						0.5,
+						"aaa@aaa.com",
+						"bbb@bbb.com"
+						);
+		assertThat(transactionExpected.getDateTime()).isCloseTo(LocalDateTime.now(), within(2, ChronoUnit.SECONDS));
+	}
+	
 }
