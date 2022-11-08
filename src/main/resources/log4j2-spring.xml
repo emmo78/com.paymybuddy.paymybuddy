@@ -31,7 +31,10 @@
         <!-- LOG at ERROR level -->
         <Logger name="org.springframework.boot.autoconfigure" level="error"></Logger>
         <Logger name="org.springframework.boot.web.embedded.tomcat" level="error"></Logger>
+		<Logger name="com.paymybuddy.paymybuddy" level="error"></Logger>
  
         <!-- LOG at DEBUG level -->
+		<Logger name="com.paymybuddy.paymybuddy.configuration" level="debug"></Logger>
+		<Logger name="com.paymybuddy.paymybuddy.service" level="debug"></Logger>
     </Loggers>
 </Configuration>

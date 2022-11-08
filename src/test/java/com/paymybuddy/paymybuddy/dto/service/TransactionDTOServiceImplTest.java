@@ -2,6 +2,7 @@ package com.paymybuddy.paymybuddy.dto.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -133,4 +135,16 @@ public class TransactionDTOServiceImplTest {
 		assertThat(transactionExpected.getDateTime()).isCloseTo(LocalDateTime.now(), within(2, ChronoUnit.SECONDS));
 	}
 	
+	@Test
+	@DisplayName("test transactionFromNewTransactionDTO should throw a MappingException")
+	public void transactionFromNewTransactionDTOTestShouldThrowMappingException() {
+		//GIVEN
+		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+		transactionDTO.setAmount("A");
+		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
+		
+		//WHEN
+		//THEN
+		assertThrows(MappingException.class, () -> transactionDTOService.transactionFromNewTransactionDTO(transactionDTO));
+	}
 }

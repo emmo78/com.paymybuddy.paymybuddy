@@ -8,12 +8,14 @@ import java.util.Locale;
 
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
+import org.modelmapper.MappingException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
 import com.paymybuddy.paymybuddy.dto.TransactionDTO;
+import com.paymybuddy.paymybuddy.exception.ParseRuntimeException;
 import com.paymybuddy.paymybuddy.model.Transaction;
 
 @Service
@@ -78,7 +80,7 @@ public class TransactionDTOServiceImpl implements TransactionDTOService {
 		return transactionDTO;
 	}
 	@Override
-	public Transaction transactionFromNewTransactionDTO(TransactionDTO transactionDTO) {
+	public Transaction transactionFromNewTransactionDTO(TransactionDTO transactionDTO) throws MappingException{
 		Converter<String, Double> stringToDouble = new AbstractConverter<String, Double>() {
 			@Override
 			protected Double convert(String amountString) {
@@ -86,8 +88,7 @@ public class TransactionDTOServiceImpl implements TransactionDTOService {
 				try { 
 					amount = NumberFormat.getInstance(new Locale(dateStringPattern.getLocalLanguage())).parse(amountString).doubleValue();
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new ParseRuntimeException(e.getMessage());
 				}
 				return amount;
 			}
@@ -101,7 +102,5 @@ public class TransactionDTOServiceImpl implements TransactionDTOService {
 		transaction.setDateTime(LocalDateTime.now());
 		transaction.monetize();
 		return transaction;
-	}
-	
-	
+	}	
 }
