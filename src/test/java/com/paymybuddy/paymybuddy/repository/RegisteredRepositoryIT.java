@@ -16,6 +16,7 @@ import javax.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -64,6 +65,7 @@ class RegisteredRepositoryIT {
 	}
 
 	@Test
+	@Tag("RegisteredRepositoryIT")
 	@DisplayName("registeredA connects B and C should fill their sets")
 	@Transactional
 	public void registeredAconnectsBandCShouldFillTheirSets() {
@@ -98,6 +100,7 @@ class RegisteredRepositoryIT {
 	}
 
 	@Test
+	@Tag("RegisteredRepositoryIT")
 	@DisplayName("registeredB disconnects added A and C should remove them from their sets")
 	@Transactional
 	public void registeredBDisconnectsAddedAandCShouldRemoveThemFromTheirSets() {
@@ -143,6 +146,7 @@ class RegisteredRepositoryIT {
 	}
 
 	@Test
+	@Tag("RegisteredRepositoryIT")
 	@DisplayName("test findAllConnectedToEmail should return expected pages")
 	@Transactional
 	public void testFindAllConnectedToEmailShouldReturnExpectedPages() {
@@ -174,6 +178,7 @@ class RegisteredRepositoryIT {
 	}
 
 	@Test
+	@Tag("RegisteredRepositoryIT")
 	@DisplayName("test findAllNotConnectedToEmail should return expected pages")
 	@Transactional
 	public void testFindAllNotConnectedToEmailShouldReturnExpectedPages() {

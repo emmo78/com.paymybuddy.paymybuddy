@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,7 +23,7 @@ import com.paymybuddy.paymybuddy.model.Registered;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-class RegisterdDTOServiceImplTest {
+class RegisterdDTOServiceTest {
 	
 	@Autowired
 	@InjectMocks
@@ -32,6 +33,7 @@ class RegisterdDTOServiceImplTest {
 	private DateTimePatternProperties dateStringPattern;
 	
 	@Test
+	@Tag("RegisterdDTOServiceTest")
 	@DisplayName("test registeredToDTO should not map password")
 	public void registeredToDTOTestShouldNotMapPassword() {
 		//GIVEN
@@ -62,6 +64,7 @@ class RegisterdDTOServiceImplTest {
 	}
 	
 	@Test
+	@Tag("RegisterdDTOServiceTest")
 	@DisplayName("test registeredToForListDTO should not map password")
 	public void registeredToForListDTOTestShouldNotMapPassword() {
 		//GIVEN
@@ -82,6 +85,7 @@ class RegisterdDTOServiceImplTest {
 	}
 
 	@Test
+	@Tag("RegisterdDTOServiceTest")
 	@DisplayName("test registeredFromDTO should map password")
 	public void registeredFromDTOTestShouldNotMapPassword() {
 		//GIVEN
@@ -115,5 +119,4 @@ class RegisterdDTOServiceImplTest {
 						"aaaIban",
 						100d);
 	}
-
 }

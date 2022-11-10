@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,7 +31,7 @@ import com.paymybuddy.paymybuddy.model.Transaction;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
-public class TransactionDTOServiceImplTest {
+public class TransactionDTOServiceTest {
 	
 	@Autowired
 	@InjectMocks
@@ -40,6 +41,7 @@ public class TransactionDTOServiceImplTest {
 	private DateTimePatternProperties dateStringPattern;
 
 	@Test
+	@Tag("TransactionDTOServiceTest")
 	@DisplayName("test transactionToDTOSender should have receiver false and negative amount")
 	public void transactionToDTOSenderTestShouldHaveReceiverFalseAndNegativeAmount() {
 		//GIVEN
@@ -75,6 +77,7 @@ public class TransactionDTOServiceImplTest {
 	}
 
 	@Test
+	@Tag("TransactionDTOServiceTest")
 	@DisplayName("test transactionToDTOReceiver should have receiver true and fee to zero")
 	public void transactionToDTOReceiverTestShouldHaveReceiverTrueAndFeeZero() {
 		//GIVEN
@@ -110,6 +113,7 @@ public class TransactionDTOServiceImplTest {
 	}
 	
 	@Test
+	@Tag("TransactionDTOServiceTest")
 	@DisplayName("test transactionFromNewTransactionDTO should have LocalDateTime.now() and fee")
 	public void transactionFromNewTransactionDTOTestShouldHaveLocalDateTimeNowAndFee() {
 		//GIVEN
@@ -136,6 +140,7 @@ public class TransactionDTOServiceImplTest {
 	}
 	
 	@Test
+	@Tag("TransactionDTOServiceTest")
 	@DisplayName("test transactionFromNewTransactionDTO should throw a MappingException")
 	public void transactionFromNewTransactionDTOTestShouldThrowMappingException() {
 		//GIVEN

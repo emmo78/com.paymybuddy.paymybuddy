@@ -13,25 +13,18 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
 
-import org.hibernate.Session;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.internal.SessionFactoryBuilderImpl;
-import org.hibernate.boot.spi.SessionFactoryBuilderFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.transaction.annotation.Propagation;
 
 import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.model.Transaction;
@@ -71,6 +64,7 @@ class TransactionRepositoryIT {
 	}
 
 	@Test
+	@Tag("TransactionRepositoryIT")
 	@DisplayName("Transactions A send to B and C merge cascade should update their List")
 	@Transactional
 	void transactionsASendToBAndCMergeCascadeShouldUpdateTheirList() {
@@ -104,6 +98,7 @@ class TransactionRepositoryIT {
 	}
 
 	@Test
+	@Tag("TransactionRepositoryIT")
 	@DisplayName("After A sended to B and C all remove from application, FK for all should be null")
 	// @Transactional//- object references an unsaved transient instance - save the
 	// transient instance before flushing
@@ -134,6 +129,7 @@ class TransactionRepositoryIT {
 	}
 
 	@Test
+	@Tag("TransactionRepositoryIT")
 	@DisplayName("Test feeSumForARegisteredBetweenDate should return 10.0")
 	@Transactional
 	void testFeeSumForARegisteredBetweenDateShouldReturnTen() {
@@ -205,6 +201,7 @@ class TransactionRepositoryIT {
 	}
 
 	@Test
+	@Tag("TransactionRepositoryIT")
 	@DisplayName("Test findAllTransactionsByEmailSenderOrReceiver should return expected pages")
 	@Transactional
 	public void testFindAllTransactionsByEmailSenderOrReceiverShouldReturnExpectedPages() {

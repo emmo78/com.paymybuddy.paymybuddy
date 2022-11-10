@@ -7,6 +7,11 @@ import org.springframework.web.context.request.WebRequest;
 public class RequestServiceImpl implements RequestService {
 
 	@Override
+	public String upperCasingFirstLetter(String word) {
+		return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
+	}
+	
+	@Override
 	public String requestToString(WebRequest request) {
 		StringBuffer parameters = new StringBuffer(request.getDescription(false)+"?"); 
 		request.getParameterMap().forEach((p,v) -> {
