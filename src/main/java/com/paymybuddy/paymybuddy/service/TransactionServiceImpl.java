@@ -45,7 +45,7 @@ public class TransactionServiceImpl implements TransactionService {
 			//Throws: IllegalArgumentException | ResourceNotFoundException
 			registeredRepository.findById(transactionDTO.getEmailSender()).ifPresentOrElse(r -> r.addSendedTransaction(transactionEnclosingScope), () -> {throw new ResourceNotFoundException("Registered sender not found for transaction");});
 			registeredRepository.findById(transactionDTO.getEmailReceiver()).ifPresentOrElse(r -> r.addReceivedTransaction(transactionEnclosingScope), () -> {throw new ResourceNotFoundException("Registered receiver not found for transaction");});
-			//OptimisticLockingFailureException
+			//Throws: IllegalArgumentException | OptimisticLockingFailureException
 			transaction = transactionRepository.save(transactionEnclosingScope);
 		} catch (MappingException | IllegalArgumentException | ResourceNotFoundException | OptimisticLockingFailureException e) {
 			throw new UnexpectedRollbackException(e.getMessage());
