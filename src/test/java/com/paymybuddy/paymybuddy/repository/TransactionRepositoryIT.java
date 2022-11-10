@@ -37,7 +37,7 @@ class TransactionRepositoryIT {
 
 	// Needed for testing
 	@Autowired
-	RegisteredRepository registeredRepository;
+	private RegisteredRepository registeredRepository;
 
 	Registered registeredA;
 	Registered registeredB;
@@ -67,7 +67,7 @@ class TransactionRepositoryIT {
 	@Tag("TransactionRepositoryIT")
 	@DisplayName("Transactions A send to B and C merge cascade should update their List")
 	@Transactional
-	void transactionsASendToBAndCMergeCascadeShouldUpdateTheirList() {
+	public void transactionsASendToBAndCMergeCascadeShouldUpdateTheirList() {
 		// GIVEN
 		Transaction transactionAtoB = new Transaction(LocalDateTime.now(), 100);
 		transactionAtoB = transactionRepository.save(transactionAtoB);
@@ -102,7 +102,7 @@ class TransactionRepositoryIT {
 	@DisplayName("After A sended to B and C all remove from application, FK for all should be null")
 	// @Transactional//- object references an unsaved transient instance - save the
 	// transient instance before flushing
-	void afterASendedToBandCAllremoveFromApplicationSoAllFKShouldBeNull() {
+	public void afterASendedToBandCAllremoveFromApplicationSoAllFKShouldBeNull() {
 		// GIVEN
 		Transaction transactionAtoB = new Transaction(LocalDateTime.now(), 100);
 		transactionAtoB = transactionRepository.save(transactionAtoB);
@@ -132,7 +132,7 @@ class TransactionRepositoryIT {
 	@Tag("TransactionRepositoryIT")
 	@DisplayName("Test feeSumForARegisteredBetweenDate should return 10.0")
 	@Transactional
-	void testFeeSumForARegisteredBetweenDateShouldReturnTen() {
+	public void testFeeSumForARegisteredBetweenDateShouldReturnTen() {
 		// GIVEN
 		Calendar dateTransaction = GregorianCalendar.getInstance();
 		dateTransaction.set(Calendar.DATE, 1); // set date at the begin of month

@@ -4,14 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,13 +18,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.MappingException;
 import org.modelmapper.spi.ErrorMessage;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.WebRequest;
 
 import com.paymybuddy.paymybuddy.dto.TransactionDTO;
 import com.paymybuddy.paymybuddy.dto.service.TransactionDTOService;
-import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.model.Transaction;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 import com.paymybuddy.paymybuddy.repository.TransactionRepository;
