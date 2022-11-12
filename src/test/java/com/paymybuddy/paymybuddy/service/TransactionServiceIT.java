@@ -52,6 +52,7 @@ public class TransactionServiceIT {
 		//GIVEN
 		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 		Registered registeredBReceiver = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
+		registeredASender.setBalance(100.5);
 		registeredRepository.save(registeredASender);
 		registeredRepository.save(registeredBReceiver);
 		
@@ -61,7 +62,6 @@ public class TransactionServiceIT {
 		MockHttpServletRequest requestMock = new MockHttpServletRequest();
 		requestMock.setServerName("http://localhost:8080");
 		requestMock.setRequestURI("/createTransaction");
-		requestMock.setMethod("POST");
 		WebRequest request = new ServletWebRequest(requestMock);
 		
 		//WHEN
@@ -83,23 +83,30 @@ public class TransactionServiceIT {
 						false
 				);
 		assertThat(LocalDateTime.parse(transactionDTOResult.getDateTime(), DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"))).isCloseTo(LocalDateTime.now(), within(2, ChronoUnit.SECONDS));
+		assertThat(registeredRepository.findById("aaa@aaa.com").get().getBalance()).isZero();
+		assertThat(registeredRepository.findById("bbb@bbb.com").get().getBalance()).isEqualTo(100d);
 	}
 	
 	@Test
 	@Tag("TransactionServiceIT")
-	@DisplayName("Test createATransaction should Rollback")
+	@DisplayName("Test createATransaction with ResourceNotFoundException for Receiver should Rollbackon")
 	public void createATransactionTestShouldRollback() {
 		//GIVEN
 		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
+		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+		registeredASender.setBalance(100.5);
+		registeredRepository.save(registeredASender);
 		
 		MockHttpServletRequest requestMock = new MockHttpServletRequest();
 		WebRequest request = new ServletWebRequest(requestMock);
 		
 		//WHEN
 		//THEN
-		assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request));
+		assertThat(assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request)).getMessage()).isEqualTo("Registered receiver not found for transaction");
 		assertThat(transactionRepository.count()).isZero();
+		assertThat(registeredRepository.findById("aaa@aaa.com").get().getBalance()).isEqualTo(100.5);
+	
 	}
 }
 

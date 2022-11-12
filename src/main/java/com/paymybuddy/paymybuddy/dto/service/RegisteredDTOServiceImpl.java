@@ -8,8 +8,6 @@ import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
@@ -26,13 +24,6 @@ public class RegisteredDTOServiceImpl implements RegisteredDTOService {
 	@Autowired
 	private DateTimePatternProperties dateStringPattern;
 	
-	@Bean
-	public CommandLineRunner run() {
-		return args ->{
-			System.out.println();
-		};
-	}
-
 	@Override
 	public RegisteredDTO registeredToDTO(Registered registered) {
 		Converter<LocalDate, String> dateToString = new AbstractConverter<LocalDate, String>() {
