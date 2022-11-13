@@ -21,6 +21,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.paymybuddy.paymybuddy.dto.TransactionDTO;
+import com.paymybuddy.paymybuddy.exception.InsufficentFundsException;
 import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 import com.paymybuddy.paymybuddy.repository.TransactionRepository;
@@ -82,15 +83,39 @@ public class TransactionServiceIT {
 						"bbb@bbb.com",
 						false
 				);
-		assertThat(LocalDateTime.parse(transactionDTOResult.getDateTime(), DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"))).isCloseTo(LocalDateTime.now(), within(2, ChronoUnit.SECONDS));
+		assertThat(LocalDateTime.parse(transactionDTOResult.getDateTime(), DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")))
+			.isCloseTo(LocalDateTime.now(), within(2, ChronoUnit.SECONDS));
 		assertThat(registeredRepository.findById("aaa@aaa.com").get().getBalance()).isZero();
 		assertThat(registeredRepository.findById("bbb@bbb.com").get().getBalance()).isEqualTo(100d);
 	}
 	
 	@Test
 	@Tag("TransactionServiceIT")
-	@DisplayName("Test createATransaction with ResourceNotFoundException for Receiver should Rollbackon")
-	public void createATransactionTestShouldRollback() {
+	@DisplayName("Test createATransaction with InsufficentFundsException should Rollback")
+	public void createATransactionTestShouldRollbackOnInsufficentFundsException() {
+		//GIVEN
+		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+		transactionDTO.setAmount("100.00");
+		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+		registeredASender.setBalance(100.0);
+		registeredRepository.save(registeredASender);
+		
+		MockHttpServletRequest requestMock = new MockHttpServletRequest();
+		WebRequest request = new ServletWebRequest(requestMock);
+		
+		//WHEN
+		//THEN
+		assertThat(assertThrows(InsufficentFundsException.class,
+				() -> transactionService.createATransaction(transactionDTO, request))
+				.getMessage()).isEqualTo("Insufficient funds for transaction : you need to transfert : 0.50 from bank");
+		assertThat(transactionRepository.count()).isZero();
+		assertThat(registeredRepository.findById("aaa@aaa.com").get().getBalance()).isEqualTo(100d);
+	}
+	
+	@Test
+	@Tag("TransactionServiceIT")
+	@DisplayName("Test createATransaction with ResourceNotFoundException for Receiver should Rollback")
+	public void createATransactionTestShouldRollbackOnResourceNotFoundException() {
 		//GIVEN
 		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
@@ -106,7 +131,6 @@ public class TransactionServiceIT {
 		assertThat(assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request)).getMessage()).isEqualTo("Registered receiver not found for transaction");
 		assertThat(transactionRepository.count()).isZero();
 		assertThat(registeredRepository.findById("aaa@aaa.com").get().getBalance()).isEqualTo(100.5);
-	
 	}
 }
 

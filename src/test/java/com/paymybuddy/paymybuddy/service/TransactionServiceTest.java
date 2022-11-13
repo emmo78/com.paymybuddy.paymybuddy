@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -34,6 +36,7 @@ import org.springframework.web.context.request.WebRequest;
 import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
 import com.paymybuddy.paymybuddy.dto.TransactionDTO;
 import com.paymybuddy.paymybuddy.dto.service.TransactionDTOService;
+import com.paymybuddy.paymybuddy.exception.InsufficentFundsException;
 import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.model.Transaction;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
@@ -43,7 +46,7 @@ import com.paymybuddy.paymybuddy.repository.TransactionRepository;
 public class TransactionServiceTest {
 
 	@InjectMocks
-	private TransactionServiceImpl transactionService = new TransactionServiceImpl();
+	private TransactionServiceImpl transactionService;
 	
 	@Mock 
 	private TransactionDTOService transactionDTOService;
@@ -61,6 +64,16 @@ public class TransactionServiceTest {
 	private DateTimePatternProperties dateStringPattern;
 	
 	private WebRequest request = null;
+	
+	@BeforeEach
+	public void setUpPerTest() {
+		transactionService = new TransactionServiceImpl();
+	}
+	
+	@AfterEach
+	public void undefPerTest() {
+		transactionService = null;
+	}
 	
 	@Nested
 	@Tag("createATransactionTests")
@@ -123,13 +136,15 @@ public class TransactionServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request)).getMessage()).isEqualTo("Registered sender not found for transaction");
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> transactionService.createATransaction(transactionDTO, request))
+					.getMessage()).isEqualTo("Registered sender not found for transaction");
 		}
 		
 		@Test
 		@Tag("TransactionServiceTest")
-		@DisplayName("test createATransaction should throw UnexpectedRollbackException On InsufficentFundsException")
-		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnInsufficentFundsException() {
+		@DisplayName("test createATransaction should throw InsufficentFundsException")
+		public void createATransactionTestShouldThrowInsufficentFundsException() {
 			//GIVEN
 			TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 			Transaction transaction = new Transaction(LocalDateTime.now(), 100.0);
@@ -142,7 +157,9 @@ public class TransactionServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request)).getMessage()).isEqualTo("Insufficient funds for transaction : you need to transfert : 0.50 from bank");
+			assertThat(assertThrows(InsufficentFundsException.class,
+					() -> transactionService.createATransaction(transactionDTO, request))
+					.getMessage()).isEqualTo("Insufficient funds for transaction : you need to transfert : 0.50 from bank");
 		}
 		
 		@Test

@@ -29,18 +29,6 @@ public class RequestServiceTest {
 	
 	@Test
 	@Tag("RequestServiceTest")
-	@DisplayName("upperCasingFirstLetter test should Capitalize the first letter and lowercase the rest")
-	public void upperCasingFirstLetterTest() {
-		//GIVEN
-		String totest = "tOTEST";
-		//WHEN
-		String result = requestService.upperCasingFirstLetter(totest);
-		//THEN
-		assertThat(result).isEqualTo("Totest");
-	}
-	
-	@Test
-	@Tag("RequestServiceTest")
 	@DisplayName("requestToString test chain a WebRequest uri+parameters into a String")
 	public void requestToStringTest() {
 		//GIVEN

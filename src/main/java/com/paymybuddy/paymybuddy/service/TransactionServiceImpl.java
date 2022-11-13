@@ -43,8 +43,8 @@ public class TransactionServiceImpl implements TransactionService {
 	private DateTimePatternProperties dateStringPattern;
 	
 	@Override
-	@Transactional(rollbackFor = UnexpectedRollbackException.class)
-	public TransactionDTO createATransaction(TransactionDTO transactionDTO, WebRequest request) throws UnexpectedRollbackException{
+	@Transactional(rollbackFor = {UnexpectedRollbackException.class, InsufficentFundsException.class})
+	public TransactionDTO createATransaction(TransactionDTO transactionDTO, WebRequest request) throws UnexpectedRollbackException, InsufficentFundsException{
 		Transaction transaction = null; 
 		try {
 			//Throws MappingException | IllegalArgumentException | OptimisticLockingFailureException
@@ -69,8 +69,10 @@ public class TransactionServiceImpl implements TransactionService {
 			//CascadeType.MERGE => Update Registered sender & receiver cf IT test
 			//Throws: IllegalArgumentException | OptimisticLockingFailureException
 			transaction = transactionRepository.save(transactionEnclosingScope);
-		} catch (MappingException | IllegalArgumentException | InsufficentFundsException | ResourceNotFoundException | OptimisticLockingFailureException re) {
+		} catch (MappingException | IllegalArgumentException | ResourceNotFoundException | OptimisticLockingFailureException re) {
 			throw new UnexpectedRollbackException(re.getMessage());
+		} catch (InsufficentFundsException ife) {
+			throw new InsufficentFundsException(ife.getMessage());
 		} catch (Exception e) {
 			throw new UnexpectedRollbackException(e.getMessage());
 		}
@@ -103,7 +105,7 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 		log.info("{} : pageTransactionDTO number : {} of {}",
 				requestService.requestToString(request),
-				pageTransactionDTO.getNumber(),
+				pageTransactionDTO.getNumber()+1,
 				pageTransactionDTO.getTotalPages());
 		return pageTransactionDTO;
 	}

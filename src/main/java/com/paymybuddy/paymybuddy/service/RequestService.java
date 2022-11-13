@@ -10,13 +10,6 @@ import org.springframework.web.context.request.WebRequest;
 public interface RequestService {
 
 	/**
-	 * Uppercase first letter
-	 * @param word to treat
-	 * @return : Word
-	 */
-	String upperCasingFirstLetter(String word);
-
-	/**
 	 * To string all the parmeters of a Web request
 	 * @param request to String
 	 * @return String of parameters

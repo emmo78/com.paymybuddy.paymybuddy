@@ -147,6 +147,51 @@ class RegisteredRepositoryIT {
 
 	@Test
 	@Tag("RegisteredRepositoryIT")
+	@DisplayName("registeredB remove from application removing added A and C should remove them from their sets")
+	@Transactional
+	public void registeredBRemoveFromApplicationRemovingAddedAandCshouldRemoveThemFromTheirSets() {
+		// GIVEN
+		Set<Registered> addConnectionsExpectedA = new HashSet<>();
+		addConnectionsExpectedA.add(registeredC);
+
+		Set<Registered> addedConnectionsExpectedC = new HashSet<>();
+		addedConnectionsExpectedC.add(registeredA);
+
+		// addedConnections Expected B size should be 0
+		// addConnections Expected C size should be 0
+
+		registeredA.addConnection(registeredB);
+		registeredA.addConnection(registeredC);
+		registeredRepository.save(registeredA);
+
+		registeredC.addConnection(registeredB);
+		registeredRepository.save(registeredC);
+
+		// WHEN
+		registeredB = registeredRepository.findById("bbb@bbb.com").get();
+		// if the set is modified at any time after the iterator is created, in any way
+		// except through the iterator's own remove method, the Iterator throws a
+		// ConcurrentModificationException.
+		Set<Registered> addedToB = registeredB.getAddedConnections().stream().collect(Collectors.toSet());
+		addedToB.forEach(added -> added.removeConnection(registeredB));
+		registeredRepository.deleteById("bbb@bbb.com");
+
+		// THEN
+		Optional<Registered> registeredAResultOpt = registeredRepository.findById("aaa@aaa.com");
+		Optional<Registered> registeredBResultOpt = registeredRepository.findById("bbb@bbb.com");
+		Optional<Registered> registeredCResultOpt = registeredRepository.findById("ccc@ccc.com");
+
+		assertThat(registeredAResultOpt).isNotEmpty();
+		assertThat(registeredBResultOpt).isEmpty();
+		assertThat(registeredCResultOpt).isNotEmpty();
+
+		registeredAResultOpt.ifPresent(registeredAResult -> assertThat(registeredAResult.getAddConnections()).containsExactlyInAnyOrderElementsOf(addConnectionsExpectedA));
+		registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddedConnections()).containsExactlyInAnyOrderElementsOf(addedConnectionsExpectedC));
+		registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddConnections()).hasSize(0));
+	}
+
+	@Test
+	@Tag("RegisteredRepositoryIT")
 	@DisplayName("test findAllConnectedToEmail should return expected pages")
 	@Transactional
 	public void testFindAllConnectedToEmailShouldReturnExpectedPages() {

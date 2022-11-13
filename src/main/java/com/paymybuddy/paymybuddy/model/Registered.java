@@ -73,6 +73,7 @@ public class Registered implements Serializable {
 	@OneToMany(mappedBy = "receiver", cascade = CascadeType.REFRESH)
 	private List<Transaction> receivedTransactions = new ArrayList<>();
 	
+	//convenience for testing
 	public Registered(String email, String password, String firstName, String lastName, LocalDate birthDate, String iban) {
 		this.email = email;
 		this.password = password;

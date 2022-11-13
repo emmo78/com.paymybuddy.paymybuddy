@@ -8,6 +8,7 @@ import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
@@ -23,6 +24,9 @@ public class RegisteredDTOServiceImpl implements RegisteredDTOService {
 	
 	@Autowired
 	private DateTimePatternProperties dateStringPattern;
+	
+	@Autowired
+	PasswordEncoder passwordEncoder;
 	
 	@Override
 	public RegisteredDTO registeredToDTO(Registered registered) {
@@ -60,8 +64,21 @@ public class RegisteredDTOServiceImpl implements RegisteredDTOService {
 				return LocalDate.parse(stringDate, DateTimeFormatter.ofPattern(dateStringPattern.getDateStringPattern()));
 			}	
 		};
-		modelMapper.typeMap(RegisteredDTO.class, Registered.class).addMappings(mapper -> 
-			mapper.using(stringToDate).map(RegisteredDTO::getBirthDate, Registered::setBirthDate));
+		Converter<String, String> toLowerCase = new AbstractConverter<String, String>() {
+			protected String convert(String email) {
+				return email == null ? null : email.toLowerCase();
+			}
+		};
+		Converter<String, String> encodePW = new AbstractConverter<String, String>() {
+			protected String convert(String passwd) {
+				return passwd == null ? null : passwordEncoder.encode(passwd);
+			}
+		};
+		modelMapper.typeMap(RegisteredDTO.class, Registered.class).addMappings(mapper -> {
+			mapper.using(stringToDate).map(RegisteredDTO::getBirthDate, Registered::setBirthDate);
+			mapper.using(toLowerCase).map(RegisteredDTO::getEmail, Registered::setEmail);
+			mapper.using(encodePW).map(RegisteredDTO::getPassword, Registered::setPassword);
+		});
 		return modelMapper.map(registeredDTO, Registered.class);
 	}
 

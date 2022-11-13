@@ -100,8 +100,7 @@ class TransactionRepositoryIT {
 	@Test
 	@Tag("TransactionRepositoryIT")
 	@DisplayName("After A sended to B and C all remove from application, FK for all should be null")
-	// @Transactional//- object references an unsaved transient instance - save the
-	// transient instance before flushing
+	@Transactional // object references an unsaved transient instance
 	public void afterASendedToBandCAllremoveFromApplicationSoAllFKShouldBeNull() {
 		// GIVEN
 		Transaction transactionAtoB = new Transaction(LocalDateTime.now(), 100);
@@ -118,9 +117,17 @@ class TransactionRepositoryIT {
 		transactionRepository.save(transactionAtoC);
 
 		// WHEN
+		// save the transient instance before flushing
+		registeredA.getSendedTransactions().forEach(t -> t.setSender(null));
+		registeredA.getReceivedTransactions().forEach(t -> t.setReceiver(null));
 		registeredRepository.deleteById("aaa@aaa.com");
+		registeredB.getSendedTransactions().forEach(t -> t.setSender(null));
+		registeredB.getReceivedTransactions().forEach(t -> t.setReceiver(null));
 		registeredRepository.deleteById("bbb@bbb.com");
+		registeredC.getSendedTransactions().forEach(t -> t.setSender(null));
+		registeredC.getReceivedTransactions().forEach(t -> t.setReceiver(null));
 		registeredRepository.deleteById("ccc@ccc.com");
+		
 
 		// THEN
 		assertThat(transactionRepository.count()).isEqualTo(2L);
