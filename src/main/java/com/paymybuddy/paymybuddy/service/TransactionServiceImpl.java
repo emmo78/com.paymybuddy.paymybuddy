@@ -54,7 +54,9 @@ public class TransactionServiceImpl implements TransactionService {
 			registeredRepository.findById(transactionDTO.getEmailSender()).ifPresentOrElse(sender -> {
 				double difference = sender.getBalance()-(amount+transactionEnclosingScope.getFee());
 				if (difference < 0) {
-					throw new InsufficentFundsException("Insufficient funds for transaction : you need to transfert : "+String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", Math.abs(difference))+" from bank");
+					throw new InsufficentFundsException("Insufficient funds for transaction : you need to transfert : "
+							+String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", Math.abs(difference))
+							+" from bank");
 				}
 				sender.setBalance(difference);
 				sender.addSendedTransaction(transactionEnclosingScope);
@@ -62,7 +64,8 @@ public class TransactionServiceImpl implements TransactionService {
 			//Throws: IllegalArgumentException | ResourceNotFoundException
 			registeredRepository.findById(transactionDTO.getEmailReceiver()).ifPresentOrElse(receiver -> {
 				receiver.setBalance(receiver.getBalance()+amount);
-				receiver.addReceivedTransaction(transactionEnclosingScope);}, () -> {throw new ResourceNotFoundException("Registered receiver not found for transaction");});
+				receiver.addReceivedTransaction(transactionEnclosingScope);},
+					() -> {throw new ResourceNotFoundException("Registered receiver not found for transaction");});
 			//CascadeType.MERGE => Update Registered sender & receiver cf IT test
 			//Throws: IllegalArgumentException | OptimisticLockingFailureException
 			transaction = transactionRepository.save(transactionEnclosingScope);
@@ -71,14 +74,37 @@ public class TransactionServiceImpl implements TransactionService {
 		} catch (Exception e) {
 			throw new UnexpectedRollbackException(e.getMessage());
 		}
-	log.info("{} : transaction sender={} receiver={} amount={} fee={} persisted", requestService.requestToString(request), transaction.getSender().getEmail(), transaction.getReceiver().getEmail(), transaction.getAmount(), transaction.getFee());
+	log.info("{} : transaction sender={} receiver={} amount={} fee={} persisted",
+			requestService.requestToString(request),
+			transaction.getSender().getEmail(),
+			transaction.getReceiver().getEmail(),
+			transaction.getAmount(),
+			transaction.getFee());
 	return transactionDTOService.transactionToDTOSender(transaction);
 	}
 
 	@Override
-	public Page<Transaction> getRegisteredAllTransaction(String email, Pageable pageRequest, WebRequest request) {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
+	public Page<TransactionDTO> getRegisteredAllTransaction(String email, Pageable pageRequest, WebRequest request) {
+		Page<TransactionDTO> pageTransactionDTO = null;
+		try {
+			pageTransactionDTO = transactionRepository.findAllTransactionsByEmailSenderOrReceiver(email, pageRequest)
+					.map(t -> {
+						if(email.equals(t.getSender().getEmail())) {
+							return transactionDTOService.transactionToDTOSender(t);
+						} else {
+							return transactionDTOService.transactionToDTOReceiver(t);
+						}
+					});
+		} catch (IllegalArgumentException re) {
+			throw new UnexpectedRollbackException(re.getMessage());
+		} catch (Exception e) {
+			throw new UnexpectedRollbackException(e.getMessage());
+		}
+		log.info("{} : pageTransactionDTO number : {} of {}",
+				requestService.requestToString(request),
+				pageTransactionDTO.getNumber(),
+				pageTransactionDTO.getTotalPages());
+		return pageTransactionDTO;
 	}
-
 }

@@ -6,9 +6,8 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.WebRequest;
 
 import com.paymybuddy.paymybuddy.dto.TransactionDTO;
-import com.paymybuddy.paymybuddy.model.Transaction;
 
 public interface TransactionService {
 	TransactionDTO createATransaction(TransactionDTO transactionDTO, WebRequest request) throws UnexpectedRollbackException;
-	Page<Transaction> getRegisteredAllTransaction(String email, Pageable pageRequest, WebRequest request);
+	Page<TransactionDTO> getRegisteredAllTransaction(String email, Pageable pageRequest, WebRequest request);
 }
