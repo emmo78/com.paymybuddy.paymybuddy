@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,16 +23,20 @@ import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.model.Registered;
 
-@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class RegisterdDTOServiceTest {
 	
-	@Autowired
 	@InjectMocks
 	private RegisteredDTOServiceImpl registerdDTOService;
 	
 	@Mock
 	private DateTimePatternProperties dateStringPattern;
+	
+	@Spy
+	ModelMapper modelMapper = new ModelMapper();
+	
+	@Spy
+	PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 	
 	@Test
 	@Tag("RegisterdDTOServiceTest")

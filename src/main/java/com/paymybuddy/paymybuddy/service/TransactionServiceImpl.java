@@ -81,7 +81,7 @@ public class TransactionServiceImpl implements TransactionService {
 			transaction.getSender().getEmail(),
 			transaction.getReceiver().getEmail(),
 			transaction.getAmount(),
-			transaction.getFee());
+			transaction.getFee());	
 	return transactionDTOService.transactionToDTOSender(transaction);
 	}
 

@@ -19,23 +19,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.MappingException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.modelmapper.ModelMapper;
 
 import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
 import com.paymybuddy.paymybuddy.dto.TransactionDTO;
 import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.model.Transaction;
 
-@SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class TransactionDTOServiceTest {
 	
-	@Autowired
 	@InjectMocks
 	private TransactionDTOServiceImpl transactionDTOService;
+	
+	@Spy
+	ModelMapper modelMapper = new ModelMapper();
 	
 	@Mock
 	private DateTimePatternProperties dateStringPattern;

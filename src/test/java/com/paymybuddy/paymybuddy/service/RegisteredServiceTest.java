@@ -7,8 +7,6 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -22,7 +20,6 @@ import org.springframework.web.context.request.WebRequest;
 import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
 import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.dto.service.RegisteredDTOService;
-import com.paymybuddy.paymybuddy.dto.service.RegisteredDTOServiceImpl;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
