@@ -47,16 +47,6 @@ public class RegisteredServiceTest {
 	
 	private WebRequest request = null;
 	
-	@BeforeEach
-	public void setUpPerTest() {
-		registeredService = new RegisteredServiceImpl();
-	}
-	
-	@AfterEach
-	public void undefPerTest() {
-		registeredService = null;
-	}
-
 	@Nested
 	@Tag("createRegisteredTests")
 	@DisplayName("Tests for method createRegistered")

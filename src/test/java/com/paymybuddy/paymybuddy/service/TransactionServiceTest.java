@@ -65,16 +65,6 @@ public class TransactionServiceTest {
 	
 	private WebRequest request = null;
 	
-	@BeforeEach
-	public void setUpPerTest() {
-		transactionService = new TransactionServiceImpl();
-	}
-	
-	@AfterEach
-	public void undefPerTest() {
-		transactionService = null;
-	}
-	
 	@Nested
 	@Tag("createATransactionTests")
 	@DisplayName("Tests for method createATransaction")
