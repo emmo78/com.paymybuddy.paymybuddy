@@ -180,6 +180,7 @@ public class TransactionServiceTest {
 			assertThat(assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request)).getMessage()).isEqualTo("Registered receiver not found for transaction");
 		}
 	}
+	
 	@Nested
 	@Tag("getRegisteredAllTransactionTests")
 	@DisplayName("Tests for method getRegisteredAllTransaction")

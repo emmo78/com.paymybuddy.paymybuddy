@@ -47,11 +47,11 @@ class RegisteredRepositoryIT {
 		registeredD = new Registered("ddd@ddd.com", "dddPasswd", "Ddd", "DDD", LocalDate.parse("04/04/1994", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "dddIban");
 		registeredE = new Registered("eee@ddd.com", "eeePasswd", "Eee", "DDD", LocalDate.parse("05/05/1994", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "eeeIban");
 
-		registeredRepository.save(registeredA);
-		registeredRepository.save(registeredB);
-		registeredRepository.save(registeredE); // No respect of Alphabetical order
-		registeredRepository.save(registeredD); // To test Sort Ascending
-		registeredRepository.save(registeredC); // by LastName then FirstName
+		registeredRepository.saveAndFlush(registeredA);
+		registeredRepository.saveAndFlush(registeredB);
+		registeredRepository.saveAndFlush(registeredE); // No respect of Alphabetical order
+		registeredRepository.saveAndFlush(registeredD); // To test Sort Ascending
+		registeredRepository.saveAndFlush(registeredC); // by LastName then FirstName
 	}
 
 	@AfterEach
@@ -83,7 +83,7 @@ class RegisteredRepositoryIT {
 		// WHEN
 		registeredA.addConnection(registeredB);
 		registeredA.addConnection(registeredC);
-		registeredRepository.save(registeredA);
+		registeredRepository.saveAndFlush(registeredA);
 
 		// THEN
 		Optional<Registered> registeredAResultOpt = registeredRepository.findById("aaa@aaa.com");
@@ -116,10 +116,10 @@ class RegisteredRepositoryIT {
 
 		registeredA.addConnection(registeredB);
 		registeredA.addConnection(registeredC);
-		registeredRepository.save(registeredA);
+		registeredRepository.saveAndFlush(registeredA);
 
 		registeredC.addConnection(registeredB);
-		registeredRepository.save(registeredC);
+		registeredRepository.saveAndFlush(registeredC);
 
 		// WHEN
 		registeredB = registeredRepository.findById("bbb@bbb.com").get();
@@ -128,7 +128,7 @@ class RegisteredRepositoryIT {
 		// ConcurrentModificationException.
 		Set<Registered> addedToB = registeredB.getAddedConnections().stream().collect(Collectors.toSet());
 		addedToB.forEach(added -> added.removeConnection(registeredB));
-		registeredRepository.save(registeredB);
+		registeredRepository.saveAndFlush(registeredB);
 
 		// THEN
 		Optional<Registered> registeredAResultOpt = registeredRepository.findById("aaa@aaa.com");
@@ -162,10 +162,10 @@ class RegisteredRepositoryIT {
 
 		registeredA.addConnection(registeredB);
 		registeredA.addConnection(registeredC);
-		registeredRepository.save(registeredA);
+		registeredRepository.saveAndFlush(registeredA);
 
 		registeredC.addConnection(registeredB);
-		registeredRepository.save(registeredC);
+		registeredRepository.saveAndFlush(registeredC);
 
 		// WHEN
 		registeredB = registeredRepository.findById("bbb@bbb.com").get();
@@ -200,13 +200,13 @@ class RegisteredRepositoryIT {
 		registeredA.addConnection(registeredE);
 		registeredA.addConnection(registeredD);
 		registeredA.addConnection(registeredC);
-		registeredRepository.save(registeredA);
+		registeredRepository.saveAndFlush(registeredA);
 		registeredC.addConnection(registeredA);
 		registeredC.addConnection(registeredB);
 		registeredC.addConnection(registeredD);
-		registeredRepository.save(registeredC);
+		registeredRepository.saveAndFlush(registeredC);
 		registeredD.addConnection(registeredA);
-		registeredRepository.save(registeredD);
+		registeredRepository.saveAndFlush(registeredD);
 		
 		List<Registered> registerdConnectedToAExpected = new ArrayList<>();
 		registerdConnectedToAExpected.add(registeredC);
@@ -231,12 +231,12 @@ class RegisteredRepositoryIT {
 		// GIVEN
 		registeredA.addConnection(registeredB);
 		registeredA.addConnection(registeredC);
-		registeredRepository.save(registeredA);
+		registeredRepository.saveAndFlush(registeredA);
 		registeredC.addConnection(registeredB);
 		registeredC.addConnection(registeredD);
-		registeredRepository.save(registeredC);
+		registeredRepository.saveAndFlush(registeredC);
 		registeredD.addConnection(registeredA);
-		registeredRepository.save(registeredD);
+		registeredRepository.saveAndFlush(registeredD);
 		List<Registered> registerdNotConnectedToAExpected = new ArrayList<>();
 		registerdNotConnectedToAExpected.add(registeredD);
 		registerdNotConnectedToAExpected.add(registeredE);

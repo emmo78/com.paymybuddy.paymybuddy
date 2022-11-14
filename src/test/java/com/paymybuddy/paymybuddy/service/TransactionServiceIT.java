@@ -54,8 +54,8 @@ public class TransactionServiceIT {
 		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 		Registered registeredBReceiver = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
 		registeredASender.setBalance(100.5);
-		registeredRepository.save(registeredASender);
-		registeredRepository.save(registeredBReceiver);
+		registeredRepository.saveAndFlush(registeredASender);
+		registeredRepository.saveAndFlush(registeredBReceiver);
 		
 		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
@@ -98,7 +98,7 @@ public class TransactionServiceIT {
 		transactionDTO.setAmount("100.00");
 		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 		registeredASender.setBalance(100.0);
-		registeredRepository.save(registeredASender);
+		registeredRepository.saveAndFlush(registeredASender);
 		
 		MockHttpServletRequest requestMock = new MockHttpServletRequest();
 		WebRequest request = new ServletWebRequest(requestMock);
@@ -121,7 +121,7 @@ public class TransactionServiceIT {
 		transactionDTO.setAmount("100.00");
 		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 		registeredASender.setBalance(100.5);
-		registeredRepository.save(registeredASender);
+		registeredRepository.saveAndFlush(registeredASender);
 		
 		MockHttpServletRequest requestMock = new MockHttpServletRequest();
 		WebRequest request = new ServletWebRequest(requestMock);

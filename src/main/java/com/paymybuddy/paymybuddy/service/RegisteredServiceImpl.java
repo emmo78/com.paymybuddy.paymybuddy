@@ -49,6 +49,7 @@ public class RegisteredServiceImpl implements RegisteredService {
 		RegisteredDTO createdRegisteredDTO = null;
 		try {
 			Registered registered = registeredDTOService.registeredFromDTO(registeredDTO);
+			System.out.println(registered);
 			if (registeredRepository.existsById(registered.getEmail())) {
 				throw new ResourceConflictException("User already exists");
 			}

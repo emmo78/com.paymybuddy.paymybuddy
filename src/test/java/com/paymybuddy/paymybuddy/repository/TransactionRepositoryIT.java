@@ -49,9 +49,9 @@ class TransactionRepositoryIT {
 		registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
 		registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "cccIban");
 
-		registeredRepository.save(registeredA);
-		registeredRepository.save(registeredB);
-		registeredRepository.save(registeredC);
+		registeredRepository.saveAndFlush(registeredA);
+		registeredRepository.saveAndFlush(registeredB);
+		registeredRepository.saveAndFlush(registeredC);
 	}
 
 	@AfterEach
@@ -70,20 +70,20 @@ class TransactionRepositoryIT {
 	public void transactionsASendToBAndCMergeCascadeShouldUpdateTheirList() {
 		// GIVEN
 		Transaction transactionAtoB = new Transaction(LocalDateTime.now(), 100);
-		transactionAtoB = transactionRepository.save(transactionAtoB);
+		transactionAtoB = transactionRepository.saveAndFlush(transactionAtoB);
 		registeredA.addSendedTransaction(transactionAtoB);
 		registeredB.addReceivedTransaction(transactionAtoB);
 
 		Transaction transactionAtoC = new Transaction(LocalDateTime.now(), 200);
-		transactionAtoC = transactionRepository.save(transactionAtoC);
+		transactionAtoC = transactionRepository.saveAndFlush(transactionAtoC);
 		registeredA.addSendedTransaction(transactionAtoC);
 		registeredC.addReceivedTransaction(transactionAtoC);
 
 		List<Transaction> sendedTransactionsAExpected = Arrays.asList(transactionAtoB, transactionAtoC);
 
 		// WHEN
-		transactionRepository.save(transactionAtoB);
-		transactionRepository.save(transactionAtoC);
+		transactionRepository.saveAndFlush(transactionAtoB);
+		transactionRepository.saveAndFlush(transactionAtoC);
 
 		// THEN
 		assertThat(transactionRepository.count()).isEqualTo(2L);
@@ -104,20 +104,20 @@ class TransactionRepositoryIT {
 	public void afterASendedToBandCAllremoveFromApplicationSoAllFKShouldBeNull() {
 		// GIVEN
 		Transaction transactionAtoB = new Transaction(LocalDateTime.now(), 100);
-		transactionAtoB = transactionRepository.save(transactionAtoB);
+		transactionAtoB = transactionRepository.saveAndFlush(transactionAtoB);
 		registeredA.addSendedTransaction(transactionAtoB);
 		registeredB.addReceivedTransaction(transactionAtoB);
 
 		Transaction transactionAtoC = new Transaction(LocalDateTime.now(), 200);
-		transactionAtoC = transactionRepository.save(transactionAtoC);
+		transactionAtoC = transactionRepository.saveAndFlush(transactionAtoC);
 		registeredA.addSendedTransaction(transactionAtoC);
 		registeredC.addReceivedTransaction(transactionAtoC);
 
-		transactionRepository.save(transactionAtoB);
-		transactionRepository.save(transactionAtoC);
+		transactionRepository.saveAndFlush(transactionAtoB);
+		transactionRepository.saveAndFlush(transactionAtoC);
 
 		// WHEN
-		// save the transient instance before flushing
+		// saveAndFlush the transient instance before flushing
 		registeredA.getSendedTransactions().forEach(t -> t.setSender(null));
 		registeredA.getReceivedTransactions().forEach(t -> t.setReceiver(null));
 		registeredRepository.deleteById("aaa@aaa.com");
@@ -158,22 +158,22 @@ class TransactionRepositoryIT {
 			dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), ZoneId.systemDefault());
 			
 			Transaction transactionAtoB = new Transaction(dateTimeTransaction, 100 * i); // 100+200+300+400 = 1000 fee = 5 A
-			transactionAtoB = transactionRepository.save(transactionAtoB);
+			transactionAtoB = transactionRepository.saveAndFlush(transactionAtoB);
 			registeredA.addSendedTransaction(transactionAtoB);
 			registeredB.addReceivedTransaction(transactionAtoB);
-			transactionAtoB = transactionRepository.save(transactionAtoB);
+			transactionAtoB = transactionRepository.saveAndFlush(transactionAtoB);
 
 			Transaction transactionAtoC = new Transaction(dateTimeTransaction, 100 * i); // 100+200+300+400 = 1000 fee = 5 A
-			transactionAtoC = transactionRepository.save(transactionAtoC);
+			transactionAtoC = transactionRepository.saveAndFlush(transactionAtoC);
 			registeredA.addSendedTransaction(transactionAtoC);
 			registeredC.addReceivedTransaction(transactionAtoC);
-			transactionAtoC = transactionRepository.save(transactionAtoC);
+			transactionAtoC = transactionRepository.saveAndFlush(transactionAtoC);
 
 			Transaction transactionBtoC = new Transaction(dateTimeTransaction, 100 * i); // 100+200+300+400 = 1000 fee = 5 B
-			transactionBtoC = transactionRepository.save(transactionBtoC);
+			transactionBtoC = transactionRepository.saveAndFlush(transactionBtoC);
 			registeredB.addSendedTransaction(transactionBtoC);
 			registeredC.addReceivedTransaction(transactionBtoC);
-			transactionBtoC = transactionRepository.save(transactionBtoC);
+			transactionBtoC = transactionRepository.saveAndFlush(transactionBtoC);
 
 			dateTransaction.roll(Calendar.DATE, 8); // 1, 9, 17, 25, (33) Roll rule : Larger fields (here MONTH) are unchanged after
 													// the call.
@@ -182,22 +182,22 @@ class TransactionRepositoryIT {
 		dateTransaction.add(Calendar.MONTH, 1);
 		dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), ZoneId.systemDefault());
 		Transaction transactionAtoB = new Transaction(dateTimeTransaction, 500);
-		transactionAtoB = transactionRepository.save(transactionAtoB);
+		transactionAtoB = transactionRepository.saveAndFlush(transactionAtoB);
 		registeredA.addSendedTransaction(transactionAtoB);
 		registeredB.addReceivedTransaction(transactionAtoB);
-		transactionAtoB = transactionRepository.save(transactionAtoB);
+		transactionAtoB = transactionRepository.saveAndFlush(transactionAtoB);
 
 		Transaction transactionAtoC = new Transaction(dateTimeTransaction, 500);
-		transactionAtoC = transactionRepository.save(transactionAtoC);
+		transactionAtoC = transactionRepository.saveAndFlush(transactionAtoC);
 		registeredA.addSendedTransaction(transactionAtoC);
 		registeredC.addReceivedTransaction(transactionAtoC);
-		transactionAtoC = transactionRepository.save(transactionAtoC);
+		transactionAtoC = transactionRepository.saveAndFlush(transactionAtoC);
 
 		Transaction transactionBtoC = new Transaction(dateTimeTransaction, 500);
-		transactionBtoC = transactionRepository.save(transactionBtoC);
+		transactionBtoC = transactionRepository.saveAndFlush(transactionBtoC);
 		registeredB.addSendedTransaction(transactionBtoC);
 		registeredC.addReceivedTransaction(transactionBtoC);
-		transactionBtoC = transactionRepository.save(transactionBtoC);
+		transactionBtoC = transactionRepository.saveAndFlush(transactionBtoC);
 
 		// WHEN
 		double result = transactionRepository.feeSumForARegisteredBetweenDate(beginDate, endDate, "aaa@aaa.com");
@@ -221,19 +221,19 @@ class TransactionRepositoryIT {
 		for (int i = 1; i <= 5; i++) { // loops 5 times
 			LocalDateTime dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), ZoneId.systemDefault());
 			Transaction transactionAtoB = new Transaction(dateTimeTransaction, 100 * i); // 100+200+300+400+500
-			transactionAtoB = transactionRepository.save(transactionAtoB);
+			transactionAtoB = transactionRepository.saveAndFlush(transactionAtoB);
 			registeredA.addSendedTransaction(transactionAtoB);
 			registeredB.addReceivedTransaction(transactionAtoB);
-			transactionAtoB = transactionRepository.save(transactionAtoB);
+			transactionAtoB = transactionRepository.saveAndFlush(transactionAtoB);
 			transactionsBExpected.add(transactionAtoB);
 			
 			dateTransaction.add(Calendar.HOUR_OF_DAY, 1);
 			dateTimeTransaction = LocalDateTime.ofInstant(dateTransaction.toInstant(), ZoneId.systemDefault());
 			Transaction transactionBtoC = new Transaction(dateTimeTransaction, 100 * i);
-			transactionBtoC = transactionRepository.save(transactionBtoC);
+			transactionBtoC = transactionRepository.saveAndFlush(transactionBtoC);
 			registeredB.addSendedTransaction(transactionBtoC);
 			registeredC.addReceivedTransaction(transactionBtoC);
-			transactionBtoC = transactionRepository.save(transactionBtoC);
+			transactionBtoC = transactionRepository.saveAndFlush(transactionBtoC);
 			transactionsBExpected.add(transactionBtoC);
 			dateTransaction.add(Calendar.HOUR_OF_DAY, 1);
 			dateTransaction.add(Calendar.DATE, 8); // 1, 9, 17, 25, next month 1 time
