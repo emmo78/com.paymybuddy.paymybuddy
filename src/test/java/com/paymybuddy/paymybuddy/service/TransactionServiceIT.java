@@ -32,13 +32,13 @@ public class TransactionServiceIT {
 	@Autowired
 	private TransactionService 	transactionService;
 	
-	//Needed for AfterEach
+	//Needed for testing
 	@Autowired
 	private TransactionRepository transactionRepository;
 	
 	// Needed for testing
 	@Autowired
-	RegisteredRepository registeredRepository;
+	private RegisteredRepository registeredRepository;
 	
 	@AfterEach
 	public void undefPerTest() {
@@ -48,8 +48,8 @@ public class TransactionServiceIT {
 	
 	@Test
 	@Tag("TransactionServiceIT")
-	@DisplayName("Test createATransaction should commit it and return transactionDTO for Sender")
-	public void createATransactionTestShouldCommitItAndReturnTransactionDTOSender() {
+	@DisplayName("IT createATransaction should commit it and return transactionDTO for Sender")
+	public void createATransactionITShouldCommitItAndReturnTransactionDTOSender() {
 		//GIVEN
 		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 		Registered registeredBReceiver = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
@@ -91,8 +91,8 @@ public class TransactionServiceIT {
 	
 	@Test
 	@Tag("TransactionServiceIT")
-	@DisplayName("Test createATransaction with InsufficentFundsException should Rollback")
-	public void createATransactionTestShouldRollbackOnInsufficentFundsException() {
+	@DisplayName("IT createATransaction with InsufficentFundsException should Rollback")
+	public void createATransactionITShouldRollbackOnInsufficentFundsException() {
 		//GIVEN
 		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
@@ -114,8 +114,8 @@ public class TransactionServiceIT {
 	
 	@Test
 	@Tag("TransactionServiceIT")
-	@DisplayName("Test createATransaction with ResourceNotFoundException for Receiver should Rollback")
-	public void createATransactionTestShouldRollbackOnResourceNotFoundException() {
+	@DisplayName("IT createATransaction with ResourceNotFoundException for Receiver should Rollback")
+	public void createATransactionITShouldRollbackOnResourceNotFoundException() {
 		//GIVEN
 		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 		transactionDTO.setAmount("100.00");

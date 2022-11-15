@@ -39,17 +39,16 @@ public class RegisteredServiceImpl implements RegisteredService {
 
 	@Override
 	public Optional<Registered> getRegistered(String email) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	@Transactional(rollbackFor = {UnexpectedRollbackException.class, ResourceConflictException.class})
-	public RegisteredDTO createRegistered(RegisteredDTO registeredDTO, WebRequest request) {
+	public RegisteredDTO createRegistered(RegisteredDTO registeredDTO, WebRequest request) throws ResourceConflictException, UnexpectedRollbackException {
 		RegisteredDTO createdRegisteredDTO = null;
 		try {
 			Registered registered = registeredDTOService.registeredFromDTO(registeredDTO);
-			System.out.println(registered);
 			if (registeredRepository.existsById(registered.getEmail())) {
 				throw new ResourceConflictException("User already exists");
 			}

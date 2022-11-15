@@ -61,17 +61,18 @@ public class RegisteredDTOServiceImpl implements RegisteredDTOService {
 		Converter<String, LocalDate> stringToDate = new AbstractConverter<String, LocalDate>() {
 			@Override
 			protected LocalDate convert(String stringDate) {
+				//LocalDate implements TemporalAdjuster so 02/31/1991 -> 02/28/1991
 				return LocalDate.parse(stringDate, DateTimeFormatter.ofPattern(dateStringPattern.getDateStringPattern()));
 			}	
 		};
 		Converter<String, String> toLowerCase = new AbstractConverter<String, String>() {
 			protected String convert(String email) {
-				return email == null ? null : email.toLowerCase();
+				return email.toLowerCase();
 			}
 		};
 		Converter<String, String> encodePW = new AbstractConverter<String, String>() {
 			protected String convert(String passwd) {
-				return passwd == null ? null : passwordEncoder.encode(passwd);
+				return passwordEncoder.encode(passwd);
 			}
 		};
 		modelMapper.typeMap(RegisteredDTO.class, Registered.class).addMappings(mapper -> {

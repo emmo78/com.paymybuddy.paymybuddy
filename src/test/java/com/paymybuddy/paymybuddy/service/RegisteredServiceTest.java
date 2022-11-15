@@ -1,5 +1,6 @@
 package com.paymybuddy.paymybuddy.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.WebRequest;
 
 import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
@@ -56,12 +59,6 @@ public class RegisteredServiceTest {
 			//GIVEN
 			RegisteredDTO registeredDTO = new RegisteredDTO();
 			registeredDTO.setEmail("Aaa@Aaa.com");
-			registeredDTO.setPassword("aaaPasswd");
-			registeredDTO.setFirstName("Aaa");
-			registeredDTO.setLastName("AAA");
-			registeredDTO.setBirthDate("01/21/1991");
-			registeredDTO.setIban("aaaIban");
-			registeredDTO.setBalance("100.00");
 
 			Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
 			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
@@ -69,7 +66,45 @@ public class RegisteredServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThrows(ResourceConflictException.class,() -> registeredService.createRegistered(registeredDTO, request));
+			assertThat(assertThrows(ResourceConflictException.class,
+					() -> registeredService.createRegistered(registeredDTO, request))
+					.getMessage()).isEqualTo("User already exists");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test createRegistered should throw UnexpectedRollbackException on IllegalArgumentException")
+		public void createRegisteredTestShouldThrowUnexpectedRollbackExceptionOnIllegalArgumentException() {
+			//GIVEN
+			RegisteredDTO registeredDTO = new RegisteredDTO();
+			registeredDTO.setEmail("Aaa@Aaa.com");
+
+			Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
+			when(registeredRepository.existsById(any(String.class))).thenReturn(false);
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new IllegalArgumentException());
+			
+			//WHEN
+			//THEN
+			assertThrows(UnexpectedRollbackException.class,	() -> registeredService.createRegistered(registeredDTO, request));
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test createRegistered should throw UnexpectedRollbackException on OptimisticLockingFailureException")
+		public void createRegisteredTestShouldThrowUnexpectedRollbackExceptionOnOptimisticLockingFailureException() {
+			//GIVEN
+			RegisteredDTO registeredDTO = new RegisteredDTO();
+			registeredDTO.setEmail("Aaa@Aaa.com");
+
+			Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
+			when(registeredRepository.existsById(any(String.class))).thenReturn(false);
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new OptimisticLockingFailureException(""));
+			
+			//WHEN
+			//THEN
+			assertThrows(UnexpectedRollbackException.class, () -> registeredService.createRegistered(registeredDTO, request));
 		}
 	}
 }

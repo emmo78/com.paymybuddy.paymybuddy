@@ -92,8 +92,8 @@ class RegisterdDTOServiceTest {
 
 	@Test
 	@Tag("RegisterdDTOServiceTest")
-	@DisplayName("test registeredFromDTO should map password")
-	public void registeredFromDTOTestShouldNotMapPassword() {
+	@DisplayName("test registeredFromDTO should encode password and adjust date")
+	public void registeredFromDTOTestShouldNotEncodePasswordAndAdjustDate() {
 		//GIVEN
 		PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 		RegisteredDTO registeredDTO = new RegisteredDTO();
@@ -101,9 +101,9 @@ class RegisterdDTOServiceTest {
 		registeredDTO.setPassword("aaaPasswd");
 		registeredDTO.setFirstName("Aaa");
 		registeredDTO.setLastName("AAA");
-		registeredDTO.setBirthDate("01/21/1991");
-		registeredDTO.setIban("aaaIban");
-		registeredDTO.setBalance("100.00");
+		registeredDTO.setBirthDate("02/29/1991"); //1991 is not a leap year : 02/28/1991 expected
+		registeredDTO.setIban(null);
+		registeredDTO.setBalance(null);
 		when(dateStringPattern.getDateStringPattern()).thenReturn("MM/dd/yyyy");
 
 		//WHEN
@@ -120,9 +120,9 @@ class RegisterdDTOServiceTest {
 						"aaa@aaa.com",
 						"Aaa",
 						"AAA",
-						LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
-						"aaaIban",
-						100d);
+						LocalDate.parse("02/28/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+						null,
+						0d);
 		assertThat(passwordEncoder.matches("aaaPasswd", registeredResult.getPassword())).isTrue();
 	}
 }
