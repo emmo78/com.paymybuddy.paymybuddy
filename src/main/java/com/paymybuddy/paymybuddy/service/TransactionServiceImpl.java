@@ -65,16 +65,19 @@ public class TransactionServiceImpl implements TransactionService {
 			registeredRepository.findById(transactionDTO.getEmailReceiver()).ifPresentOrElse(receiver -> {
 				receiver.setBalance(receiver.getBalance()+amount);
 				receiver.addReceivedTransaction(transactionEnclosingScope);},
-					() -> {throw new ResourceNotFoundException("Registered receiver not found for transaction");});
+					() -> {throw new ResourceNotFoundException("Registered receiver "+transactionDTO.getEmailReceiver()+" not found for transaction");});
 			//CascadeType.MERGE => Update Registered sender & receiver cf IT test
 			//Throws: IllegalArgumentException | OptimisticLockingFailureException
 			transaction = transactionRepository.save(transactionEnclosingScope);
 		} catch (MappingException | IllegalArgumentException | ResourceNotFoundException | OptimisticLockingFailureException re) {
-			throw new UnexpectedRollbackException(re.getMessage());
+			log.error("{} : sender={} : {}", requestService.requestToString(request), transactionDTO.getEmailSender(), re.toString());
+			throw new UnexpectedRollbackException("Error while creating money transfer");
 		} catch (InsufficentFundsException ife) {
+			log.error("{} : sender={} : {}", requestService.requestToString(request), transactionDTO.getEmailSender(), ife.getMessage());
 			throw new InsufficentFundsException(ife.getMessage());
 		} catch (Exception e) {
-			throw new UnexpectedRollbackException(e.getMessage());
+			log.error("{} : {} ", requestService.requestToString(request),e.toString());
+			throw new UnexpectedRollbackException("Error while creating money transfer");
 		}
 	log.info("{} : transaction sender={} receiver={} amount={} fee={} persisted",
 			requestService.requestToString(request),
@@ -99,9 +102,11 @@ public class TransactionServiceImpl implements TransactionService {
 						}
 					});
 		} catch (IllegalArgumentException re) {
-			throw new UnexpectedRollbackException(re.getMessage());
+			log.error("{} : {} ", requestService.requestToString(request), re.toString());
+			throw new UnexpectedRollbackException("Error while looking for your money transactions");
 		} catch (Exception e) {
-			throw new UnexpectedRollbackException(e.getMessage());
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while looking for your money transactions");
 		}
 		log.info("{} : pageTransactionDTO number : {} of {}",
 				requestService.requestToString(request),

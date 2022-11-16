@@ -55,11 +55,14 @@ public class RegisteredServiceImpl implements RegisteredService {
 			//Throws IllegalArgumentException | OptimisticLockingFailureException
 			createdRegisteredDTO = registeredDTOService.registeredToDTO(registeredRepository.save(registered));			
 		} catch(ResourceConflictException rce) {
+			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), rce.toString());
 			throw new ResourceConflictException(rce.getMessage());
 		} catch(IllegalArgumentException | OptimisticLockingFailureException re) {
-			throw new UnexpectedRollbackException(re.getMessage());
+			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), re.toString());
+			throw new UnexpectedRollbackException("Error while creating your profile");
 		} catch(Exception e) {
-			throw new UnexpectedRollbackException(e.getMessage());
+			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), e.toString());
+			throw new UnexpectedRollbackException("Error while creating your profile");
 		}
 		log.info("{} : registered : {} created and persisted",
 				requestService.requestToString(request),

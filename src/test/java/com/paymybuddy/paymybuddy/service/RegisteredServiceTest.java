@@ -86,7 +86,9 @@ public class RegisteredServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThrows(UnexpectedRollbackException.class,	() -> registeredService.createRegistered(registeredDTO, request));
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+				() -> registeredService.createRegistered(registeredDTO, request))
+				.getMessage()).isEqualTo("Error while creating your profile");
 		}
 		
 		@Test
@@ -104,7 +106,9 @@ public class RegisteredServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThrows(UnexpectedRollbackException.class, () -> registeredService.createRegistered(registeredDTO, request));
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+				() -> registeredService.createRegistered(registeredDTO, request))
+				.getMessage()).isEqualTo("Error while creating your profile");
 		}
 	}
 }

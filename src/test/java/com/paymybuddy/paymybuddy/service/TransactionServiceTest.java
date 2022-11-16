@@ -72,12 +72,14 @@ public class TransactionServiceTest {
 		@DisplayName("test createATransaction should throw UnexpectedRollbackException On MappingException")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnMappingException() {
 			//GIVEN
-			TransactionDTO transactionDTO = new TransactionDTO();
+			TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenThrow(new MappingException(new ArrayList<ErrorMessage>()));
 			
 			//WHEN
 			//THEN
-			assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request));
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+				() -> transactionService.createATransaction(transactionDTO, request))
+				.getMessage()).isEqualTo("Error while creating money transfer");
 		}
 	
 		@Test
@@ -92,7 +94,9 @@ public class TransactionServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request));
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+				() -> transactionService.createATransaction(transactionDTO, request))
+				.getMessage()).isEqualTo("Error while creating money transfer");
 		}
 		
 		@Test
@@ -108,7 +112,9 @@ public class TransactionServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request));
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+				() -> transactionService.createATransaction(transactionDTO, request))
+				.getMessage()).isEqualTo("Error while creating money transfer");	
 		}
 	
 		@Test
@@ -125,8 +131,8 @@ public class TransactionServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> transactionService.createATransaction(transactionDTO, request))
-					.getMessage()).isEqualTo("Registered sender not found for transaction");
+				() -> transactionService.createATransaction(transactionDTO, request))
+				.getMessage()).isEqualTo("Error while creating money transfer");
 		}
 		
 		@Test
@@ -146,8 +152,8 @@ public class TransactionServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(InsufficentFundsException.class,
-					() -> transactionService.createATransaction(transactionDTO, request))
-					.getMessage()).isEqualTo("Insufficient funds for transaction : you need to transfert : 0.50 from bank");
+				() -> transactionService.createATransaction(transactionDTO, request))
+				.getMessage()).isEqualTo("Insufficient funds for transaction : you need to transfert : 0.50 from bank");
 		}
 		
 		@Test
@@ -165,7 +171,9 @@ public class TransactionServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request)).getMessage()).isEqualTo("Registered receiver not found for transaction");
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+				() -> transactionService.createATransaction(transactionDTO, request))
+				.getMessage()).isEqualTo("Error while creating money transfer");
 		}
 	}
 	
@@ -221,7 +229,9 @@ public class TransactionServiceTest {
 		
 			//WHEN
 			//THEN
-			assertThrows(UnexpectedRollbackException.class, () -> transactionService.getRegisteredAllTransaction("aaa@aaa.com", pageRequest, request));
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+				() -> transactionService.getRegisteredAllTransaction("aaa@aaa.com", pageRequest, request))
+				.getMessage()).isEqualTo("Error while looking for your money transactions");
 		}
 	}
 }
