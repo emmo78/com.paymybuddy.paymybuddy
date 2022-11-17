@@ -16,6 +16,7 @@ import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.dto.service.RegisteredDTOService;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
+import com.paymybuddy.paymybuddy.exception.ResourceNotFoundException;
 import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 
@@ -38,9 +39,24 @@ public class RegisteredServiceImpl implements RegisteredService {
 	private RequestService requestService;
 
 	@Override
-	public Optional<Registered> getRegistered(String email) {
-		
-		return null;
+	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
+	public Registered getRegistered(String email, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
+		Registered registered = null;
+		try {
+			//Throws ResourceNotFoundException | IllegalArgumentException
+			registered = (registeredRepository.findById(email.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Your email is not found")));
+		} catch (ResourceNotFoundException rnfe) {
+			log.error("{} : email={} : {} ", requestService.requestToString(request), email.toLowerCase(), rnfe.toString());
+			throw new ResourceNotFoundException(rnfe.getMessage());
+		} catch(IllegalArgumentException re) {
+			log.error("{} : email={} : {} ", requestService.requestToString(request), email.toLowerCase(), re.toString());
+			throw new UnexpectedRollbackException("Error while getting your profile");
+		} catch (Exception e) {
+			log.error("{} : email={} : {} ", requestService.requestToString(request), email.toLowerCase(), e.toString());
+			throw new UnexpectedRollbackException("Error while getting your profile");
+		}
+		log.info("{} : Registered {} gotten",  requestService.requestToString(request), registered.getEmail());
+		return registered;
 	}
 
 	@Override

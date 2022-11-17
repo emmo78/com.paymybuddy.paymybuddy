@@ -90,7 +90,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
-	public Page<TransactionDTO> getRegisteredAllTransaction(String email, Pageable pageRequest, WebRequest request) {
+	public Page<TransactionDTO> getRegisteredAllTransaction(String email, Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
 		Page<TransactionDTO> pageTransactionDTO = null;
 		try {
 			pageTransactionDTO = transactionRepository.findAllTransactionsByEmailSenderOrReceiver(email, pageRequest)

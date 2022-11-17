@@ -7,11 +7,8 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -46,8 +43,7 @@ public class TransactionDTOServiceTest {
 	@DisplayName("test transactionToDTOSender should have receiver false and negative amount")
 	public void transactionToDTOSenderTestShouldHaveReceiverFalseAndNegativeAmount() {
 		//GIVEN
-		Calendar calTransaction = new GregorianCalendar(2022, 9, 23, 18, 43, 55); //Month value is 0-based. e.g., 0 for January.
-		LocalDateTime dateTimeTransaction = LocalDateTime.ofInstant(calTransaction.toInstant(), ZoneId.systemDefault());
+		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
 		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
 		Registered registeredBReceiver = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "bbbIban");
 		Transaction transaction = new Transaction(dateTimeTransaction, 100);
@@ -82,8 +78,7 @@ public class TransactionDTOServiceTest {
 	@DisplayName("test transactionToDTOReceiver should have receiver true and fee to zero")
 	public void transactionToDTOReceiverTestShouldHaveReceiverTrueAndFeeZero() {
 		//GIVEN
-		Calendar calTransaction = new GregorianCalendar(2022, 9, 23, 18, 43, 55); //Month value is 0-based. e.g., 0 for January.
-		LocalDateTime dateTimeTransaction = LocalDateTime.ofInstant(calTransaction.toInstant(), ZoneId.systemDefault());
+		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
 		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
 		Registered registeredBReceiver = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "bbbIban");
 		Transaction transaction = new Transaction(dateTimeTransaction, 100);

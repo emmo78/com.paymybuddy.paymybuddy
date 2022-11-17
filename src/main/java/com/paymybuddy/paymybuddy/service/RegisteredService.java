@@ -10,10 +10,11 @@ import org.springframework.web.context.request.WebRequest;
 import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
+import com.paymybuddy.paymybuddy.exception.ResourceNotFoundException;
 import com.paymybuddy.paymybuddy.model.Registered;
 
 public interface RegisteredService {
-	Optional<Registered> getRegistered(String email);
+	Registered getRegistered(String email, WebRequest request) throws ResourceNotFoundException ,UnexpectedRollbackException;
 	RegisteredDTO createRegistered(RegisteredDTO registeredDTO, WebRequest request) throws ResourceConflictException, UnexpectedRollbackException;
 	RegisteredDTO updateRegistered(RegisteredDTO registeredDTO);
 	void removeRegistered(String email);

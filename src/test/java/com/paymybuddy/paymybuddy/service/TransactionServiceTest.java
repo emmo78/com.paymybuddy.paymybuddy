@@ -13,13 +13,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.MappingException;
 import org.modelmapper.spi.ErrorMessage;
@@ -28,7 +35,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
@@ -55,24 +64,55 @@ public class TransactionServiceTest {
 	@Mock
 	private RegisteredRepository registeredRepository;
 	
-	@Mock
-	private RequestService requestService;
+	@Spy
+	private RequestService requestService = new RequestServiceImpl();
 	
 	@Mock
 	private DateTimePatternProperties dateStringPattern;
 	
-	private WebRequest request = null;
+	private MockHttpServletRequest requestMock;
+	private WebRequest request;
 	
 	@Nested
 	@Tag("createATransactionTests")
 	@DisplayName("Tests for method createATransaction")
+	@TestInstance(Lifecycle.PER_CLASS)
 	class CreateATransactionTests{
+		
+		private TransactionDTO transactionDTO;
+		private Transaction transaction;
+
+		@BeforeAll
+		public void setUpForAllCreateATransactionTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/createTransaction");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllCreateATransactionTests() {
+			requestMock = null;
+			request = null;
+		}
+		
+		@BeforeEach
+		public void setUpForEachTests() {
+			transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+			transaction = new Transaction(LocalDateTime.now(), 100.0);
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			transactionDTO = null;
+			transaction = null;
+		}
+		
 		@Test
 		@Tag("TransactionServiceTest")
 		@DisplayName("test createATransaction should throw UnexpectedRollbackException On MappingException")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnMappingException() {
 			//GIVEN
-			TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenThrow(new MappingException(new ArrayList<ErrorMessage>()));
 			
 			//WHEN
@@ -87,8 +127,6 @@ public class TransactionServiceTest {
 		@DisplayName("test createATransaction should throw UnexpectedRollbackException On OptimisticLockingFailureException")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnOptimisticLockingFailureException() {
 			//GIVEN
-			TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
-			Transaction transaction = new Transaction(LocalDateTime.now(), 100.0);
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
 			when(transactionRepository.save(any(Transaction.class))).thenThrow(new OptimisticLockingFailureException(""));
 			
@@ -104,8 +142,6 @@ public class TransactionServiceTest {
 		@DisplayName("test createATransaction should throw UnexpectedRollbackException On IllegalArgumentException")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnIllegalArgumentException() {
 			//GIVEN
-			TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
-			Transaction transaction = new Transaction(LocalDateTime.now(), 100.0);
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
 			when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 			when(registeredRepository.findById(any(String.class))).thenThrow(new IllegalArgumentException());
@@ -122,8 +158,6 @@ public class TransactionServiceTest {
 		@DisplayName("test createATransaction should throw UnexpectedRollbackException On ResourceNotFoundException for Sender")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundExceptionForSender() {
 			//GIVEN
-			TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
-			Transaction transaction = new Transaction(LocalDateTime.now(), 100.0);
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
 			when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
 			when(registeredRepository.findById(any(String.class))).thenReturn(Optional.ofNullable(null));
@@ -140,8 +174,6 @@ public class TransactionServiceTest {
 		@DisplayName("test createATransaction should throw InsufficentFundsException")
 		public void createATransactionTestShouldThrowInsufficentFundsException() {
 			//GIVEN
-			TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
-			Transaction transaction = new Transaction(LocalDateTime.now(), 100.0);
 			Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 			registeredASender.setBalance(100.0);
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
@@ -161,8 +193,6 @@ public class TransactionServiceTest {
 		@DisplayName("test createATransaction should throw UnexpectedRollbackException On ResourceNotFoundException for Receiver")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundExceptionForReceiver() {
 			//GIVEN
-			TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
-			Transaction transaction = new Transaction(LocalDateTime.now(), 100.0);
 			Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 			registeredASender.setBalance(100.5);
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
@@ -180,9 +210,26 @@ public class TransactionServiceTest {
 	@Nested
 	@Tag("getRegisteredAllTransactionTests")
 	@DisplayName("Tests for method getRegisteredAllTransaction")
+	@TestInstance(Lifecycle.PER_CLASS)
 	class GetRegisteredAllTransactionTests {
 
-		private Pageable pageRequest = PageRequest.of(0, 3);
+		private Pageable pageRequest;
+
+		@BeforeAll
+		public void setUpForAllCreateATransactionTests() {
+			pageRequest = PageRequest.of(0, 3);
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/transfert?email=aaa@aaa.com");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllCreateATransactionTests() {
+			pageRequest = null;
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("TransactionServiceTest")

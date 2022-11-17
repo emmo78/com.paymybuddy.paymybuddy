@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -40,10 +42,28 @@ public class TransactionServiceIT {
 	@Autowired
 	private RegisteredRepository registeredRepository;
 	
+	private static MockHttpServletRequest requestMock;
+	private static WebRequest request;
+	
+	@BeforeAll
+	public static void setUpForAllTests() {
+		requestMock = new MockHttpServletRequest();
+		requestMock.setServerName("http://localhost:8080");
+		requestMock.setRequestURI("/createTransaction");
+		request = new ServletWebRequest(requestMock);
+	}
+
+	@AfterAll
+	public static void unSetForAllTests() {
+		requestMock=null;
+		request=null;
+	}
+	
 	@AfterEach
-	public void undefPerTest() {
+	public void unSetForEachTests() {
 		transactionRepository.deleteAll();
 		registeredRepository.deleteAll();
+		
 	}
 	
 	@Test
@@ -59,11 +79,6 @@ public class TransactionServiceIT {
 		
 		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
-		
-		MockHttpServletRequest requestMock = new MockHttpServletRequest();
-		requestMock.setServerName("http://localhost:8080");
-		requestMock.setRequestURI("/createTransaction");
-		WebRequest request = new ServletWebRequest(requestMock);
 		
 		//WHEN
 		TransactionDTO transactionDTOResult = transactionService.createATransaction(transactionDTO, request);
@@ -100,9 +115,6 @@ public class TransactionServiceIT {
 		registeredASender.setBalance(100.0);
 		registeredRepository.saveAndFlush(registeredASender);
 		
-		MockHttpServletRequest requestMock = new MockHttpServletRequest();
-		WebRequest request = new ServletWebRequest(requestMock);
-		
 		//WHEN
 		//THEN
 		assertThat(assertThrows(InsufficentFundsException.class,
@@ -123,9 +135,6 @@ public class TransactionServiceIT {
 		registeredASender.setBalance(100.5);
 		registeredRepository.saveAndFlush(registeredASender);
 		
-		MockHttpServletRequest requestMock = new MockHttpServletRequest();
-		WebRequest request = new ServletWebRequest(requestMock);
-		
 		//WHEN
 		//THEN
 		assertThat(assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request)).getMessage()).isEqualTo("Registered receiver not found for transaction");
@@ -133,4 +142,3 @@ public class TransactionServiceIT {
 		assertThat(registeredRepository.findById("aaa@aaa.com").get().getBalance()).isEqualTo(100.5);
 	}
 }
-
