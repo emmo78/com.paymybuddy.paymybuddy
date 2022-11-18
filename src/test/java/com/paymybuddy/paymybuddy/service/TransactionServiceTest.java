@@ -18,7 +18,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -303,7 +302,6 @@ public class TransactionServiceTest {
 		}
 		
 		@Test
-		@Disabled
 		@Tag("TransactionServiceTest")
 		@DisplayName("test getRegisteredAllTransaction should throw UnexpectedRollbackException on IllegalArgumentException")
 		public void getRegisteredAllTransactionTestShouldThrowUnexpectedRollbackExceptionOnIllegalArgumentException() {
@@ -319,7 +317,6 @@ public class TransactionServiceTest {
 		}
 		
 		@Test
-		@Disabled
 		@Tag("TransactionServiceTest")
 		@DisplayName("test getRegisteredAllTransaction should throw UnexpectedRollbackException on any RuntimeException")
 		public void getRegisteredAllTransactionTestShouldThrowUnexpectedRollbackExceptionOnAnyuntimeException() {

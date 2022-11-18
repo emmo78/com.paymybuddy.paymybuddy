@@ -87,9 +87,44 @@ public class RegisteredServiceImpl implements RegisteredService {
 	}
 
 	@Override
-	public RegisteredDTO updateRegistered(RegisteredDTO registeredDTO) {
-		// TODO Auto-generated method stub
-		return null;
+	public RegisteredDTO updateRegistered(RegisteredDTO registeredDTO, WebRequest request) throws UnexpectedRollbackException {
+		RegisteredDTO updatedRegisteredDTO = null;
+		try {
+			Registered registered = registeredDTOService.registeredFromDTO(registeredDTO);
+			//Throws IllegalArgumentException
+			Registered registeredToUpdate = registeredRepository.findById(registered.getEmail()).get();
+			Optional.ofNullable(registered.getFirstName()).ifPresent(firstName -> {
+				if (!firstName.equals(registeredToUpdate.getFirstName())) {
+					registeredToUpdate.setFirstName(firstName);
+				}
+			});
+			Optional.ofNullable(registered.getLastName()).ifPresent(lastName -> {
+				if (!lastName.equals(registeredToUpdate.getLastName())) {
+					registeredToUpdate.setLastName(lastName);
+				}
+			});
+			Optional.ofNullable(registered.getBirthDate()).ifPresent(birthDate -> {
+				if (!birthDate.equals(registeredToUpdate.getBirthDate())) {
+					registeredToUpdate.setBirthDate(birthDate);
+				}
+			});
+			String iban = registered.getIban();
+			if (!iban.equals(registeredToUpdate.getIban())) {
+				registeredToUpdate.setIban(iban);
+			}
+			//Throws IllegalArgumentException | OptimisticLockingFailureException
+			updatedRegisteredDTO = registeredDTOService.registeredToDTO(registeredRepository.save(registeredToUpdate));
+		} catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), re.toString());
+			throw new UnexpectedRollbackException("Error while creating your profile");
+		} catch(Exception e) {
+			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), e.toString());
+			throw new UnexpectedRollbackException("Error while creating your profile");
+		}
+		log.info("{} : registered : {} updated and persisted",
+				requestService.requestToString(request),
+				updatedRegisteredDTO.getEmail());
+		return updatedRegisteredDTO;
 	}
 
 	@Override
