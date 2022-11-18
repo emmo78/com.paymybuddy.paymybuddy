@@ -72,7 +72,7 @@ public class RegisteredDTOServiceImpl implements RegisteredDTOService {
 		};
 		Converter<String, String> encodePW = new AbstractConverter<String, String>() {
 			protected String convert(String passwd) {
-				return passwordEncoder.encode(passwd);
+				return passwd == null ? null : passwordEncoder.encode(passwd);
 			}
 		};
 		modelMapper.typeMap(RegisteredDTO.class, Registered.class).addMappings(mapper -> {

@@ -181,13 +181,14 @@ public class RegisteredServiceIT {
 		@BeforeEach
 		public void setUpForEachTests() {
 			registeredDTO = new RegisteredDTO();
-			registeredDTO.setEmail("Aaa@Aaa.com");
-			registeredDTO.setPassword("aaaPasswd");
-			registeredDTO.setFirstName("Aaa");
-			registeredDTO.setLastName("AAA");
-			registeredDTO.setBirthDate("01/01/1991");
-			registeredDTO.setIban(null);
-			registeredDTO.setBalance(null);
+			registeredDTO.setEmail("Aaa@Aaa.com"); //NOT Updated
+			registeredDTO.setPassword(null); //NOT Updated
+			registeredDTO.setFirstName("Aaa"); //Equal -> expect not Updated
+			registeredDTO.setLastName(null); //Null -> expect not updated
+			registeredDTO.setBirthDate("02/02/1992"); //expect updated
+			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
+			registeredDTO.setBalance(null); //NOT Updated
+
 		}
 		
 		@AfterEach
@@ -195,5 +196,55 @@ public class RegisteredServiceIT {
 			registeredRepository.deleteAll();
 			registeredDTO = null;
 		}
+		
+		@Test
+		@Tag("RegisteredServiceIT")
+		@DisplayName("IT UpdateRegistered should update and commit")
+		public void updateRegisteredITShouldUpdateAndCommit() {
+			//GIVEN
+			Registered registeredToUpate =  new Registered(
+					"aaa@aaa.com",
+					passwordEncoder.encode("aaaPasswd"),
+					"Aaa",
+					"AAA",
+					LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+					null);
+			registeredToUpate.setBalance(100);
+			registeredRepository.saveAndFlush(registeredToUpate);
+			
+			//WHEN
+			RegisteredDTO registerdDTOResult = registeredService.updateRegistered(registeredDTO, request);
+			Registered registeredResult = registeredRepository.findById("aaa@aaa.com").get();
+			
+			//THEN
+			assertThat(registerdDTOResult).extracting(
+					RegisteredDTO::getEmail,
+					RegisteredDTO::getFirstName,
+					RegisteredDTO::getLastName,
+					RegisteredDTO::getBirthDate,
+					RegisteredDTO::getIban,
+					RegisteredDTO::getBalance).containsExactly(
+							"aaa@aaa.com",
+							"Aaa",
+							"AAA",
+							"02/02/1992",
+							"FR7601234567890123456789",
+							"100.00");
+			assertThat(registeredResult).extracting(
+					Registered::getEmail,
+					Registered::getFirstName,
+					Registered::getLastName,
+					Registered::getBirthDate,
+					Registered::getIban,
+					Registered::getBalance).containsExactly(
+							"aaa@aaa.com",
+							"Aaa",
+							"AAA",
+							LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+							"FR7601234567890123456789",
+							100d);
+			assertThat(passwordEncoder.matches("aaaPasswd", registeredResult.getPassword())).isTrue();
+		}
+
 	}
 }
