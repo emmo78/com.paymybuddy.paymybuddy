@@ -3,7 +3,8 @@ package com.paymybuddy.paymybuddy.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterAll;
@@ -25,10 +26,8 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
-import com.paymybuddy.paymybuddy.dto.TransactionDTO;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.model.Registered;
-import com.paymybuddy.paymybuddy.model.Transaction;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 
 @SpringBootTest
@@ -40,8 +39,10 @@ public class RegisteredServiceIT {
 	@Autowired
 	private RegisteredRepository registeredRepository;
 	
-	private static MockHttpServletRequest requestMock;
-	private static WebRequest request;
+	private MockHttpServletRequest requestMock;
+	private WebRequest request;
+	private RegisteredDTO registeredDTO;
+	private PasswordEncoder passwordEncoder;
 	
 	@Nested
 	@Tag("createRegisteredIT")
@@ -49,15 +50,12 @@ public class RegisteredServiceIT {
 	@TestInstance(Lifecycle.PER_CLASS)
 	class CreateRegisteredIT {
 		
-		private PasswordEncoder passwordEncoder;
-		private RegisteredDTO registeredDTO;
-		
 		@BeforeAll
 		public void setUpForAllTests() {
 			passwordEncoder = new BCryptPasswordEncoder();
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/createregistered");
+			requestMock.setRequestURI("/createRegistered");
 			request = new ServletWebRequest(requestMock);
 		}			
 
@@ -139,8 +137,63 @@ public class RegisteredServiceIT {
 			assertThat(assertThrows(ResourceConflictException.class,
 					() -> registeredService.createRegistered(registeredDTO, request))
 					.getMessage()).isEqualTo("User already exists");
-			Optional<Registered> registeredResultOpt = registeredRepository.findById("aaa@aaa.com");
-			assertThat(passwordEncoder.matches("bbbPasswd", registeredResultOpt.get().getPassword())).isFalse();
+			Registered registeredResult = registeredRepository.findById("aaa@aaa.com").get();
+			assertThat(registeredResult).extracting(
+					Registered::getEmail,
+					Registered::getFirstName,
+					Registered::getLastName,
+					Registered::getBirthDate,
+					Registered::getIban,
+					Registered::getBalance).containsExactly(
+							"aaa@aaa.com",
+							"Aaa",
+							"AAA",
+							LocalDate.parse("02/28/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+							null,
+							0d);
+			assertThat(passwordEncoder.matches("bbbPasswd", registeredResult.getPassword())).isFalse();
+			assertThat(passwordEncoder.matches("aaaPasswd", registeredResult.getPassword())).isTrue();
+		}
+	}
+	
+	@Nested
+	@Tag("updateRegisteredIT")
+	@DisplayName("IT for method updateRegistered")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class GetRegisteredIT {
+		
+		@BeforeAll
+		public void setUpForAllTests() {
+			passwordEncoder = new BCryptPasswordEncoder();
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/updateRegistered");
+			request = new ServletWebRequest(requestMock);
+		}			
+
+		@AfterAll
+		public void unSetForAllTests() {
+			passwordEncoder = null;
+			requestMock=null;
+			request=null;
+		}
+		
+		@BeforeEach
+		public void setUpForEachTests() {
+			registeredDTO = new RegisteredDTO();
+			registeredDTO.setEmail("Aaa@Aaa.com");
+			registeredDTO.setPassword("aaaPasswd");
+			registeredDTO.setFirstName("Aaa");
+			registeredDTO.setLastName("AAA");
+			registeredDTO.setBirthDate("01/01/1991");
+			registeredDTO.setIban(null);
+			registeredDTO.setBalance(null);
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredRepository.deleteAll();
+			registeredDTO = null;
 		}
 	}
 }

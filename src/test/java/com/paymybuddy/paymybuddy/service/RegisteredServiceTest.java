@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,12 +23,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
@@ -165,7 +170,7 @@ public class RegisteredServiceTest {
 	@Tag("getRegisteredTests")
 	@DisplayName("Tests for method getRegistered")
 	@TestInstance(Lifecycle.PER_CLASS)
-	class getRegisteredTests {
+	class GetRegisteredTests {
 		
 		@BeforeAll
 		public void setUpForAllCreateATransactionTests() {
@@ -222,6 +227,87 @@ public class RegisteredServiceTest {
 				() -> registeredService.getRegistered("aaa@aaa.com", request))
 				.getMessage()).isEqualTo("Error while getting your profile");
 		}
+	}
+	
+	@Nested
+	@Tag("UpdateRegisteredTests")
+	@DisplayName("Tests for method updateRegistered")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class UpdateRegisteredTests {
+		
+		@BeforeAll
+		public void setUpForAllCreateATransactionTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/getRegistered");
+			request = new ServletWebRequest(requestMock);
+		}
 
+		@AfterAll
+		public void unSetForAllCreateATransactionTests() {
+			requestMock = null;
+			request = null;
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test UpdateRegistered should update not null and equal")
+		public void updateRegisteredTestShouldUpdateNotNullAndEqual() {
+			//GIVEN
+			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			
+			RegisteredDTO registeredDTO = new RegisteredDTO();
+			registeredDTO.setEmail("Aaa@Aaa.com"); //NOT Updated
+			registeredDTO.setPassword(null); //NOT Updated
+			registeredDTO.setFirstName("Aaa"); //Equal -> expect not Updated
+			registeredDTO.setLastName(null); //Null -> expect not updated
+			registeredDTO.setBirthDate("02/02/1992"); //expect updated
+			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
+			registeredDTO.setBalance(null); //NOT Updated
+			
+			Registered registered = new Registered(
+					"aaa@aaa.com",
+					null,
+					"Aaa",
+					null,
+					LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+					"FR7601234567890123456789");
+			registered.setBalance(0);
+			
+			Registered registeredToUpate =  new Registered(
+					"aaa@aaa.com",
+					passwordEncoder.encode("aaaPasswd"),
+					"Aaa",
+					"AAA",
+					LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+					null);
+			registeredToUpate.setBalance(100);
+			
+			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredToUpate));
+			ArgumentCaptor<Registered> registeredResultCapt = ArgumentCaptor.forClass(Registered.class);
+			when(registeredRepository.save(any(Registered.class))).thenReturn(registered);
+			when(registeredDTOService.registeredToDTO(any(Registered.class))).thenReturn(registeredDTO);
+			
+			//WHEN
+			registeredService.updateRegistered(registeredDTO, request);
+			
+			//THEN
+			verify(registeredRepository, times(1)).save(registeredResultCapt.capture());
+			assertThat(registeredResultCapt.getValue()).extracting(
+					Registered::getEmail,
+					Registered::getFirstName,
+					Registered::getLastName,
+					Registered::getBirthDate,
+					Registered::getIban,
+					Registered::getBalance).containsExactly(
+							"aaa@aaa.com",
+							"Aaa",
+							"AAA",
+							LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+							"FR7601234567890123456789",
+							100d);
+			assertThat(passwordEncoder.matches("aaaPasswd", registeredResultCapt.getValue().getPassword())).isTrue();
+		}
 	}
 }
