@@ -1,6 +1,7 @@
 package com.paymybuddy.paymybuddy.service;
 
 import java.util.Locale;
+import java.util.Optional;
 
 import org.modelmapper.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import com.paymybuddy.paymybuddy.dto.TransactionDTO;
 import com.paymybuddy.paymybuddy.dto.service.TransactionDTOService;
 import com.paymybuddy.paymybuddy.exception.InsufficentFundsException;
 import com.paymybuddy.paymybuddy.exception.ResourceNotFoundException;
+import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.model.Transaction;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 import com.paymybuddy.paymybuddy.repository.TransactionRepository;
@@ -95,7 +97,7 @@ public class TransactionServiceImpl implements TransactionService {
 		try {
 			pageTransactionDTO = transactionRepository.findAllTransactionsByEmailSenderOrReceiver(email, pageRequest)
 					.map(t -> {
-						if(email.equals(t.getSender().getEmail())) {
+						if(email.equals(Optional.ofNullable(t.getSender()).orElse(new Registered()).getEmail())) {
 							return transactionDTOService.transactionToDTOSender(t);
 						} else {
 							return transactionDTOService.transactionToDTOReceiver(t);

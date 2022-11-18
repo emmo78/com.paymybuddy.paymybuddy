@@ -15,6 +15,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -29,6 +31,7 @@ import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 import com.paymybuddy.paymybuddy.repository.TransactionRepository;
 
 @SpringBootTest
+@TestInstance(Lifecycle.PER_CLASS)
 public class TransactionServiceIT {
 
 	@Autowired
@@ -46,7 +49,7 @@ public class TransactionServiceIT {
 	private static WebRequest request;
 	
 	@BeforeAll
-	public static void setUpForAllTests() {
+	public void setUpForAllTests() {
 		requestMock = new MockHttpServletRequest();
 		requestMock.setServerName("http://localhost:8080");
 		requestMock.setRequestURI("/createTransaction");
@@ -54,7 +57,7 @@ public class TransactionServiceIT {
 	}
 
 	@AfterAll
-	public static void unSetForAllTests() {
+	public void unSetForAllTests() {
 		requestMock=null;
 		request=null;
 	}
@@ -63,9 +66,8 @@ public class TransactionServiceIT {
 	public void unSetForEachTests() {
 		transactionRepository.deleteAll();
 		registeredRepository.deleteAll();
-		
 	}
-	
+
 	@Test
 	@Tag("TransactionServiceIT")
 	@DisplayName("IT createATransaction should commit it and return transactionDTO for Sender")
@@ -137,8 +139,10 @@ public class TransactionServiceIT {
 		
 		//WHEN
 		//THEN
-		assertThat(assertThrows(UnexpectedRollbackException.class, () -> transactionService.createATransaction(transactionDTO, request)).getMessage()).isEqualTo("Registered receiver not found for transaction");
+		assertThat(assertThrows(UnexpectedRollbackException.class,
+			() -> transactionService.createATransaction(transactionDTO, request))
+			.getMessage()).isEqualTo("Error while creating money transfer");
 		assertThat(transactionRepository.count()).isZero();
 		assertThat(registeredRepository.findById("aaa@aaa.com").get().getBalance()).isEqualTo(100.5);
-	}
+	}	
 }

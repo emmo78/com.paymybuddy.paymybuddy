@@ -3,6 +3,7 @@ package com.paymybuddy.paymybuddy.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -77,7 +79,7 @@ public class TransactionServiceTest {
 	@Tag("createATransactionTests")
 	@DisplayName("Tests for method createATransaction")
 	@TestInstance(Lifecycle.PER_CLASS)
-	class CreateATransactionTests{
+	class CreateATransactionTests {
 		
 		private TransactionDTO transactionDTO;
 		private Transaction transaction;
@@ -110,7 +112,7 @@ public class TransactionServiceTest {
 		
 		@Test
 		@Tag("TransactionServiceTest")
-		@DisplayName("test createATransaction should throw UnexpectedRollbackException On MappingException")
+		@DisplayName("test createATransaction should throw UnexpectedRollbackException on MappingException")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnMappingException() {
 			//GIVEN
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenThrow(new MappingException(new ArrayList<ErrorMessage>()));
@@ -124,7 +126,7 @@ public class TransactionServiceTest {
 	
 		@Test
 		@Tag("TransactionServiceTest")
-		@DisplayName("test createATransaction should throw UnexpectedRollbackException On OptimisticLockingFailureException")
+		@DisplayName("test createATransaction should throw UnexpectedRollbackException on OptimisticLockingFailureException")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnOptimisticLockingFailureException() {
 			//GIVEN
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
@@ -139,7 +141,7 @@ public class TransactionServiceTest {
 		
 		@Test
 		@Tag("TransactionServiceTest")
-		@DisplayName("test createATransaction should throw UnexpectedRollbackException On IllegalArgumentException")
+		@DisplayName("test createATransaction should throw UnexpectedRollbackException on IllegalArgumentException")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnIllegalArgumentException() {
 			//GIVEN
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
@@ -155,12 +157,12 @@ public class TransactionServiceTest {
 	
 		@Test
 		@Tag("TransactionServiceTest")
-		@DisplayName("test createATransaction should throw UnexpectedRollbackException On ResourceNotFoundException for Sender")
+		@DisplayName("test createATransaction should throw UnexpectedRollbackException on ResourceNotFoundException for Sender")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundExceptionForSender() {
 			//GIVEN
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
 			when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
-			when(registeredRepository.findById(any(String.class))).thenReturn(Optional.ofNullable(null));
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.ofNullable(null));
 			
 			//WHEN
 			//THEN
@@ -178,7 +180,7 @@ public class TransactionServiceTest {
 			registeredASender.setBalance(100.0);
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
 			when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
-			when(registeredRepository.findById(any(String.class))).thenReturn(Optional.ofNullable(registeredASender));
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.ofNullable(registeredASender));
 			when(dateStringPattern.getLocalLanguage()).thenReturn("en");
 			
 			//WHEN
@@ -190,14 +192,32 @@ public class TransactionServiceTest {
 		
 		@Test
 		@Tag("TransactionServiceTest")
-		@DisplayName("test createATransaction should throw UnexpectedRollbackException On ResourceNotFoundException for Receiver")
+		@DisplayName("test createATransaction should throw UnexpectedRollbackException on ResourceNotFoundException for Receiver")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundExceptionForReceiver() {
 			//GIVEN
 			Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 			registeredASender.setBalance(100.5);
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
 			when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
-			when(registeredRepository.findById(any(String.class))).thenReturn(Optional.ofNullable(registeredASender)).thenReturn(Optional.ofNullable(null));
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.ofNullable(registeredASender)).thenReturn(Optional.ofNullable(null));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+				() -> transactionService.createATransaction(transactionDTO, request))
+				.getMessage()).isEqualTo("Error while creating money transfer");
+		}
+		
+		@Test
+		@Tag("TransactionServiceTest")
+		@DisplayName("test createATransaction should throw UnexpectedRollbackException on any RuntimeException")
+		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+			registeredASender.setBalance(100.5);
+			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
+			when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
+			when(registeredRepository.findById(anyString())).thenThrow(new RuntimeException());
 			
 			//WHEN
 			//THEN
@@ -244,6 +264,13 @@ public class TransactionServiceTest {
 			Transaction transactionBtoA = new Transaction(LocalDateTime.now(), 100);
 			transactionBtoA.setSender(registeredB);
 			transactionBtoA.setReceiver(registeredA);
+			Transaction transactionAtoNull = new Transaction(LocalDateTime.now(), 100);
+			transactionAtoNull.setSender(registeredA);
+			transactionAtoNull.setReceiver(null);
+			Transaction transactionNulltoA = new Transaction(LocalDateTime.now(), 100);
+			transactionNulltoA.setSender(null);
+			transactionNulltoA.setReceiver(registeredA);
+			
 			TransactionDTO transactionAtoBDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 			transactionAtoBDTO.setAmount("-100.00");
 			transactionAtoBDTO.setFee("-0.50");
@@ -252,11 +279,20 @@ public class TransactionServiceTest {
 			transactionBtoADTO.setAmount("100.00");
 			transactionBtoADTO.setFee("0.00");
 			transactionBtoADTO.setReceiver(true);
-			List<TransactionDTO> transactionsDTOExpected = Arrays.asList(transactionAtoBDTO, transactionBtoADTO);
-			when(transactionRepository.findAllTransactionsByEmailSenderOrReceiver(any(String.class), any(Pageable.class)))
-				.thenReturn(new PageImpl<Transaction>(Arrays.asList(transactionAtoB, transactionBtoA), pageRequest, 2));
-			when(transactionDTOService.transactionToDTOSender(any(Transaction.class))).thenReturn(transactionAtoBDTO);
-			when(transactionDTOService.transactionToDTOReceiver(any(Transaction.class))).thenReturn(transactionBtoADTO);
+			TransactionDTO transactionAtoNullDTO = new TransactionDTO("aaa@aaa.com", null);
+			transactionAtoNullDTO.setAmount("-100.00");
+			transactionAtoNullDTO.setFee("-0.50");
+			transactionAtoNullDTO.setReceiver(false);
+			TransactionDTO transactionNulltoADTO = new TransactionDTO(null, "aaa@aaa.com");
+			transactionNulltoADTO.setAmount("100.00");
+			transactionNulltoADTO.setFee("0.00");
+			transactionNulltoADTO.setReceiver(true);
+			
+			List<TransactionDTO> transactionsDTOExpected = Arrays.asList(transactionAtoBDTO, transactionBtoADTO, transactionAtoNullDTO, transactionNulltoADTO);
+			when(transactionRepository.findAllTransactionsByEmailSenderOrReceiver(anyString(), any(Pageable.class)))
+				.thenReturn(new PageImpl<Transaction>(Arrays.asList(transactionAtoB, transactionBtoA, transactionAtoNull, transactionNulltoA), pageRequest, 4));
+			when(transactionDTOService.transactionToDTOSender(any(Transaction.class))).thenReturn(transactionAtoBDTO).thenReturn(transactionAtoNullDTO);
+			when(transactionDTOService.transactionToDTOReceiver(any(Transaction.class))).thenReturn(transactionBtoADTO).thenReturn(transactionNulltoADTO);
 			
 			//WHEN
 			Page<TransactionDTO> pageTransactionDTO = transactionService.getRegisteredAllTransaction("aaa@aaa.com", pageRequest, request);
@@ -267,11 +303,12 @@ public class TransactionServiceTest {
 		}
 		
 		@Test
+		@Disabled
 		@Tag("TransactionServiceTest")
-		@DisplayName("test getRegisteredAllTransaction should throw UnexpectedRollbackException On IllegalArgumentException")
+		@DisplayName("test getRegisteredAllTransaction should throw UnexpectedRollbackException on IllegalArgumentException")
 		public void getRegisteredAllTransactionTestShouldThrowUnexpectedRollbackExceptionOnIllegalArgumentException() {
 			//GIVEN
-			when(transactionRepository.findAllTransactionsByEmailSenderOrReceiver(any(String.class), any(Pageable.class)))
+			when(transactionRepository.findAllTransactionsByEmailSenderOrReceiver(anyString(), any(Pageable.class)))
 			.thenThrow(new IllegalArgumentException());
 		
 			//WHEN
@@ -280,5 +317,22 @@ public class TransactionServiceTest {
 				() -> transactionService.getRegisteredAllTransaction("aaa@aaa.com", pageRequest, request))
 				.getMessage()).isEqualTo("Error while looking for your money transactions");
 		}
+		
+		@Test
+		@Disabled
+		@Tag("TransactionServiceTest")
+		@DisplayName("test getRegisteredAllTransaction should throw UnexpectedRollbackException on any RuntimeException")
+		public void getRegisteredAllTransactionTestShouldThrowUnexpectedRollbackExceptionOnAnyuntimeException() {
+			//GIVEN
+			when(transactionRepository.findAllTransactionsByEmailSenderOrReceiver(anyString(), any(Pageable.class)))
+			.thenThrow(new RuntimeException());
+		
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+				() -> transactionService.getRegisteredAllTransaction("aaa@aaa.com", pageRequest, request))
+				.getMessage()).isEqualTo("Error while looking for your money transactions");
+		}
+
 	}
 }

@@ -42,13 +42,14 @@ public class TransactionDTOServiceImpl implements TransactionDTOService {
 				return String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", amountFee);
 			}
 		};
-
+		
 		modelMapper.typeMap(Transaction.class, TransactionDTO.class).addMappings(mapper -> {
 			mapper.using(dateTimeToString).map(Transaction::getDateTime, TransactionDTO::setDateTime);
 			mapper.using(amountFeeToNegString).map(Transaction::getAmount, TransactionDTO::setAmount);
 			mapper.using(amountFeeToNegString).map(Transaction::getFee, TransactionDTO::setFee);
 			mapper.skip(TransactionDTO::setReceiver);
 		});
+		
 		TransactionDTO transactionDTO = modelMapper.map(transaction, TransactionDTO.class);
 		transactionDTO.setReceiver(false);
 		return transactionDTO;
@@ -68,17 +69,20 @@ public class TransactionDTOServiceImpl implements TransactionDTOService {
 				return String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", amount);
 			}
 		};
+		
 		modelMapper.typeMap(Transaction.class, TransactionDTO.class).addMappings(mapper -> {
 			mapper.using(dateTimeToString).map(Transaction::getDateTime, TransactionDTO::setDateTime);
 			mapper.using(amountToString).map(Transaction::getAmount, TransactionDTO::setAmount);
 			mapper.skip(TransactionDTO::setFee);
 			mapper.skip(TransactionDTO::setReceiver);
 		});
+		
 		TransactionDTO transactionDTO = modelMapper.map(transaction, TransactionDTO.class);
 		transactionDTO.setFee("0.00");
 		transactionDTO.setReceiver(true);
 		return transactionDTO;
 	}
+	
 	@Override
 	public Transaction transactionFromNewTransactionDTO(TransactionDTO transactionDTO) throws MappingException{
 		Converter<String, Double> stringToDouble = new AbstractConverter<String, Double>() {
@@ -93,11 +97,13 @@ public class TransactionDTOServiceImpl implements TransactionDTOService {
 				return amount;
 			}
 		};
+		
 		modelMapper.typeMap(TransactionDTO.class, Transaction.class).addMappings(mapper -> {
 			mapper.using(stringToDouble).map(TransactionDTO::getAmount, Transaction::setAmount);
 			mapper.skip(Transaction::setDateTime);
 			mapper.skip(Transaction::setFee);
 		});
+		
 		Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
 		transaction.setDateTime(LocalDateTime.now());
 		transaction.monetize();

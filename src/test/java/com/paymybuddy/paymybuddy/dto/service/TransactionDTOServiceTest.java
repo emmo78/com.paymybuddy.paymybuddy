@@ -75,6 +75,40 @@ public class TransactionDTOServiceTest {
 
 	@Test
 	@Tag("TransactionDTOServiceTest")
+	@DisplayName("test transactionToDTOSender should have email receiver null")
+	public void transactionToDTOSenderTestShouldHaveEamilReceiverNull() {
+		//GIVEN
+		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
+		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+		Transaction transaction = new Transaction(dateTimeTransaction, 100);
+		transaction.setSender(registeredASender);
+		transaction.setReceiver(null);
+		when(dateStringPattern.getDateTimeStringPattern()).thenReturn("MM/dd/yyyy HH:mm:ss");
+		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
+
+		//WHEN
+		TransactionDTO transactionDTOresult = transactionDTOService.transactionToDTOSender(transaction);
+		
+		//THEN
+		assertThat(transactionDTOresult).extracting(
+				TransactionDTO::getDateTime,
+				TransactionDTO::getAmount,
+				TransactionDTO::getFee,
+				TransactionDTO::getEmailSender,
+				TransactionDTO::getEmailReceiver,
+				TransactionDTO::isReceiver
+				).containsExactly(
+						"10/23/2022 18:43:55",
+						"-100.00",
+						"-0.50",
+						"aaa@aaa.com",
+						null,
+						false
+				);
+	}
+	
+	@Test
+	@Tag("TransactionDTOServiceTest")
 	@DisplayName("test transactionToDTOReceiver should have receiver true and fee to zero")
 	public void transactionToDTOReceiverTestShouldHaveReceiverTrueAndFeeZero() {
 		//GIVEN
@@ -103,6 +137,40 @@ public class TransactionDTOServiceTest {
 						"100.00",
 						"0.00",
 						"aaa@aaa.com",
+						"bbb@bbb.com",
+						true
+				);
+	}
+
+	@Test
+	@Tag("TransactionDTOServiceTest")
+	@DisplayName("test transactionToDTOReceiver should have email sender null")
+	public void transactionToDTOReceiverTestShouldHaveEamilSenderNull() {
+		//GIVEN
+		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
+		Registered registeredBReceiver = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "bbbIban");
+		Transaction transaction = new Transaction(dateTimeTransaction, 100);
+		transaction.setSender(null);
+		transaction.setReceiver(registeredBReceiver);
+		when(dateStringPattern.getDateTimeStringPattern()).thenReturn("MM/dd/yyyy HH:mm:ss");
+		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
+
+		//WHEN
+		TransactionDTO transactionDTOresult = transactionDTOService.transactionToDTOReceiver(transaction);
+		
+		//THEN
+		assertThat(transactionDTOresult).extracting(
+				TransactionDTO::getDateTime,
+				TransactionDTO::getAmount,
+				TransactionDTO::getFee,
+				TransactionDTO::getEmailSender,
+				TransactionDTO::getEmailReceiver,
+				TransactionDTO::isReceiver
+				).containsExactly(
+						"10/23/2022 18:43:55",
+						"100.00",
+						"0.00",
+						null,
 						"bbb@bbb.com",
 						true
 				);
