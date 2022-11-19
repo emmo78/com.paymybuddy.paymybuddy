@@ -309,5 +309,175 @@ public class RegisteredServiceTest {
 							100d);
 			assertThat(passwordEncoder.matches("aaaPasswd", registeredResultCapt.getValue().getPassword())).isTrue();
 		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test updateRegistered should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void updateRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
+			//GIVEN
+		
+			RegisteredDTO registeredDTO = new RegisteredDTO();
+			registeredDTO.setEmail("Aaa@Aaa.com"); //NOT Updated
+			registeredDTO.setPassword(null); //NOT Updated
+			registeredDTO.setFirstName("Aaa"); //Equal -> expect not Updated
+			registeredDTO.setLastName(null); //Null -> expect not updated
+			registeredDTO.setBirthDate("02/02/1992"); //expect updated
+			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
+			registeredDTO.setBalance(null); //NOT Updated
+			
+			Registered registered = new Registered(
+					"aaa@aaa.com",
+					null,
+					"Aaa",
+					null,
+					LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+					"FR7601234567890123456789");
+			registered.setBalance(0);
+			
+			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
+			when(registeredRepository.findById(anyString())).thenThrow(new ResourceNotFoundException(""));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.updateRegistered(registeredDTO, request))
+					.getMessage()).isEqualTo("Error while updating your profile");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test updateRegistered should throw UnexpectedRollbackException on IllegalArgumentException")
+		public void updateRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+			//GIVEN
+			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			
+			RegisteredDTO registeredDTO = new RegisteredDTO();
+			registeredDTO.setEmail("Aaa@Aaa.com"); //NOT Updated
+			registeredDTO.setPassword(null); //NOT Updated
+			registeredDTO.setFirstName("Aaa"); //Equal -> expect not Updated
+			registeredDTO.setLastName(null); //Null -> expect not updated
+			registeredDTO.setBirthDate("02/02/1992"); //expect updated
+			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
+			registeredDTO.setBalance(null); //NOT Updated
+			
+			Registered registered = new Registered(
+					"aaa@aaa.com",
+					null,
+					"Aaa",
+					null,
+					LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+					"FR7601234567890123456789");
+			registered.setBalance(0);
+			
+			Registered registeredToUpate =  new Registered(
+					"aaa@aaa.com",
+					passwordEncoder.encode("aaaPasswd"),
+					"Aaa",
+					"AAA",
+					LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+					null);
+			registeredToUpate.setBalance(100);
+			
+			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredToUpate));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new IllegalArgumentException());
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.updateRegistered(registeredDTO, request))
+					.getMessage()).isEqualTo("Error while updating your profile");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test updateRegistered should throw UnexpectedRollbackException on OptimisticLockingFailureException")
+		public void updateRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnOptimisticLockingFailureException() {
+			//GIVEN
+			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			
+			RegisteredDTO registeredDTO = new RegisteredDTO();
+			registeredDTO.setEmail("Aaa@Aaa.com"); //NOT Updated
+			registeredDTO.setPassword(null); //NOT Updated
+			registeredDTO.setFirstName("Aaa"); //Equal -> expect not Updated
+			registeredDTO.setLastName(null); //Null -> expect not updated
+			registeredDTO.setBirthDate("02/02/1992"); //expect updated
+			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
+			registeredDTO.setBalance(null); //NOT Updated
+			
+			Registered registered = new Registered(
+					"aaa@aaa.com",
+					null,
+					"Aaa",
+					null,
+					LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+					"FR7601234567890123456789");
+			registered.setBalance(0);
+			
+			Registered registeredToUpate =  new Registered(
+					"aaa@aaa.com",
+					passwordEncoder.encode("aaaPasswd"),
+					"Aaa",
+					"AAA",
+					LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+					null);
+			registeredToUpate.setBalance(100);
+			
+			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredToUpate));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new OptimisticLockingFailureException(""));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.updateRegistered(registeredDTO, request))
+					.getMessage()).isEqualTo("Error while updating your profile");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test updateRegistered should throw UnexpectedRollbackException on any RuntimeException")
+		public void updateRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			
+			RegisteredDTO registeredDTO = new RegisteredDTO();
+			registeredDTO.setEmail("Aaa@Aaa.com"); //NOT Updated
+			registeredDTO.setPassword(null); //NOT Updated
+			registeredDTO.setFirstName("Aaa"); //Equal -> expect not Updated
+			registeredDTO.setLastName(null); //Null -> expect not updated
+			registeredDTO.setBirthDate("02/02/1992"); //expect updated
+			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
+			registeredDTO.setBalance(null); //NOT Updated
+			
+			Registered registered = new Registered(
+					"aaa@aaa.com",
+					null,
+					"Aaa",
+					null,
+					LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+					"FR7601234567890123456789");
+			registered.setBalance(0);
+			
+			Registered registeredToUpate =  new Registered(
+					"aaa@aaa.com",
+					passwordEncoder.encode("aaaPasswd"),
+					"Aaa",
+					"AAA",
+					LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
+					null);
+			registeredToUpate.setBalance(100);
+			
+			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredToUpate));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new RuntimeException(""));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.updateRegistered(registeredDTO, request))
+					.getMessage()).isEqualTo("Error while updating your profile");
+		}
+		
 	}
 }

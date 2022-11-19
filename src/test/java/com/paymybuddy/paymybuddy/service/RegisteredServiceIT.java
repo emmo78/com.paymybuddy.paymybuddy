@@ -22,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
@@ -160,7 +161,7 @@ public class RegisteredServiceIT {
 	@Tag("updateRegisteredIT")
 	@DisplayName("IT for method updateRegistered")
 	@TestInstance(Lifecycle.PER_CLASS)
-	class GetRegisteredIT {
+	class UpdateRegisteredIT {
 		
 		@BeforeAll
 		public void setUpForAllTests() {
@@ -244,6 +245,20 @@ public class RegisteredServiceIT {
 							"FR7601234567890123456789",
 							100d);
 			assertThat(passwordEncoder.matches("aaaPasswd", registeredResult.getPassword())).isTrue();
+		}
+
+		@Test
+		@Tag("RegisteredServiceIT")
+		@DisplayName("IT UpdateRegistered throws UnexpectedRollbackException should rollback")
+		public void updateRegisteredITthrowsUnexpectedRollbackExceptionShouldRollback() {
+			//GIVEN
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.updateRegistered(registeredDTO, request))
+					.getMessage()).isEqualTo("Error while updating your profile");
+			assertThat(registeredRepository.findById("aaa@aaa.com")).isEmpty();
+
 		}
 
 	}

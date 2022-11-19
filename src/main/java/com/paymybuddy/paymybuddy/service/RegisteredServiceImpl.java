@@ -44,7 +44,7 @@ public class RegisteredServiceImpl implements RegisteredService {
 		Registered registered = null;
 		try {
 			//Throws ResourceNotFoundException | IllegalArgumentException
-			registered = (registeredRepository.findById(email.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Your email is not found")));
+			registered = registeredRepository.findById(email.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Your email is not found"));
 		} catch (ResourceNotFoundException rnfe) {
 			log.error("{} : email={} : {} ", requestService.requestToString(request), email.toLowerCase(), rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
@@ -91,8 +91,8 @@ public class RegisteredServiceImpl implements RegisteredService {
 		RegisteredDTO updatedRegisteredDTO = null;
 		try {
 			Registered registered = registeredDTOService.registeredFromDTO(registeredDTO);
-			//Throws IllegalArgumentException
-			Registered registeredToUpdate = registeredRepository.findById(registered.getEmail()).get();
+			//Throws IllegalArgumentException | ResourceNotFoundException
+			Registered registeredToUpdate = registeredRepository.findById(registered.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Registered not found for update"));
 			Optional.ofNullable(registered.getFirstName()).ifPresent(firstName -> {
 				if (!firstName.equals(registeredToUpdate.getFirstName())) {
 					registeredToUpdate.setFirstName(firstName);
@@ -114,12 +114,12 @@ public class RegisteredServiceImpl implements RegisteredService {
 			}
 			//Throws IllegalArgumentException | OptimisticLockingFailureException
 			updatedRegisteredDTO = registeredDTOService.registeredToDTO(registeredRepository.save(registeredToUpdate));
-		} catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+		} catch(IllegalArgumentException | OptimisticLockingFailureException | ResourceNotFoundException re) {
 			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), re.toString());
-			throw new UnexpectedRollbackException("Error while creating your profile");
+			throw new UnexpectedRollbackException("Error while updating your profile");
 		} catch(Exception e) {
 			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), e.toString());
-			throw new UnexpectedRollbackException("Error while creating your profile");
+			throw new UnexpectedRollbackException("Error while updating your profile");
 		}
 		log.info("{} : registered : {} updated and persisted",
 				requestService.requestToString(request),
