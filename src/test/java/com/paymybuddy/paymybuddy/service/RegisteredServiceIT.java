@@ -189,7 +189,6 @@ public class RegisteredServiceIT {
 			registeredDTO.setBirthDate("02/02/1992"); //expect updated
 			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
 			registeredDTO.setBalance(null); //NOT Updated
-
 		}
 		
 		@AfterEach
@@ -258,8 +257,6 @@ public class RegisteredServiceIT {
 					() -> registeredService.updateRegistered(registeredDTO, request))
 					.getMessage()).isEqualTo("Error while updating your profile");
 			assertThat(registeredRepository.findById("aaa@aaa.com")).isEmpty();
-
 		}
-
 	}
 }
