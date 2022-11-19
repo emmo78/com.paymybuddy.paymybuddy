@@ -46,13 +46,13 @@ public class RegisteredServiceImpl implements RegisteredService {
 			//Throws ResourceNotFoundException | IllegalArgumentException
 			registered = registeredRepository.findById(email.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Your email is not found"));
 		} catch (ResourceNotFoundException rnfe) {
-			log.error("{} : email={} : {} ", requestService.requestToString(request), email.toLowerCase(), rnfe.toString());
+			log.error("{} : {} ", requestService.requestToString(request), rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
 		} catch(IllegalArgumentException re) {
-			log.error("{} : email={} : {} ", requestService.requestToString(request), email.toLowerCase(), re.toString());
+			log.error("{} : {} ", requestService.requestToString(request), re.toString());
 			throw new UnexpectedRollbackException("Error while getting your profile");
 		} catch (Exception e) {
-			log.error("{} : email={} : {} ", requestService.requestToString(request), email.toLowerCase(), e.toString());
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting your profile");
 		}
 		log.info("{} : Registered {} gotten",  requestService.requestToString(request), registered.getEmail());
@@ -122,9 +122,7 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), e.toString());
 			throw new UnexpectedRollbackException("Error while updating your profile");
 		}
-		log.info("{} : registered : {} updated and persisted",
-				requestService.requestToString(request),
-				updatedRegisteredDTO.getEmail());
+		log.info("{} : registered : {} updated and persisted", requestService.requestToString(request), updatedRegisteredDTO.getEmail());
 		return updatedRegisteredDTO;
 	}
 
@@ -135,18 +133,35 @@ public class RegisteredServiceImpl implements RegisteredService {
 			//throws IllegalArgumentException
 			registeredRepository.deleteById(email);
 		} catch(IllegalArgumentException re) {
-			log.error("{} : registered={} : {} ", requestService.requestToString(request), email, re.toString());
+			log.error("{} : {} ", requestService.requestToString(request), re.toString());
 			throw new UnexpectedRollbackException("Error while removing your profile");
 		} catch(Exception e) {
-			log.error("{} : registered={} : {} ", requestService.requestToString(request), email, e.toString());
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while removing your profile");
 		}
+		log.info("{} : registered : {} removed and deleted", requestService.requestToString(request), email);
 	}
 
 	@Override
-	public Page<RegisteredForListDTO> getAllRegistered(Pageable pageRequest) {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
+	public Page<RegisteredForListDTO> getRegistrants(Pageable pageRequest, WebRequest request ) {
+		Page<RegisteredForListDTO> pageRegisteredForListDTO = null;
+		try {
+			//throws NullPointerException if pageRequest is null
+			pageRegisteredForListDTO = registeredRepository.findAll(pageRequest)
+					.map(registered -> registeredDTOService.registeredToForListDTO(registered));
+		} catch(NullPointerException npe) {
+			log.error("{} : Registrants : {} ", requestService.requestToString(request), npe.toString());
+			throw new UnexpectedRollbackException("Error while getting Registrants");
+		} catch(Exception e) {
+			log.error("{} : Registrants : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while getting Registrants");
+		}
+		log.info("{} : pageRegistrantsDTO number : {} of {}",
+			requestService.requestToString(request),
+			pageRegisteredForListDTO.getNumber()+1,
+			pageRegisteredForListDTO.getTotalPages());
+		return pageRegisteredForListDTO;
 	}
 
 	@Override

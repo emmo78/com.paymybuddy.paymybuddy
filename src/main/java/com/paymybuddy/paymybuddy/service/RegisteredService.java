@@ -18,7 +18,7 @@ public interface RegisteredService {
 	RegisteredDTO createRegistered(RegisteredDTO registeredDTO, WebRequest request) throws ResourceConflictException, UnexpectedRollbackException;
 	RegisteredDTO updateRegistered(RegisteredDTO registeredDTO, WebRequest request) throws UnexpectedRollbackException;
 	void removeRegistered(String email, WebRequest request) throws UnexpectedRollbackException;
-	Page<RegisteredForListDTO> getAllRegistered(Pageable pageRequest); // for admin
+	Page<RegisteredForListDTO> getRegistrants(Pageable pageRequest, WebRequest request); // for admin
 	Page<RegisteredForListDTO> getAllConnectedToARegistered(String email, Pageable pageRequest);
 	Page<RegisteredForListDTO> getAllNotConnectedToARegistered(String email, Pageable pageRequest);
 	Optional<String> getRegisteredIban(String email);

@@ -54,15 +54,17 @@ public class TransactionServiceImpl implements TransactionService {
 			double amount = transactionEnclosingScope.getAmount();
 			//Throws: IllegalArgumentException | ResourceNotFoundException
 			registeredRepository.findById(transactionDTO.getEmailSender()).ifPresentOrElse(sender -> {
-				double difference = sender.getBalance()-(amount+transactionEnclosingScope.getFee());
-				if (difference < 0) {
-					throw new InsufficentFundsException("Insufficient funds for transaction : you need to transfert : "
-							+String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", Math.abs(difference))
-							+" from bank");
-				}
-				sender.setBalance(difference);
-				sender.addSendedTransaction(transactionEnclosingScope);
-				}, () -> {throw new ResourceNotFoundException("Registered sender not found for transaction");});
+					double difference = sender.getBalance()-(amount+transactionEnclosingScope.getFee());
+					if (difference < 0) {
+						throw new InsufficentFundsException("Insufficient funds for transaction : you need to transfert : "
+								+String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", Math.abs(difference))
+								+" from bank");
+					}
+					sender.setBalance(difference);
+					sender.addSendedTransaction(transactionEnclosingScope);
+				}, () -> { 
+					throw new ResourceNotFoundException("Registered sender not found for transaction");
+				});
 			//Throws: IllegalArgumentException | ResourceNotFoundException
 			registeredRepository.findById(transactionDTO.getEmailReceiver()).ifPresentOrElse(receiver -> {
 				receiver.setBalance(receiver.getBalance()+amount);
@@ -78,7 +80,7 @@ public class TransactionServiceImpl implements TransactionService {
 			log.error("{} : sender={} : {}", requestService.requestToString(request), transactionDTO.getEmailSender(), ife.getMessage());
 			throw new InsufficentFundsException(ife.getMessage());
 		} catch (Exception e) {
-			log.error("{} : {} ", requestService.requestToString(request),e.toString());
+			log.error("{} : sender={} : {} ", requestService.requestToString(request), transactionDTO.getEmailSender(), e.toString());
 			throw new UnexpectedRollbackException("Error while creating money transfer");
 		}
 	log.info("{} : transaction sender={} receiver={} amount={} fee={} persisted",
@@ -96,11 +98,11 @@ public class TransactionServiceImpl implements TransactionService {
 		Page<TransactionDTO> pageTransactionDTO = null;
 		try {
 			pageTransactionDTO = transactionRepository.findAllTransactionsByEmailSenderOrReceiver(email, pageRequest)
-					.map(t -> {
-						if(email.equals(Optional.ofNullable(t.getSender()).orElse(new Registered()).getEmail())) {
-							return transactionDTOService.transactionToDTOSender(t);
+					.map(transaction -> {
+						if(email.equals(Optional.ofNullable(transaction.getSender()).orElseGet(() -> new Registered()).getEmail())) {
+							return transactionDTOService.transactionToDTOSender(transaction);
 						} else {
-							return transactionDTOService.transactionToDTOReceiver(t);
+							return transactionDTOService.transactionToDTOReceiver(transaction);
 						}
 					});
 		} catch (IllegalArgumentException re) {

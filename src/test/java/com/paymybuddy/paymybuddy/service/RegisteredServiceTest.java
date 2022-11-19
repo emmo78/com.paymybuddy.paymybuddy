@@ -4,13 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterAll;
@@ -30,6 +32,10 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +45,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
 import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
+import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.dto.service.RegisteredDTOService;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.exception.ResourceNotFoundException;
@@ -177,7 +184,7 @@ public class RegisteredServiceTest {
 		public void setUpForAllCreateATransactionTests() {
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/getRegistered");
+			requestMock.setRequestURI("/getRegistered?email=aaa@aaa.com");
 			request = new ServletWebRequest(requestMock);
 		}
 
@@ -491,7 +498,7 @@ public class RegisteredServiceTest {
 		public void setUpForAllCreateATransactionTests() {
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/updateRegistered");
+			requestMock.setRequestURI("/removeRegistered?email=aaa@aaa.com");
 			request = new ServletWebRequest(requestMock);
 		}
 
@@ -525,6 +532,79 @@ public class RegisteredServiceTest {
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> registeredService.removeRegistered("aaa@aaa.com", request))
 					.getMessage()).isEqualTo("Error while removing your profile");
+		}
+	}
+	
+	@Nested
+	@Tag("getRegistrantsTests")
+	@DisplayName("Tests for method getRegistrants")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class GetAllRegisteredTests {
+		
+		private Pageable pageRequest;
+
+		@BeforeAll
+		public void setUpForAllCreateATransactionTests() {
+			pageRequest = PageRequest.of(0, 3);
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/getRegistrants");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllCreateATransactionTests() {
+			pageRequest = null;
+			requestMock = null;
+			request = null;
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test getRegistrants should return page of RegisterdForListDTO")
+		public void removeRegisteredTestShouldReturnPageOfRegisterdForListDTO() {
+			//GIVEN
+			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
+			RegisteredForListDTO registeredForListDTOA = new RegisteredForListDTO("aaa@aaa.com", "Aaa", "AAA");
+			RegisteredForListDTO registeredForListDTOB = new RegisteredForListDTO("bbb@bbb.com", "Bbb", "BBB");
+			List<RegisteredForListDTO> registrantsDTOExpected = Arrays.asList(registeredForListDTOA, registeredForListDTOB);
+			when(registeredRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<Registered>(Arrays.asList(registeredA, registeredB), pageRequest, 2));
+			when(registeredDTOService.registeredToForListDTO(any(Registered.class))).thenReturn(registeredForListDTOA).thenReturn(registeredForListDTOB);
+			
+			//WHEN			
+			Page<RegisteredForListDTO> pageRegistrantsDTOResult = registeredService.getRegistrants(pageRequest, request);
+			
+			///THEN
+			assertThat(pageRegistrantsDTOResult.getContent()).containsExactlyElementsOf(registrantsDTOExpected);
+			assertThat(pageRegistrantsDTOResult.getPageable().getPageSize()).isEqualTo(3);
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test getRegistrants should throw UnexpectedRollbackException on NullPointerException")
+		public void getRegistrantsTestShouldThrowsUnexpectedRollbackExceptionOnNullPointerException() {
+			//GIVEN
+			when(registeredRepository.findAll(any(Pageable.class))).thenThrow(new NullPointerException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.getRegistrants(pageRequest, request))
+					.getMessage()).isEqualTo("Error while getting Registrants");
+			
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test getRegistrants should throw UnexpectedRollbackException on any RuntimeException")
+		public void getRegistrantsTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			when(registeredRepository.findAll(any(Pageable.class))).thenThrow(new RuntimeException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.getRegistrants(pageRequest, request))
+					.getMessage()).isEqualTo("Error while getting Registrants");
 		}
 
 	}
