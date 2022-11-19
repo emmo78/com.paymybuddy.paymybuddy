@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -239,7 +240,7 @@ public class RegisteredServiceTest {
 		public void setUpForAllCreateATransactionTests() {
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/getRegistered");
+			requestMock.setRequestURI("/updateRegistered");
 			request = new ServletWebRequest(requestMock);
 		}
 
@@ -251,7 +252,7 @@ public class RegisteredServiceTest {
 		
 		@Test
 		@Tag("RegisteredServiceTest")
-		@DisplayName("test UpdateRegistered should update not null and equal")
+		@DisplayName("test opdateRegistered should update not null and equal")
 		public void updateRegisteredTestShouldUpdateNotNullAndEqual() {
 			//GIVEN
 			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -478,6 +479,53 @@ public class RegisteredServiceTest {
 					() -> registeredService.updateRegistered(registeredDTO, request))
 					.getMessage()).isEqualTo("Error while updating your profile");
 		}
+	}
+	
+	@Nested
+	@Tag("removeRegisteredTests")
+	@DisplayName("Tests for method removeRegistered")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class RemoverRegisteredTests {
+
+		@BeforeAll
+		public void setUpForAllCreateATransactionTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/updateRegistered");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllCreateATransactionTests() {
+			requestMock = null;
+			request = null;
+		}
 		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test removeRegistered should throw UnexpectedRollbackException on IllegalArgumentException")
+		public void removeRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+			//GIVEN
+			doThrow(new IllegalArgumentException()).when(registeredRepository).deleteById(anyString());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.removeRegistered("aaa@aaa.com", request))
+					.getMessage()).isEqualTo("Error while removing your profile");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test removeRegistered should throw UnexpectedRollbackException on any RuntimeException")
+		public void removeRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			doThrow(new RuntimeException()).when(registeredRepository).deleteById(anyString());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.removeRegistered("aaa@aaa.com", request))
+					.getMessage()).isEqualTo("Error while removing your profile");
+		}
+
 	}
 }

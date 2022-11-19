@@ -87,6 +87,7 @@ public class RegisteredServiceImpl implements RegisteredService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public RegisteredDTO updateRegistered(RegisteredDTO registeredDTO, WebRequest request) throws UnexpectedRollbackException {
 		RegisteredDTO updatedRegisteredDTO = null;
 		try {
@@ -128,9 +129,18 @@ public class RegisteredServiceImpl implements RegisteredService {
 	}
 
 	@Override
-	public void removeRegistered(String email) {
-		// TODO Auto-generated method stub
-
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
+	public void removeRegistered(String email, WebRequest request) throws UnexpectedRollbackException {
+		try {		
+			//throws IllegalArgumentException
+			registeredRepository.deleteById(email);
+		} catch(IllegalArgumentException re) {
+			log.error("{} : registered={} : {} ", requestService.requestToString(request), email, re.toString());
+			throw new UnexpectedRollbackException("Error while removing your profile");
+		} catch(Exception e) {
+			log.error("{} : registered={} : {} ", requestService.requestToString(request), email, e.toString());
+			throw new UnexpectedRollbackException("Error while removing your profile");
+		}
 	}
 
 	@Override
