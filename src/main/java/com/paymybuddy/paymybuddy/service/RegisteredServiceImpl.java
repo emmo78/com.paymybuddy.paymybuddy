@@ -235,13 +235,19 @@ public class RegisteredServiceImpl implements RegisteredService {
 	@Override
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public void removeConnection(String email, String emailToRemove, WebRequest request) throws UnexpectedRollbackException {
-		
-	}
-
-	@Override
-	@Transactional(rollbackFor = UnexpectedRollbackException.class)
-	public void removeAddedBy(String email, String emailAddedBy, WebRequest request) throws UnexpectedRollbackException {
-		// TODO Auto-generated method stub
+		try {
+			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
+			Registered registeredToAdd = registeredRepository.findById(emailToRemove).orElseThrow(() -> new ResourceNotFoundException("Registered to remove not found"));
+			registered.removeConnection(registeredToAdd);
+			registeredRepository.save(registered);
+		} catch(IllegalArgumentException | OptimisticLockingFailureException | ResourceNotFoundException re) {
+			log.error("{} : {} ", requestService.requestToString(request), re.toString());
+			throw new UnexpectedRollbackException("Error while removing connection");
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while removing connection");
+		}
+		log.info("{} : removed and persisted", requestService.requestToString(request));
 		
 	}
 
@@ -249,10 +255,12 @@ public class RegisteredServiceImpl implements RegisteredService {
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public void removeRegistered(String email, WebRequest request) throws UnexpectedRollbackException {
 		try {		
-			//throws IllegalArgumentException
-			//registeredRepository.findAllAddedToEmail(email, Pageable.unpaged()).forEach(added -> added);
+			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
+			registeredRepository.findAllAddedToEmail(email, Pageable.unpaged())
+				.forEach(added -> registeredRepository.findById(added.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Registered added not found"))
+				.removeConnection(registered));
 			registeredRepository.deleteById(email);
-		} catch(IllegalArgumentException re) {
+		} catch(IllegalArgumentException | ResourceNotFoundException re) {
 			log.error("{} : {} ", requestService.requestToString(request), re.toString());
 			throw new UnexpectedRollbackException("Error while removing your profile");
 		} catch(Exception e) {

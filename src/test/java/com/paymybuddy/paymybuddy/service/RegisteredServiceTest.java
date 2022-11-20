@@ -699,7 +699,7 @@ public class RegisteredServiceTest {
 		public void setUpForAllTests() {
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/addConnection?email=aaaPasswd&emailToAdd=bbbPasswd");
+			requestMock.setRequestURI("/addConnection?email=aaa@aaa.com&emailToAdd=bbb@bbb.com");
 			request = new ServletWebRequest(requestMock);
 		}
 
@@ -723,8 +723,8 @@ public class RegisteredServiceTest {
 		
 		@Test
 		@Tag("RegisteredServiceTest")
-		@DisplayName("test addConnection should ")
-		public void addConnectionTestShouldUpdateNotNullAndEqual() {
+		@DisplayName("test addConnection should fill their sets")
+		public void addConnectionTestShouldFillTheirSets() {
 			//GIVEN
 			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA)).thenReturn(Optional.of(registeredB));
 			ArgumentCaptor<Registered> registeredResultCapt = ArgumentCaptor.forClass(Registered.class);
@@ -803,10 +803,129 @@ public class RegisteredServiceTest {
 	}
 	
 	@Nested
+	@Tag("removeConnectionTests")
+	@DisplayName("Tests for method removeConnection")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class RemoveConnectionTests {
+		
+		private Registered registeredA;
+		private Registered registeredB;
+		
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/removeConnection?email=aaa@aaa.com&emailToRemove=bbb@bbb.com");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+		
+		@BeforeEach
+		public void setUpForEachTests() {
+			registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+			registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "bbbIban");
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredA = null;
+			registeredB = null;
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test removeConnection should remove them from their sets")
+		public void removeConnectionTestShouldRemoveThemFromTheirSets() {
+			//GIVEN
+			registeredA.addConnection(registeredB);
+			// registeredB is a pointer to Object !
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA)).thenReturn(Optional.of(registeredB));
+			ArgumentCaptor<Registered> registeredResultCapt = ArgumentCaptor.forClass(Registered.class);
+			when(registeredRepository.save(any(Registered.class))).thenReturn(registeredA);
+			
+			//WHEN
+			registeredService.removeConnection("aaa@aaa.com", "bbb@bbb.com", request);
+			
+			//THEN
+			verify(registeredRepository, times(1)).save(registeredResultCapt.capture());
+			Registered registeredAResult = registeredResultCapt.getValue();
+			assertThat(registeredAResult.getAddConnections()).isEmpty();
+			assertThat(registeredB.getAddedConnections()).isEmpty();
+		}
+		
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test removeConnection should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void removeConnectionTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.ofNullable(null));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.removeConnection("aaa@aaa.com", "bbb@bbb.com", request))
+					.getMessage()).isEqualTo("Error while removing connection");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test removeConnection should throw UnexpectedRollbackException on IllegalArgumentException")
+		public void removeConnectionTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA)).thenReturn(Optional.of(registeredB));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new IllegalArgumentException());
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.removeConnection("aaa@aaa.com", "bbb@bbb.com", request))
+					.getMessage()).isEqualTo("Error while removing connection");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test removeConnection should throw UnexpectedRollbackException on OptimisticLockingFailureException")
+		public void removeConnectionTestShouldThrowsUnexpectedRollbackExceptionOnOptimisticLockingFailureException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA)).thenReturn(Optional.of(registeredB));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new OptimisticLockingFailureException(""));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.removeConnection("aaa@aaa.com", "bbb@bbb.com", request))
+					.getMessage()).isEqualTo("Error while removing connection");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test removeConnection should throw UnexpectedRollbackException on any RuntimeException")
+		public void removeConnectionTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA)).thenReturn(Optional.of(registeredB));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new RuntimeException(""));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.removeConnection("aaa@aaa.com", "bbb@bbb.com", request))
+					.getMessage()).isEqualTo("Error while removing connection");
+		}
+	}
+	
+	@Nested
 	@Tag("removeRegisteredTests")
 	@DisplayName("Tests for method removeRegistered")
 	@TestInstance(Lifecycle.PER_CLASS)
 	class RemoveRegisteredTests {
+		
+		private Registered registeredA;
 
 		@BeforeAll
 		public void setUpForAllTests() {
@@ -820,6 +939,30 @@ public class RegisteredServiceTest {
 		public void unSetForAllTests() {
 			requestMock = null;
 			request = null;
+		}
+		
+		@BeforeEach
+		public void setUpForEachTests() {
+			registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredA = null;
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test removeRegistered should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void removeRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.ofNullable(null));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.removeRegistered("aaa@aaa.com", request))
+					.getMessage()).isEqualTo("Error while removing your profile");
 		}
 		
 		@Test
