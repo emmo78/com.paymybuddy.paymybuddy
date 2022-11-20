@@ -515,7 +515,7 @@ public class RegisteredServiceTest {
 		@Test
 		@Tag("RegisteredServiceTest")
 		@DisplayName("test getRegistrants should return page of RegisterdForListDTO")
-		public void removeRegisteredTestShouldReturnPageOfRegisterdForListDTO() {
+		public void getRegistrantsTestShouldReturnPageOfRegisterdForListDTO() {
 			//GIVEN
 			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
@@ -544,7 +544,6 @@ public class RegisteredServiceTest {
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> registeredService.getRegistrants(pageRequest, request))
 					.getMessage()).isEqualTo("Error while getting Registrants");
-			
 		}
 		
 		@Test
@@ -574,7 +573,7 @@ public class RegisteredServiceTest {
 			pageRequest = PageRequest.of(0, 3);
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/getgetAllAddBy?email=ccc@ccc.com");
+			requestMock.setRequestURI("/getAllAddBy?email=ccc@ccc.com");
 			request = new ServletWebRequest(requestMock);
 		}
 
@@ -588,7 +587,7 @@ public class RegisteredServiceTest {
 		@Test
 		@Tag("RegisteredServiceTest")
 		@DisplayName("test getAllAddBy should return page of RegisterdForListDTO")
-		public void removeRegisteredTestShouldReturnPageOfRegisterdForListDTO() {
+		public void getAllAddByTestShouldReturnPageOfRegisterdForListDTO() {
 			//GIVEN : C add A and B
 			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
@@ -608,8 +607,8 @@ public class RegisteredServiceTest {
 		
 		@Test
 		@Tag("RegisteredServiceTest")
-		@DisplayName("test getRegistrants should throw UnexpectedRollbackException on NullPointerException")
-		public void getRegistrantsTestShouldThrowsUnexpectedRollbackExceptionOnNullPointerException() {
+		@DisplayName("test getAllAddBy should throw UnexpectedRollbackException on NullPointerException")
+		public void getAllAddByTestShouldThrowsUnexpectedRollbackExceptionOnNullPointerException() {
 			//GIVEN
 			when(registeredRepository.findAllAddByEmail(anyString(), any(Pageable.class))).thenThrow(new NullPointerException());
 			//WHEN
@@ -617,13 +616,12 @@ public class RegisteredServiceTest {
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> registeredService.getAllAddBy("ccc@ccc.com", pageRequest, request))
 					.getMessage()).isEqualTo("Error while getting connections you added");
-			
 		}
 		
 		@Test
 		@Tag("RegisteredServiceTest")
-		@DisplayName("test getRegistrants should throw UnexpectedRollbackException on any RuntimeException")
-		public void getRegistrantsTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+		@DisplayName("test getAllAddBys should throw UnexpectedRollbackException on any RuntimeException")
+		public void getAllAddByTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			//GIVEN
 			when(registeredRepository.findAllAddByEmail(anyString(), any(Pageable.class))).thenThrow(new RuntimeException());
 			//WHEN
@@ -634,6 +632,77 @@ public class RegisteredServiceTest {
 		}
 	}
 	
+	@Nested
+	@Tag("getAllNotAddByTests")
+	@DisplayName("Tests for method getAllNotAddBy")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class GetAllNotAddByTests {
+		
+		private Pageable pageRequest;
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			pageRequest = PageRequest.of(0, 3);
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/getAllNotAddBy?email=ccc@ccc.com");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			pageRequest = null;
+			requestMock = null;
+			request = null;
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test getAllNotAddBy should return page of RegisterdForListDTO")
+		public void getAllNotAddByTestShouldReturnPageOfRegisterdForListDTO() {
+			//GIVEN : C not add A and B
+			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
+			RegisteredForListDTO registeredForListDTOA = new RegisteredForListDTO("aaa@aaa.com", "Aaa", "AAA");
+			RegisteredForListDTO registeredForListDTOB = new RegisteredForListDTO("bbb@bbb.com", "Bbb", "BBB");
+			List<RegisteredForListDTO> registrantsDTOExpected = Arrays.asList(registeredForListDTOA, registeredForListDTOB);
+			when(registeredRepository.findAllNotAddByEmail(anyString(), any(Pageable.class))).thenReturn(new PageImpl<Registered>(Arrays.asList(registeredA, registeredB), pageRequest, 2));
+			when(registeredDTOService.registeredToForListDTO(any(Registered.class))).thenReturn(registeredForListDTOA).thenReturn(registeredForListDTOB);
+			
+			//WHEN			
+			Page<RegisteredForListDTO> pageRegistrantsDTOResult = registeredService.getAllNotAddBy("ccc@ccc.com", pageRequest, request);
+			
+			///THEN
+			assertThat(pageRegistrantsDTOResult.getContent()).containsExactlyElementsOf(registrantsDTOExpected);
+			assertThat(pageRegistrantsDTOResult.getPageable().getPageSize()).isEqualTo(3);
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test getAllNotAddBy should throw UnexpectedRollbackException on NullPointerException")
+		public void getAllNotAddByTestShouldThrowsUnexpectedRollbackExceptionOnNullPointerException() {
+			//GIVEN
+			when(registeredRepository.findAllNotAddByEmail(anyString(), any(Pageable.class))).thenThrow(new NullPointerException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.getAllNotAddBy("ccc@ccc.com", pageRequest, request))
+					.getMessage()).isEqualTo("Error while getting connections you can add");	
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test getAllNotAddBy should throw UnexpectedRollbackException on any RuntimeException")
+		public void getAllNotAddByTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			when(registeredRepository.findAllNotAddByEmail(anyString(), any(Pageable.class))).thenThrow(new RuntimeException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.getAllNotAddBy("ccc@ccc.com", pageRequest, request))
+					.getMessage()).isEqualTo("Error while getting connections you can add");
+		}
+	}
 	
 
 	

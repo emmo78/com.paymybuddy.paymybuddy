@@ -163,7 +163,7 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting connections you added");
 		}
-		log.info("{} : page all add by number : {} of {}",
+		log.info("{} : page all add by, number : {} of {}",
 			requestService.requestToString(request),
 			pageRegisteredForListDTO.getNumber()+1,
 			pageRegisteredForListDTO.getTotalPages());
@@ -185,7 +185,7 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting connections you can add");
 		}
-		log.info("{} : page all not add by number : {} of {}",
+		log.info("{} : page all not add by, number : {} of {}",
 			requestService.requestToString(request),
 			pageRegisteredForListDTO.getNumber()+1,
 			pageRegisteredForListDTO.getTotalPages());
