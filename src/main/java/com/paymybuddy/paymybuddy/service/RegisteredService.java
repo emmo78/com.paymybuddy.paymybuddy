@@ -21,6 +21,9 @@ public interface RegisteredService {
 	Page<RegisteredForListDTO> getAllAddBy(String email, Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
 	Page<RegisteredForListDTO> getAllNotAddBy(String email, Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
 	Page<RegisteredForListDTO> getAllAddedTo(String email, Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
+	void addConnection(String email, String emailToAdd, WebRequest request) throws UnexpectedRollbackException;
+	void removeConnection(String email, String emailToRemove, WebRequest request) throws UnexpectedRollbackException;
+	void removeAddedBy(String email, String emailAddedBy, WebRequest request)  throws UnexpectedRollbackException;
 	
 	void removeRegistered(String email, WebRequest request) throws UnexpectedRollbackException;
 	Optional<String> getRegisteredIban(String email);

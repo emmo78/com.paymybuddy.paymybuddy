@@ -216,10 +216,41 @@ public class RegisteredServiceImpl implements RegisteredService {
 
 	@Override
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
+	public void addConnection(String email, String emailToAdd, WebRequest request) throws UnexpectedRollbackException {
+		try {
+			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
+			Registered registeredToAdd = registeredRepository.findById(emailToAdd).orElseThrow(() -> new ResourceNotFoundException("Registered to add not found"));
+			registered.addConnection(registeredToAdd);
+			registeredRepository.save(registered);
+		} catch(IllegalArgumentException | OptimisticLockingFailureException | ResourceNotFoundException re) {
+			log.error("{} : {} ", requestService.requestToString(request), re.toString());
+			throw new UnexpectedRollbackException("Error while adding connection");
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while adding connection");
+		}
+		log.info("{} : added and persisted", requestService.requestToString(request));
+	}
+
+	@Override
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
+	public void removeConnection(String email, String emailToRemove, WebRequest request) throws UnexpectedRollbackException {
+		
+	}
+
+	@Override
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
+	public void removeAddedBy(String email, String emailAddedBy, WebRequest request) throws UnexpectedRollbackException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public void removeRegistered(String email, WebRequest request) throws UnexpectedRollbackException {
 		try {		
 			//throws IllegalArgumentException
-			
+			//registeredRepository.findAllAddedToEmail(email, Pageable.unpaged()).forEach(added -> added);
 			registeredRepository.deleteById(email);
 		} catch(IllegalArgumentException re) {
 			log.error("{} : {} ", requestService.requestToString(request), re.toString());
@@ -247,6 +278,4 @@ public class RegisteredServiceImpl implements RegisteredService {
 	public void resetRegisteredPassword(String email) {
 		// TODO Auto-generated method stub
 	}
-
-
 }

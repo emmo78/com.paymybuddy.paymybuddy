@@ -175,6 +175,7 @@ class RegisteredRepositoryIT {
 		Set<Registered> addedToB = registeredB.getAddedConnections().stream().collect(Collectors.toSet());
 		addedToB.forEach(added -> added.removeConnection(registeredB));
 		registeredRepository.deleteById("bbb@bbb.com");
+		registeredRepository.flush();
 
 		// THEN
 		Optional<Registered> registeredAResultOpt = registeredRepository.findById("aaa@aaa.com");

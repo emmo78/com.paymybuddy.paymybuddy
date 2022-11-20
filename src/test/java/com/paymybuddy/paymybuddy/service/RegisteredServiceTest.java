@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -243,8 +244,14 @@ public class RegisteredServiceTest {
 	@TestInstance(Lifecycle.PER_CLASS)
 	class UpdateRegisteredTests {
 		
+		private RegisteredDTO registeredDTO;
+		private Registered registered;
+		private PasswordEncoder passwordEncoder;
+		private Registered registeredToUpate;
+		
 		@BeforeAll
 		public void setUpForAllTests() {
+			passwordEncoder = new BCryptPasswordEncoder();
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
 			requestMock.setRequestURI("/updateRegistered");
@@ -253,18 +260,14 @@ public class RegisteredServiceTest {
 
 		@AfterAll
 		public void unSetForAllTests() {
+			passwordEncoder = null;
 			requestMock = null;
 			request = null;
 		}
 		
-		@Test
-		@Tag("RegisteredServiceTest")
-		@DisplayName("test opdateRegistered should update not null and equal")
-		public void updateRegisteredTestShouldUpdateNotNullAndEqual() {
-			//GIVEN
-			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-			
-			RegisteredDTO registeredDTO = new RegisteredDTO();
+		@BeforeEach
+		public void setUpForEachTests() {
+			registeredDTO = new RegisteredDTO();
 			registeredDTO.setEmail("Aaa@Aaa.com"); //NOT Updated
 			registeredDTO.setPassword(null); //NOT Updated
 			registeredDTO.setFirstName("Aaa"); //Equal -> expect not Updated
@@ -272,8 +275,8 @@ public class RegisteredServiceTest {
 			registeredDTO.setBirthDate("02/02/1992"); //expect updated
 			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
 			registeredDTO.setBalance(null); //NOT Updated
-			
-			Registered registered = new Registered(
+
+			registered = new Registered(
 					"aaa@aaa.com",
 					null,
 					"Aaa",
@@ -282,7 +285,7 @@ public class RegisteredServiceTest {
 					"FR7601234567890123456789");
 			registered.setBalance(0);
 			
-			Registered registeredToUpate =  new Registered(
+			registeredToUpate =  new Registered(
 					"aaa@aaa.com",
 					passwordEncoder.encode("aaaPasswd"),
 					"Aaa",
@@ -290,7 +293,20 @@ public class RegisteredServiceTest {
 					LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
 					null);
 			registeredToUpate.setBalance(100);
-			
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredDTO = null;
+			registered = null;
+			registeredToUpate = null;
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test updateRegistered should update not null and equal")
+		public void updateRegisteredTestShouldUpdateNotNullAndEqual() {
+			//GIVEN
 			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
 			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredToUpate));
 			ArgumentCaptor<Registered> registeredResultCapt = ArgumentCaptor.forClass(Registered.class);
@@ -323,27 +339,8 @@ public class RegisteredServiceTest {
 		@DisplayName("test updateRegistered should throw UnexpectedRollbackException on ResourceNotFoundException")
 		public void updateRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
 			//GIVEN
-		
-			RegisteredDTO registeredDTO = new RegisteredDTO();
-			registeredDTO.setEmail("Aaa@Aaa.com"); //NOT Updated
-			registeredDTO.setPassword(null); //NOT Updated
-			registeredDTO.setFirstName("Aaa"); //Equal -> expect not Updated
-			registeredDTO.setLastName(null); //Null -> expect not updated
-			registeredDTO.setBirthDate("02/02/1992"); //expect updated
-			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
-			registeredDTO.setBalance(null); //NOT Updated
-			
-			Registered registered = new Registered(
-					"aaa@aaa.com",
-					null,
-					"Aaa",
-					null,
-					LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
-					"FR7601234567890123456789");
-			registered.setBalance(0);
-			
 			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
-			when(registeredRepository.findById(anyString())).thenThrow(new ResourceNotFoundException(""));
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.ofNullable(null));
 			
 			//WHEN
 			//THEN
@@ -357,35 +354,6 @@ public class RegisteredServiceTest {
 		@DisplayName("test updateRegistered should throw UnexpectedRollbackException on IllegalArgumentException")
 		public void updateRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
 			//GIVEN
-			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-			
-			RegisteredDTO registeredDTO = new RegisteredDTO();
-			registeredDTO.setEmail("Aaa@Aaa.com"); //NOT Updated
-			registeredDTO.setPassword(null); //NOT Updated
-			registeredDTO.setFirstName("Aaa"); //Equal -> expect not Updated
-			registeredDTO.setLastName(null); //Null -> expect not updated
-			registeredDTO.setBirthDate("02/02/1992"); //expect updated
-			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
-			registeredDTO.setBalance(null); //NOT Updated
-			
-			Registered registered = new Registered(
-					"aaa@aaa.com",
-					null,
-					"Aaa",
-					null,
-					LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
-					"FR7601234567890123456789");
-			registered.setBalance(0);
-			
-			Registered registeredToUpate =  new Registered(
-					"aaa@aaa.com",
-					passwordEncoder.encode("aaaPasswd"),
-					"Aaa",
-					"AAA",
-					LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
-					null);
-			registeredToUpate.setBalance(100);
-			
 			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
 			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredToUpate));
 			when(registeredRepository.save(any(Registered.class))).thenThrow(new IllegalArgumentException());
@@ -402,35 +370,6 @@ public class RegisteredServiceTest {
 		@DisplayName("test updateRegistered should throw UnexpectedRollbackException on OptimisticLockingFailureException")
 		public void updateRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnOptimisticLockingFailureException() {
 			//GIVEN
-			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-			
-			RegisteredDTO registeredDTO = new RegisteredDTO();
-			registeredDTO.setEmail("Aaa@Aaa.com"); //NOT Updated
-			registeredDTO.setPassword(null); //NOT Updated
-			registeredDTO.setFirstName("Aaa"); //Equal -> expect not Updated
-			registeredDTO.setLastName(null); //Null -> expect not updated
-			registeredDTO.setBirthDate("02/02/1992"); //expect updated
-			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
-			registeredDTO.setBalance(null); //NOT Updated
-			
-			Registered registered = new Registered(
-					"aaa@aaa.com",
-					null,
-					"Aaa",
-					null,
-					LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
-					"FR7601234567890123456789");
-			registered.setBalance(0);
-			
-			Registered registeredToUpate =  new Registered(
-					"aaa@aaa.com",
-					passwordEncoder.encode("aaaPasswd"),
-					"Aaa",
-					"AAA",
-					LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
-					null);
-			registeredToUpate.setBalance(100);
-			
 			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
 			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredToUpate));
 			when(registeredRepository.save(any(Registered.class))).thenThrow(new OptimisticLockingFailureException(""));
@@ -447,35 +386,6 @@ public class RegisteredServiceTest {
 		@DisplayName("test updateRegistered should throw UnexpectedRollbackException on any RuntimeException")
 		public void updateRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			//GIVEN
-			PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-			
-			RegisteredDTO registeredDTO = new RegisteredDTO();
-			registeredDTO.setEmail("Aaa@Aaa.com"); //NOT Updated
-			registeredDTO.setPassword(null); //NOT Updated
-			registeredDTO.setFirstName("Aaa"); //Equal -> expect not Updated
-			registeredDTO.setLastName(null); //Null -> expect not updated
-			registeredDTO.setBirthDate("02/02/1992"); //expect updated
-			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
-			registeredDTO.setBalance(null); //NOT Updated
-			
-			Registered registered = new Registered(
-					"aaa@aaa.com",
-					null,
-					"Aaa",
-					null,
-					LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
-					"FR7601234567890123456789");
-			registered.setBalance(0);
-			
-			Registered registeredToUpate =  new Registered(
-					"aaa@aaa.com",
-					passwordEncoder.encode("aaaPasswd"),
-					"Aaa",
-					"AAA",
-					LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
-					null);
-			registeredToUpate.setBalance(100);
-			
 			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
 			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredToUpate));
 			when(registeredRepository.save(any(Registered.class))).thenThrow(new RuntimeException(""));
@@ -776,6 +686,121 @@ public class RegisteredServiceTest {
 		}
 	}
 
+	@Nested
+	@Tag("addConnectionTests")
+	@DisplayName("Tests for method addConnection")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class AddConnectionTests {
+		
+		private Registered registeredA;
+		private Registered registeredB;
+		
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/addConnection?email=aaaPasswd&emailToAdd=bbbPasswd");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+		
+		@BeforeEach
+		public void setUpForEachTests() {
+			registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+			registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "bbbIban");
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredA = null;
+			registeredB = null;
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test addConnection should ")
+		public void addConnectionTestShouldUpdateNotNullAndEqual() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA)).thenReturn(Optional.of(registeredB));
+			ArgumentCaptor<Registered> registeredResultCapt = ArgumentCaptor.forClass(Registered.class);
+			when(registeredRepository.save(any(Registered.class))).thenReturn(registeredA);
+			
+			//WHEN
+			registeredService.addConnection("aaa@aaa.com", "bbb@bbb.com", request);
+			
+			//THEN
+			verify(registeredRepository, times(1)).save(registeredResultCapt.capture());
+			Registered registeredAResult = registeredResultCapt.getValue();
+			Registered registerdBResullt = registeredAResult.getAddConnections().stream().collect(Collectors.toList()).get(0);
+			assertThat(registerdBResullt).isEqualTo(registeredB);
+			assertThat(registerdBResullt.getAddedConnections()).containsOnly(registeredA);
+		}
+		
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test addConnection should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void addConnectionTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.ofNullable(null));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.addConnection("aaa@aaa.com", "bbb@bbb.com", request))
+					.getMessage()).isEqualTo("Error while adding connection");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test addConnection should throw UnexpectedRollbackException on IllegalArgumentException")
+		public void addConnectionTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA)).thenReturn(Optional.of(registeredB));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new IllegalArgumentException());
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.addConnection("aaa@aaa.com", "bbb@bbb.com", request))
+					.getMessage()).isEqualTo("Error while adding connection");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test addConnection should throw UnexpectedRollbackException on OptimisticLockingFailureException")
+		public void addConnectionTestShouldThrowsUnexpectedRollbackExceptionOnOptimisticLockingFailureException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA)).thenReturn(Optional.of(registeredB));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new OptimisticLockingFailureException(""));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.addConnection("aaa@aaa.com", "bbb@bbb.com", request))
+					.getMessage()).isEqualTo("Error while adding connection");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test addConnection should throw UnexpectedRollbackException on any RuntimeException")
+		public void addConnectionTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA)).thenReturn(Optional.of(registeredB));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new RuntimeException(""));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.addConnection("aaa@aaa.com", "bbb@bbb.com", request))
+					.getMessage()).isEqualTo("Error while adding connection");
+		}
+	}
 	
 	@Nested
 	@Tag("removeRegisteredTests")
