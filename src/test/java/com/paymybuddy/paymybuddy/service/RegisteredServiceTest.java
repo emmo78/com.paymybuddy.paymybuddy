@@ -660,7 +660,7 @@ public class RegisteredServiceTest {
 		@Tag("RegisteredServiceTest")
 		@DisplayName("test getAllNotAddBy should return page of RegisterdForListDTO")
 		public void getAllNotAddByTestShouldReturnPageOfRegisterdForListDTO() {
-			//GIVEN : C not add A and B
+			//GIVEN : C can add A and B
 			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
 			RegisteredForListDTO registeredForListDTOA = new RegisteredForListDTO("aaa@aaa.com", "Aaa", "AAA");
@@ -704,6 +704,77 @@ public class RegisteredServiceTest {
 		}
 	}
 	
+	@Nested
+	@Tag("getAllAddedToTests")
+	@DisplayName("Tests for method getAllAddedTo")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class GetAllAddedTo {
+		
+		private Pageable pageRequest;
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			pageRequest = PageRequest.of(0, 3);
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/getAllAddedTo?email=ccc@ccc.com");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			pageRequest = null;
+			requestMock = null;
+			request = null;
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test getAllAddedTo should return page of RegisterdForListDTO")
+		public void getAllAddedToTestShouldReturnPageOfRegisterdForListDTO() {
+			//GIVEN : A and B add C so C was added by A and B
+			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
+			RegisteredForListDTO registeredForListDTOA = new RegisteredForListDTO("aaa@aaa.com", "Aaa", "AAA");
+			RegisteredForListDTO registeredForListDTOB = new RegisteredForListDTO("bbb@bbb.com", "Bbb", "BBB");
+			List<RegisteredForListDTO> registrantsDTOExpected = Arrays.asList(registeredForListDTOA, registeredForListDTOB);
+			when(registeredRepository.findAllAddedToEmail(anyString(), any(Pageable.class))).thenReturn(new PageImpl<Registered>(Arrays.asList(registeredA, registeredB), pageRequest, 2));
+			when(registeredDTOService.registeredToForListDTO(any(Registered.class))).thenReturn(registeredForListDTOA).thenReturn(registeredForListDTOB);
+			
+			//WHEN			
+			Page<RegisteredForListDTO> pageRegistrantsDTOResult = registeredService.getAllAddedTo("ccc@ccc.com", pageRequest, request);
+			
+			///THEN
+			assertThat(pageRegistrantsDTOResult.getContent()).containsExactlyElementsOf(registrantsDTOExpected);
+			assertThat(pageRegistrantsDTOResult.getPageable().getPageSize()).isEqualTo(3);
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test getAllAddedTo should throw UnexpectedRollbackException on NullPointerException")
+		public void getAllAddedToTestShouldThrowsUnexpectedRollbackExceptionOnNullPointerException() {
+			//GIVEN
+			when(registeredRepository.findAllAddedToEmail(anyString(), any(Pageable.class))).thenThrow(new NullPointerException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.getAllAddedTo("ccc@ccc.com", pageRequest, request))
+					.getMessage()).isEqualTo("Error while getting connected to you");	
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test getAllAddedTo should throw UnexpectedRollbackException on any RuntimeException")
+		public void getAllAddedToTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			when(registeredRepository.findAllAddedToEmail(anyString(), any(Pageable.class))).thenThrow(new RuntimeException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.getAllAddedTo("ccc@ccc.com", pageRequest, request))
+					.getMessage()).isEqualTo("Error while getting connected to you");
+		}
+	}
 
 	
 	@Nested

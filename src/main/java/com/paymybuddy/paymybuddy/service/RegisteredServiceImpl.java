@@ -193,6 +193,28 @@ public class RegisteredServiceImpl implements RegisteredService {
 	}
 
 	@Override
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
+	public Page<RegisteredForListDTO> getAllAddedTo(String email, Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
+		Page<RegisteredForListDTO> pageRegisteredForListDTO = null;
+		try {
+			//throws NullPointerException if pageRequest is null
+			pageRegisteredForListDTO = registeredRepository.findAllAddedToEmail(email, pageRequest)
+					.map(registered -> registeredDTOService.registeredToForListDTO(registered));
+		} catch(NullPointerException npe) {
+			log.error("{} : {} ", requestService.requestToString(request), npe.toString());
+			throw new UnexpectedRollbackException("Error while getting connected to you");
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while getting connected to you");
+		}
+		log.info("{} : page all connected to, number : {} of {}",
+			requestService.requestToString(request),
+			pageRegisteredForListDTO.getNumber()+1,
+			pageRegisteredForListDTO.getTotalPages());
+		return pageRegisteredForListDTO;
+	}
+
+	@Override
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public void removeRegistered(String email, WebRequest request) throws UnexpectedRollbackException {
 		try {		
@@ -225,5 +247,6 @@ public class RegisteredServiceImpl implements RegisteredService {
 	public void resetRegisteredPassword(String email) {
 		// TODO Auto-generated method stub
 	}
+
 
 }
