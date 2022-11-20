@@ -55,7 +55,7 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting your profile");
 		}
-		log.info("{} : Registered {} gotten",  requestService.requestToString(request), registered.getEmail());
+		log.info("{} : registered={} gotten",  requestService.requestToString(request), registered.getEmail());
 		return registered;
 	}
 
@@ -80,7 +80,7 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), e.toString());
 			throw new UnexpectedRollbackException("Error while creating your profile");
 		}
-		log.info("{} : registered : {} created and persisted",
+		log.info("{} : registered={} created and persisted",
 				requestService.requestToString(request),
 				createdRegisteredDTO.getEmail());
 		return createdRegisteredDTO;
@@ -122,8 +122,74 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), e.toString());
 			throw new UnexpectedRollbackException("Error while updating your profile");
 		}
-		log.info("{} : registered : {} updated and persisted", requestService.requestToString(request), updatedRegisteredDTO.getEmail());
+		log.info("{} : registered={} updated and persisted", requestService.requestToString(request), updatedRegisteredDTO.getEmail());
 		return updatedRegisteredDTO;
+	}
+
+	@Override
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
+	public Page<RegisteredForListDTO> getRegistrants(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException{
+		Page<RegisteredForListDTO> pageRegisteredForListDTO = null;
+		try {
+			//throws NullPointerException if pageRequest is null
+			pageRegisteredForListDTO = registeredRepository.findAll(pageRequest)
+					.map(registered -> registeredDTOService.registeredToForListDTO(registered));
+		} catch(NullPointerException npe) {
+			log.error("{} : {} ", requestService.requestToString(request), npe.toString());
+			throw new UnexpectedRollbackException("Error while getting Registrants");
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while getting Registrants");
+		}
+		log.info("{} : page registrants number : {} of {}",
+			requestService.requestToString(request),
+			pageRegisteredForListDTO.getNumber()+1,
+			pageRegisteredForListDTO.getTotalPages());
+		return pageRegisteredForListDTO;
+	}
+
+	@Override
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
+	public Page<RegisteredForListDTO> getAllAddBy(String email, Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException{
+		Page<RegisteredForListDTO> pageRegisteredForListDTO = null;
+		try {
+			//throws NullPointerException if pageRequest is null
+			pageRegisteredForListDTO = registeredRepository.findAllAddByEmail(email, pageRequest)
+					.map(registered -> registeredDTOService.registeredToForListDTO(registered));
+		} catch(NullPointerException npe) {
+			log.error("{} : {} ", requestService.requestToString(request), npe.toString());
+			throw new UnexpectedRollbackException("Error while getting connections you added");
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while getting connections you added");
+		}
+		log.info("{} : page all add by number : {} of {}",
+			requestService.requestToString(request),
+			pageRegisteredForListDTO.getNumber()+1,
+			pageRegisteredForListDTO.getTotalPages());
+		return pageRegisteredForListDTO;
+	}
+
+	@Override
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
+	public Page<RegisteredForListDTO> getAllNotAddBy(String email, Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException{
+		Page<RegisteredForListDTO> pageRegisteredForListDTO = null;
+		try {
+			//throws NullPointerException if pageRequest is null
+			pageRegisteredForListDTO = registeredRepository.findAllNotAddByEmail(email, pageRequest)
+					.map(registered -> registeredDTOService.registeredToForListDTO(registered));
+		} catch(NullPointerException npe) {
+			log.error("{} : {} ", requestService.requestToString(request), npe.toString());
+			throw new UnexpectedRollbackException("Error while getting connections you can add");
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while getting connections you can add");
+		}
+		log.info("{} : page all not add by number : {} of {}",
+			requestService.requestToString(request),
+			pageRegisteredForListDTO.getNumber()+1,
+			pageRegisteredForListDTO.getTotalPages());
+		return pageRegisteredForListDTO;
 	}
 
 	@Override
@@ -131,6 +197,7 @@ public class RegisteredServiceImpl implements RegisteredService {
 	public void removeRegistered(String email, WebRequest request) throws UnexpectedRollbackException {
 		try {		
 			//throws IllegalArgumentException
+			
 			registeredRepository.deleteById(email);
 		} catch(IllegalArgumentException re) {
 			log.error("{} : {} ", requestService.requestToString(request), re.toString());
@@ -139,41 +206,7 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while removing your profile");
 		}
-		log.info("{} : registered : {} removed and deleted", requestService.requestToString(request), email);
-	}
-
-	@Override
-	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
-	public Page<RegisteredForListDTO> getRegistrants(Pageable pageRequest, WebRequest request ) {
-		Page<RegisteredForListDTO> pageRegisteredForListDTO = null;
-		try {
-			//throws NullPointerException if pageRequest is null
-			pageRegisteredForListDTO = registeredRepository.findAll(pageRequest)
-					.map(registered -> registeredDTOService.registeredToForListDTO(registered));
-		} catch(NullPointerException npe) {
-			log.error("{} : Registrants : {} ", requestService.requestToString(request), npe.toString());
-			throw new UnexpectedRollbackException("Error while getting Registrants");
-		} catch(Exception e) {
-			log.error("{} : Registrants : {} ", requestService.requestToString(request), e.toString());
-			throw new UnexpectedRollbackException("Error while getting Registrants");
-		}
-		log.info("{} : pageRegistrantsDTO number : {} of {}",
-			requestService.requestToString(request),
-			pageRegisteredForListDTO.getNumber()+1,
-			pageRegisteredForListDTO.getTotalPages());
-		return pageRegisteredForListDTO;
-	}
-
-	@Override
-	public Page<RegisteredForListDTO> getAllConnectedToARegistered(String email, Pageable pageRequest) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Page<RegisteredForListDTO> getAllNotConnectedToARegistered(String email, Pageable pageRequest) {
-		// TODO Auto-generated method stub
-		return null;
+		log.info("{} : registered={} removed and deleted", requestService.requestToString(request), email);
 	}
 
 	@Override

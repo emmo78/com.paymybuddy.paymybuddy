@@ -192,15 +192,17 @@ class RegisteredRepositoryIT {
 
 	@Test
 	@Tag("RegisteredRepositoryIT")
-	@DisplayName("test findAllConnectedToEmail should return expected pages")
+	@DisplayName("test findAllAddByEmail should return expected pages")
 	@Transactional
-	public void testFindAllConnectedToEmailShouldReturnExpectedPages() {
+	public void testFindAllAddByEmailShouldReturnExpectedPages() {
 
 		// GIVEN
-		registeredA.addConnection(registeredE);
 		registeredA.addConnection(registeredD);
 		registeredA.addConnection(registeredC);
+		registeredA.addConnection(registeredE);
 		registeredRepository.saveAndFlush(registeredA);
+		registeredB.addConnection(registeredA);
+		registeredRepository.saveAndFlush(registeredB);
 		registeredC.addConnection(registeredA);
 		registeredC.addConnection(registeredB);
 		registeredC.addConnection(registeredD);
@@ -208,30 +210,32 @@ class RegisteredRepositoryIT {
 		registeredD.addConnection(registeredA);
 		registeredRepository.saveAndFlush(registeredD);
 		
-		List<Registered> registerdConnectedToAExpected = new ArrayList<>();
-		registerdConnectedToAExpected.add(registeredC);
-		registerdConnectedToAExpected.add(registeredD);
-		registerdConnectedToAExpected.add(registeredE);
+		List<Registered> registerdAddByAExpected = new ArrayList<>();
+		registerdAddByAExpected.add(registeredC);
+		registerdAddByAExpected.add(registeredD);
+		registerdAddByAExpected.add(registeredE);
 		Pageable pageRequest = PageRequest.of(0, 5, Sort.by("last_name", "first_name").ascending());
 		
 		// WHERE
-		Page<Registered> pageRegisteredResult = registeredRepository.findAllConnectedToEmail("aaa@aaa.com", pageRequest);
+		Page<Registered> pageRegisteredResult = registeredRepository.findAllAddByEmail("aaa@aaa.com", pageRequest);
 		
 		// THEN
-		assertThat(pageRegisteredResult.getContent()).containsExactlyElementsOf(registerdConnectedToAExpected);	
+		assertThat(pageRegisteredResult.getContent()).containsExactlyElementsOf(registerdAddByAExpected);	
 
 	}
 
 	@Test
 	@Tag("RegisteredRepositoryIT")
-	@DisplayName("test findAllNotConnectedToEmail should return expected pages")
+	@DisplayName("test findAllNotAddByEmail should return expected pages")
 	@Transactional
-	public void testFindAllNotConnectedToEmailShouldReturnExpectedPages() {
+	public void testFindAllNotAddByEmailShouldReturnExpectedPages() {
 
 		// GIVEN
 		registeredA.addConnection(registeredB);
 		registeredA.addConnection(registeredC);
 		registeredRepository.saveAndFlush(registeredA);
+		registeredB.addConnection(registeredA);
+		registeredRepository.saveAndFlush(registeredB);
 		registeredC.addConnection(registeredB);
 		registeredC.addConnection(registeredD);
 		registeredRepository.saveAndFlush(registeredC);
@@ -243,10 +247,44 @@ class RegisteredRepositoryIT {
 		Pageable pageRequest = PageRequest.of(0, 5, Sort.by("last_name", "first_name").ascending());
 
 		// WHERE
-		Page<Registered> pageRegisteredResult = registeredRepository.findAllNotConnectedToEmail("aaa@aaa.com", pageRequest);
+		Page<Registered> pageRegisteredResult = registeredRepository.findAllNotAddByEmail("aaa@aaa.com", pageRequest);
 
 		// THEN		
 		assertThat(pageRegisteredResult.getContent()).containsExactlyElementsOf(registerdNotConnectedToAExpected);
+	}
+	
+	@Test
+	@Tag("RegisteredRepositoryIT")
+	@DisplayName("test findAllAddedToEmail should return expected pages")
+	@Transactional
+	public void testFindAllAddedToEmailShouldReturnExpectedPages() {
+
+		// GIVEN
+		registeredA.addConnection(registeredE);
+		registeredA.addConnection(registeredD);
+		registeredA.addConnection(registeredC);
+		registeredRepository.saveAndFlush(registeredA);
+		registeredD.addConnection(registeredA);
+		registeredRepository.saveAndFlush(registeredD);
+		registeredB.addConnection(registeredA);
+		registeredRepository.saveAndFlush(registeredB);
+		registeredC.addConnection(registeredA);
+		registeredC.addConnection(registeredB);
+		registeredC.addConnection(registeredD);
+		registeredRepository.saveAndFlush(registeredC);
+		
+		List<Registered> registerdAddedToAExpected = new ArrayList<>();
+		registerdAddedToAExpected.add(registeredB);
+		registerdAddedToAExpected.add(registeredC);
+		registerdAddedToAExpected.add(registeredD);
+		Pageable pageRequest = PageRequest.of(0, 5, Sort.by("last_name", "first_name").ascending());
+		
+		// WHERE
+		Page<Registered> pageRegisteredResult = registeredRepository.findAllAddedToEmail("aaa@aaa.com", pageRequest);
+		
+		// THEN
+		assertThat(pageRegisteredResult).containsExactlyElementsOf(pageRegisteredResult);
+
 	}
 
 }

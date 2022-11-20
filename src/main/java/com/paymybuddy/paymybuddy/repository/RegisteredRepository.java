@@ -15,10 +15,15 @@ public interface RegisteredRepository extends JpaRepository<Registered, String> 
 	@Query(value = "SELECT * FROM registered r WHERE r.email IN (SELECT c.email_add FROM registered r INNER JOIN connection c ON r.email = c.email_added AND r.email = :email)",
 			countQuery = "SELECT COUNT(*) FROM registered r WHERE r.email IN (SELECT c.email_add FROM registered r INNER JOIN connection c ON r.email = c.email_added AND r.email = :email)",
 			nativeQuery = true)
-	Page<Registered> findAllConnectedToEmail(@Param("email") String email, Pageable pageRequest);
+	Page<Registered> findAllAddByEmail(@Param("email") String email, Pageable pageRequest);
 
 	@Query(value = "SELECT * FROM registered r WHERE (NOT r.email = :email) AND (r.email NOT IN (SELECT c.email_add FROM registered r INNER JOIN connection c ON r.email = c.email_added AND r.email = :email))",
 			countQuery = "SELECT COUNT(*) FROM registered r WHERE (NOT r.email = :email) AND (r.email NOT IN (SELECT c.email_add FROM registered r INNER JOIN connection c ON r.email = c.email_added AND r.email = :email))",
 			nativeQuery = true)
-	Page<Registered> findAllNotConnectedToEmail(@Param("email") String email, Pageable pageRequest);
+	Page<Registered> findAllNotAddByEmail(@Param("email") String email, Pageable pageRequest);
+	
+	@Query(value = "SELECT * FROM registered r WHERE r.email IN (SELECT c.email_added FROM registered r INNER JOIN connection c ON r.email = c.email_add AND r.email = :email)",
+			countQuery = "SELECT COUNT(*) FROM registered r WHERE r.email IN (SELECT c.email_added FROM registered r INNER JOIN connection c ON r.email = c.email_add AND r.email = :email)",
+			nativeQuery = true)
+	Page<Registered> findAllAddedToEmail(@Param("email") String email, Pageable pageRequest);
 }
