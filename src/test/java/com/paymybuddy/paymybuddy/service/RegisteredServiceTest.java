@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -970,6 +971,8 @@ public class RegisteredServiceTest {
 		@DisplayName("test removeRegistered should throw UnexpectedRollbackException on IllegalArgumentException")
 		public void removeRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
 			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			when(registeredRepository.findAllAddedToEmail(anyString(), any(Pageable.class))).thenReturn(new PageImpl<Registered>(new ArrayList<Registered>(), Pageable.unpaged(), 0));
 			doThrow(new IllegalArgumentException()).when(registeredRepository).deleteById(anyString());
 			//WHEN
 			//THEN
@@ -983,6 +986,8 @@ public class RegisteredServiceTest {
 		@DisplayName("test removeRegistered should throw UnexpectedRollbackException on any RuntimeException")
 		public void removeRegisteredTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			when(registeredRepository.findAllAddedToEmail(anyString(), any(Pageable.class))).thenReturn(new PageImpl<Registered>(new ArrayList<Registered>(), Pageable.unpaged(), 0));
 			doThrow(new RuntimeException()).when(registeredRepository).deleteById(anyString());
 			//WHEN
 			//THEN

@@ -5,7 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+
+import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -257,6 +261,79 @@ public class RegisteredServiceIT {
 					() -> registeredService.updateRegistered(registeredDTO, request))
 					.getMessage()).isEqualTo("Error while updating your profile");
 			assertThat(registeredRepository.findById("aaa@aaa.com")).isEmpty();
+		}
+	}
+	
+	@Nested
+	@Tag("removeRegisteredIT")
+	@DisplayName("IT for method removeRegistered")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class RemoveRegisteredTests {
+		
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/removeRegistered?email=bbb@bbb.com");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredRepository.deleteAll();
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test removeRegistered should throw UnexpectedRollbackException on ResourceNotFoundException")
+		@Transactional
+		public void removeRegisteredTestShouldRemoveRegisteredAndDeleteHim() {
+			
+			//GIVEN
+			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
+			Registered registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "cccIban");
+
+			registeredRepository.saveAndFlush(registeredA);
+			registeredRepository.saveAndFlush(registeredB);
+			registeredRepository.saveAndFlush(registeredC);
+			
+			Set<Registered> addConnectionsExpectedA = new HashSet<>();
+			addConnectionsExpectedA.add(registeredC);
+
+			Set<Registered> addedConnectionsExpectedC = new HashSet<>();
+			addedConnectionsExpectedC.add(registeredA);
+
+			// addConnections Expected C size should be 0
+
+			registeredA.addConnection(registeredB);
+			registeredA.addConnection(registeredC);
+			registeredRepository.saveAndFlush(registeredA);
+
+			registeredC.addConnection(registeredB);
+			registeredRepository.saveAndFlush(registeredC);
+
+			// WHEN
+			registeredService.removeRegistered("bbb@bbb.com", request);
+			
+			// THEN
+			Optional<Registered> registeredAResultOpt = registeredRepository.findById("aaa@aaa.com");
+			Optional<Registered> registeredBResultOpt = registeredRepository.findById("bbb@bbb.com");
+			Optional<Registered> registeredCResultOpt = registeredRepository.findById("ccc@ccc.com");
+
+			assertThat(registeredAResultOpt).isNotEmpty();
+			assertThat(registeredBResultOpt).isEmpty();
+			assertThat(registeredCResultOpt).isNotEmpty();
+
+			registeredAResultOpt.ifPresent(registeredAResult -> assertThat(registeredAResult.getAddConnections()).containsExactlyInAnyOrderElementsOf(addConnectionsExpectedA));
+			registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddedConnections()).containsExactlyInAnyOrderElementsOf(addedConnectionsExpectedC));
+			registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddConnections()).hasSize(0));
 		}
 	}
 }

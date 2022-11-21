@@ -33,11 +33,11 @@ class RegisteredRepositoryIT {
 	@Autowired
 	private RegisteredRepository registeredRepository;
 
-	Registered registeredA;
-	Registered registeredB;
-	Registered registeredC;
-	Registered registeredD;
-	Registered registeredE;
+	private Registered registeredA;
+	private Registered registeredB;
+	private Registered registeredC;
+	private Registered registeredD;
+	private Registered registeredE;
 
 	@BeforeEach
 	public void setUpPerTest() {

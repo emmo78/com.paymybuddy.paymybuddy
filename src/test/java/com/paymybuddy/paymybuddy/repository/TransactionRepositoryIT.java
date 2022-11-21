@@ -39,9 +39,9 @@ class TransactionRepositoryIT {
 	@Autowired
 	private RegisteredRepository registeredRepository;
 
-	Registered registeredA;
-	Registered registeredB;
-	Registered registeredC;
+	private Registered registeredA;
+	private Registered registeredB;
+	private Registered registeredC;
 
 	@BeforeEach
 	public void setUpPerTest() {

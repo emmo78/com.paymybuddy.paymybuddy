@@ -270,20 +270,15 @@ public class RegisteredServiceImpl implements RegisteredService {
 		log.info("{} : registered={} removed and deleted", requestService.requestToString(request), email);
 	}
 
-	@Override
-	public Optional<String> getRegisteredIban(String email) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String saveUpdateRegisteredIban(String email, String iban) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public void resetRegisteredPassword(String email) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void frombank() {
+		// TODO Auto-generated method stub
+		
 	}
 }
