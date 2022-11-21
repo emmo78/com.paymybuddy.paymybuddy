@@ -51,6 +51,7 @@ import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.dto.service.RegisteredDTOService;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.exception.ResourceNotFoundException;
+import com.paymybuddy.paymybuddy.exception.WithdrawException;
 import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 
@@ -994,6 +995,233 @@ public class RegisteredServiceTest {
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> registeredService.removeRegistered("aaa@aaa.com", request))
 					.getMessage()).isEqualTo("Error while removing your profile");
+		}
+	}
+	
+	@Nested
+	@Tag("depositFromBankTests")
+	@DisplayName("Tests for method depositFromBank")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class DepositFromBankTests {
+		
+		private Registered registeredA;
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/depositFromBank?email=aaa@aaa.com&amount=110");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+		
+		@BeforeEach
+		public void setUpForEachTests() {
+			registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+			registeredA.setBalance(100);
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredA = null;
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test depositFromBank should sum balance and amount")
+		public void depositFromBankTestShouldSumBalanceAndAmount() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			ArgumentCaptor<Registered> registeredResultCapt = ArgumentCaptor.forClass(Registered.class);
+			when(registeredRepository.save(any(Registered.class))).thenReturn(registeredA);
+			
+			//WHEN
+			registeredService.depositFromBank("aaa@aaa.com", 110.0, request);
+			//THEN
+			verify(registeredRepository, times(1)).save(registeredResultCapt.capture());
+			assertThat(registeredResultCapt.getValue().getBalance()).isEqualTo(210d);
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test depositFromBank should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void depositFromBankTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.ofNullable(null));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.depositFromBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("Error while deposit money from bank. Canceled");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test depositFromBank should throw UnexpectedRollbackException on IllegalArgumentException")
+		public void depositFromBankTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new IllegalArgumentException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.depositFromBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("Error while deposit money from bank. Canceled");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test depositFromBank should throw UnexpectedRollbackException on OptimisticLockingFailureException")
+		public void depositFromBankTestShouldThrowsUnexpectedRollbackExceptionOnOptimisticLockingFailureException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new OptimisticLockingFailureException(""));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.depositFromBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("Error while deposit money from bank. Canceled");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test depositFromBank should throw UnexpectedRollbackException on any RuntimeException")
+		public void depositFromBankTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new RuntimeException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.depositFromBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("Error while deposit money from bank. Canceled");
+		}
+	}
+	
+	@Nested
+	@Tag("withdrawToBankTests")
+	@DisplayName("Tests for method withdrawToBank")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class WithdrawToBankTests {
+		
+		private Registered registeredA;
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/withdrawToBank?email=aaa@aaa.com&amount=110");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+		
+		@BeforeEach
+		public void setUpForEachTests() {
+			registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+			registeredA.setBalance(120);
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredA = null;
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test withdrawToBank should sum balance and amount")
+		public void withdrawToBankTestShouldSumBalanceAndAmount() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			ArgumentCaptor<Registered> registeredResultCapt = ArgumentCaptor.forClass(Registered.class);
+			when(registeredRepository.save(any(Registered.class))).thenReturn(registeredA);
+			
+			//WHEN
+			registeredService.withdrawToBank("aaa@aaa.com", 110.0, request);
+			//THEN
+			verify(registeredRepository, times(1)).save(registeredResultCapt.capture());
+			assertThat(registeredResultCapt.getValue().getBalance()).isEqualTo(10d);
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test withdrawToBank with insuficient balance should throw WithdrawException")
+		public void withdrawToBankTestWithInsufientBalanceShouldThrowsWithdrawException() {
+			//GIVEN
+			registeredA.setBalance(100);
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(WithdrawException.class,
+					() -> registeredService.withdrawToBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("Insufficient funds for withdraw to bank");
+		}		
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test withdrawToBank should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void withdrawToBankTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.ofNullable(null));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.withdrawToBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("Error while withdraw to bank. Canceled");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test withdrawToBank should throw UnexpectedRollbackException on IllegalArgumentException")
+		public void withdrawToBankTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new IllegalArgumentException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.withdrawToBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("Error while withdraw to bank. Canceled");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test withdrawToBank should throw UnexpectedRollbackException on OptimisticLockingFailureException")
+		public void withdrawToBankTestShouldThrowsUnexpectedRollbackExceptionOnOptimisticLockingFailureException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new OptimisticLockingFailureException(""));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.withdrawToBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("Error while withdraw to bank. Canceled");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test withdrawToBank should throw UnexpectedRollbackException on any RuntimeException")
+		public void withdrawToBankTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			when(registeredRepository.save(any(Registered.class))).thenThrow(new RuntimeException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> registeredService.withdrawToBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("Error while withdraw to bank. Canceled");
 		}
 	}
 }

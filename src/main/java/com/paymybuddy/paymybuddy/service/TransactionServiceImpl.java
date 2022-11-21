@@ -77,7 +77,7 @@ public class TransactionServiceImpl implements TransactionService {
 			log.error("{} : sender={} : {}", requestService.requestToString(request), transactionDTO.getEmailSender(), re.toString());
 			throw new UnexpectedRollbackException("Error while creating money transfer");
 		} catch (InsufficentFundsException ife) {
-			log.error("{} : sender={} : {}", requestService.requestToString(request), transactionDTO.getEmailSender(), ife.getMessage());
+			log.error("{} : sender={} : {}", requestService.requestToString(request), transactionDTO.getEmailSender(), ife.toString());
 			throw new InsufficentFundsException(ife.getMessage());
 		} catch (Exception e) {
 			log.error("{} : sender={} : {} ", requestService.requestToString(request), transactionDTO.getEmailSender(), e.toString());

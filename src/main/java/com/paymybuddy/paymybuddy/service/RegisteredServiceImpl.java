@@ -17,6 +17,7 @@ import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.dto.service.RegisteredDTOService;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.exception.ResourceNotFoundException;
+import com.paymybuddy.paymybuddy.exception.WithdrawException;
 import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 
@@ -267,18 +268,54 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while removing your profile");
 		}
-		log.info("{} : registered={} removed and deleted", requestService.requestToString(request), email);
+		log.info("{} : removed and deleted", requestService.requestToString(request));
 	}
 
+	@Override
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
+	public void depositFromBank(String email, double amount, WebRequest request) throws UnexpectedRollbackException {
+		try {		
+			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
+			registered.setBalance(registered.getBalance()+amount);
+			registeredRepository.save(registered);
+		} catch(IllegalArgumentException | OptimisticLockingFailureException | ResourceNotFoundException re) {
+			log.error("{} : {} ", requestService.requestToString(request), re.toString());
+			throw new UnexpectedRollbackException("Error while deposit money from bank. Canceled");
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while deposit money from bank. Canceled");
+		}
+		log.info("{} : deposit {} from bank persisted", requestService.requestToString(request), amount);
+	}
 
+	@Override
+	@Transactional(rollbackFor = {UnexpectedRollbackException.class, WithdrawException.class})
+	public void withdrawToBank(String email, double amount, WebRequest request) throws UnexpectedRollbackException, WithdrawException {
+		try {		
+			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
+			double total = registered.getBalance() - amount;
+			if (total<0d) {
+				throw new WithdrawException("Insufficient funds for withdraw to bank");
+			}
+			registered.setBalance(total);
+			registeredRepository.save(registered);
+		} catch(IllegalArgumentException | OptimisticLockingFailureException | ResourceNotFoundException re) {
+			log.error("{} : {} ", requestService.requestToString(request), re.toString());
+			throw new UnexpectedRollbackException("Error while withdraw to bank. Canceled");
+		} catch (WithdrawException we) {
+			log.error("{} : {}", requestService.requestToString(request), we.toString());
+			throw new WithdrawException(we.getMessage());
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while withdraw to bank. Canceled");
+		}
+		log.info("{} : withdraw to bank persisted", requestService.requestToString(request));
+	}
+	
 	@Override
 	public void resetRegisteredPassword(String email) {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
-	public void frombank() {
-		// TODO Auto-generated method stub
-		
-	}
+
 }
