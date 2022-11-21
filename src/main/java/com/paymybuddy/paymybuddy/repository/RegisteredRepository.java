@@ -5,14 +5,25 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.paymybuddy.paymybuddy.model.Registered;
 
+@Repository
 public interface RegisteredRepository extends JpaRepository<Registered, String> {
 
-	@Query(value = "SELECT * FROM registered r INNER JOIN connection c ON NOT r.email = c.email_added WHERE NOT r.email = :email",
-			countQuery = "SELECT COUNT(*) FROM registered r INNER JOIN connection c ON NOT r.email = c.email_added WHERE NOT r.email = :email", 
+	@Query(value = "SELECT * FROM registered r WHERE r.email IN (SELECT c.email_add FROM registered r INNER JOIN connection c ON r.email = c.email_added AND r.email = :email)",
+			countQuery = "SELECT COUNT(*) FROM registered r WHERE r.email IN (SELECT c.email_add FROM registered r INNER JOIN connection c ON r.email = c.email_added AND r.email = :email)",
 			nativeQuery = true)
-	Page<Registered> findAllNotConnectedToId(@Param("email") String email, Pageable pageRequest);
+	Page<Registered> findAllAddByEmail(@Param("email") String email, Pageable pageRequest);
 
+	@Query(value = "SELECT * FROM registered r WHERE (NOT r.email = :email) AND (r.email NOT IN (SELECT c.email_add FROM registered r INNER JOIN connection c ON r.email = c.email_added AND r.email = :email))",
+			countQuery = "SELECT COUNT(*) FROM registered r WHERE (NOT r.email = :email) AND (r.email NOT IN (SELECT c.email_add FROM registered r INNER JOIN connection c ON r.email = c.email_added AND r.email = :email))",
+			nativeQuery = true)
+	Page<Registered> findAllNotAddByEmail(@Param("email") String email, Pageable pageRequest);
+	
+	@Query(value = "SELECT * FROM registered r WHERE r.email IN (SELECT c.email_added FROM registered r INNER JOIN connection c ON r.email = c.email_add AND r.email = :email)",
+			countQuery = "SELECT COUNT(*) FROM registered r WHERE r.email IN (SELECT c.email_added FROM registered r INNER JOIN connection c ON r.email = c.email_add AND r.email = :email)",
+			nativeQuery = true)
+	Page<Registered> findAllAddedToEmail(@Param("email") String email, Pageable pageRequest);
 }

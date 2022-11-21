@@ -1,7 +1,7 @@
 package com.paymybuddy.paymybuddy.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +22,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -31,6 +32,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor
 public class Registered implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -50,7 +52,7 @@ public class Registered implements Serializable {
 	private String lastName;
 
 	@Column(name = "birth_date")
-	private Date birthDate;
+	private LocalDate birthDate;
 
 	@Column(name = "iban")
 	private String iban;
@@ -59,7 +61,7 @@ public class Registered implements Serializable {
 	private double balance = 0;
 
 	@ManyToMany(cascade = CascadeType.MERGE)
-	@JoinTable(name = "connection", joinColumns = @JoinColumn(name = "email_add", referencedColumnName = "email", nullable = false), inverseJoinColumns = @JoinColumn(name = "email_added", referencedColumnName = "email", nullable = false))
+	@JoinTable(name = "connection", joinColumns = @JoinColumn(name = "email_added", referencedColumnName = "email", nullable = false), inverseJoinColumns = @JoinColumn(name = "email_add", referencedColumnName = "email", nullable = false))
 	private Set<Registered> addConnections = new HashSet<>();
 	
 	@ManyToMany(cascade = CascadeType.MERGE, mappedBy ="addConnections")
@@ -71,12 +73,8 @@ public class Registered implements Serializable {
 	@OneToMany(mappedBy = "receiver", cascade = CascadeType.REFRESH)
 	private List<Transaction> receivedTransactions = new ArrayList<>();
 	
-	public Registered() {
-		super();
-	}
-
-	public Registered(String email, String password, String firstName, String lastName, Date birthDate, String iban) {
-		super();
+	//convenience for testing
+	public Registered(String email, String password, String firstName, String lastName, LocalDate birthDate, String iban) {
 		this.email = email;
 		this.password = password;
 		this.firstName = firstName;

@@ -3,7 +3,7 @@ package com.paymybuddy.paymybuddy.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,7 +18,9 @@ import javax.persistence.Table;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -27,6 +29,8 @@ import lombok.Setter;
 @DynamicUpdate
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor
 public class Transaction implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -34,10 +38,11 @@ public class Transaction implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "transaction_id")
+	@EqualsAndHashCode.Include
 	private long transactionId;
 
 	@Column(name = "date_time")
-	private Timestamp dateTime;
+	private LocalDateTime dateTime;
 
 	@Column(name = "amount")
 	private double amount;
@@ -53,12 +58,7 @@ public class Transaction implements Serializable {
 	@JoinColumn(name = "email_receiver")
 	private Registered receiver;
 
-	public Transaction() {
-		super();
-	}
-	
-	public Transaction(Timestamp dateTime, double amount) {
-		super();
+	public Transaction(LocalDateTime dateTime, double amount) {
 		this.dateTime = dateTime;
 		this.amount = amount;
 		monetize();

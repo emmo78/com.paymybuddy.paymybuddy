@@ -16,7 +16,7 @@ USE paymybuddy;
 
 CREATE TABLE registered(  
    email VARCHAR(320) NOT NULL,  
-   password VARCHAR(25) NOT NULL,  
+   password CHAR(60) NOT NULL,  
    first_name VARCHAR(30) NOT NULL,  
    last_name VARCHAR(30) NOT NULL,  
    birth_date DATE NOT NULL,  
@@ -36,8 +36,8 @@ CREATE TABLE connection(
 CREATE TABLE transaction(  
    transaction_id BIGINT AUTO_INCREMENT,  
    date_time DATETIME NOT NULL,  
-   amount DOUBLE NOT NULL,
-   fee DOUBLE NOT NULL,
+   amount DOUBLE NOT NULL,  
+   fee DOUBLE NOT NULL,  
    email_sender VARCHAR(320),  
    email_receiver VARCHAR(320),  
    PRIMARY KEY(transaction_id),  
