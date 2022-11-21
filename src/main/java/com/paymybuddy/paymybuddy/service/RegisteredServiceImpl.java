@@ -128,6 +128,25 @@ public class RegisteredServiceImpl implements RegisteredService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
+	public void removeRegistered(String email, WebRequest request) throws UnexpectedRollbackException {
+		try {		
+			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
+			registeredRepository.findAllAddedToEmail(email, Pageable.unpaged())
+				.forEach(added -> registeredRepository.findById(added.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Registered added not found"))
+				.removeConnection(registered));
+			registeredRepository.deleteById(email);
+		} catch(IllegalArgumentException | ResourceNotFoundException re) {
+			log.error("{} : {} ", requestService.requestToString(request), re.toString());
+			throw new UnexpectedRollbackException("Error while removing your profile");
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while removing your profile");
+		}
+		log.info("{} : removed and deleted", requestService.requestToString(request));
+	}
+
+	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
 	public Page<RegisteredForListDTO> getRegistrants(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException{
 		Page<RegisteredForListDTO> pageRegisteredForListDTO = null;
@@ -254,25 +273,6 @@ public class RegisteredServiceImpl implements RegisteredService {
 
 	@Override
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
-	public void removeRegistered(String email, WebRequest request) throws UnexpectedRollbackException {
-		try {		
-			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
-			registeredRepository.findAllAddedToEmail(email, Pageable.unpaged())
-				.forEach(added -> registeredRepository.findById(added.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Registered added not found"))
-				.removeConnection(registered));
-			registeredRepository.deleteById(email);
-		} catch(IllegalArgumentException | ResourceNotFoundException re) {
-			log.error("{} : {} ", requestService.requestToString(request), re.toString());
-			throw new UnexpectedRollbackException("Error while removing your profile");
-		} catch(Exception e) {
-			log.error("{} : {} ", requestService.requestToString(request), e.toString());
-			throw new UnexpectedRollbackException("Error while removing your profile");
-		}
-		log.info("{} : removed and deleted", requestService.requestToString(request));
-	}
-
-	@Override
-	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public void depositFromBank(String email, double amount, WebRequest request) throws UnexpectedRollbackException {
 		try {		
 			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
@@ -316,6 +316,4 @@ public class RegisteredServiceImpl implements RegisteredService {
 	public void resetRegisteredPassword(String email) {
 		// TODO Auto-generated method stub
 	}
-
-
 }
