@@ -23,6 +23,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -262,6 +263,7 @@ public class RegisteredServiceIT {
 		@DisplayName("IT UpdateRegistered throws UnexpectedRollbackException should rollback")
 		public void updateRegisteredITthrowsUnexpectedRollbackExceptionShouldRollback() {
 			//GIVEN
+				//No Registered to Update => Not Found
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
@@ -301,7 +303,7 @@ public class RegisteredServiceIT {
 		
 		@Test
 		@Tag("RegisteredServiceTest")
-		@DisplayName("test removeRegistered should throw UnexpectedRollbackException on ResourceNotFoundException")
+		@DisplayName("test removeRegistered should throw remove registered and delete him")
 		@Transactional
 		public void removeRegisteredTestShouldRemoveRegisteredAndDeleteHim() {
 			
@@ -310,12 +312,19 @@ public class RegisteredServiceIT {
 			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
 			Registered registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "cccIban");
-
 			registeredB.addRole(roleRepository.findById(1).get());
-			registeredRepository.saveAndFlush(registeredA);
-			registeredRepository.saveAndFlush(registeredB);
-			registeredRepository.saveAndFlush(registeredC);
 			
+			registeredA.addConnection(registeredB);
+			registeredA.addConnection(registeredC);
+			registeredRepository.saveAndFlush(registeredA);
+			
+			registeredB.addConnection(registeredA);
+			registeredB.addConnection(registeredC);
+			registeredRepository.saveAndFlush(registeredB);
+
+			registeredC.addConnection(registeredB);
+			registeredRepository.saveAndFlush(registeredC);
+
 			Set<Registered> addConnectionsExpectedA = new HashSet<>();
 			addConnectionsExpectedA.add(registeredC);
 
@@ -323,32 +332,21 @@ public class RegisteredServiceIT {
 			addedConnectionsExpectedC.add(registeredA);
 
 			// addConnections Expected C size should be 0
+			// addedConnections Expected A size should be 0
 
-			registeredA.addConnection(registeredB);
-			registeredA.addConnection(registeredC);
-			registeredRepository.saveAndFlush(registeredA);
-			
-			registeredB.addConnection(registeredA);
-			registeredRepository.saveAndFlush(registeredB);
-
-			registeredC.addConnection(registeredB);
-			registeredRepository.saveAndFlush(registeredC);
 
 			// WHEN
 			registeredService.removeRegistered("bbb@bbb.com", request);
 			
 			// THEN
-			Optional<Registered> registeredAResultOpt = registeredRepository.findById("aaa@aaa.com");
-			Optional<Registered> registeredBResultOpt = registeredRepository.findById("bbb@bbb.com");
-			Optional<Registered> registeredCResultOpt = registeredRepository.findById("ccc@ccc.com");
+			assertThat(registeredRepository.findById("aaa@aaa.com")).isNotEmpty();
+			assertThat(registeredRepository.findById("bbb@bbb.com")).isEmpty();
+			assertThat(registeredRepository.findById("ccc@ccc.com")).isNotEmpty();
 
-			assertThat(registeredAResultOpt).isNotEmpty();
-			assertThat(registeredBResultOpt).isEmpty();
-			assertThat(registeredCResultOpt).isNotEmpty();
-
-			registeredAResultOpt.ifPresent(registeredAResult -> assertThat(registeredAResult.getAddConnections()).containsExactlyInAnyOrderElementsOf(addConnectionsExpectedA));
-			//registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddedConnections()).containsExactlyInAnyOrderElementsOf(addedConnectionsExpectedC));
-			registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddConnections()).hasSize(0));
+			assertThat(registeredRepository.findAllAddByEmail("aaa@aaa.com", Pageable.unpaged())).containsExactlyInAnyOrderElementsOf(addConnectionsExpectedA);
+			assertThat(registeredRepository.findAllAddByEmail("ccc@ccc.com", Pageable.unpaged())).isEmpty();
+			assertThat(registeredRepository.findAllAddedToEmail("aaa@aaa.com", Pageable.unpaged())).isEmpty();
+			assertThat(registeredRepository.findAllAddedToEmail("ccc@ccc.com", Pageable.unpaged())).containsExactlyInAnyOrderElementsOf(addedConnectionsExpectedC);
 		}
 	}
 }

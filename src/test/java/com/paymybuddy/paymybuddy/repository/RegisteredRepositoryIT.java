@@ -89,6 +89,34 @@ class RegisteredRepositoryIT {
 
 		registeredAResultOpt.ifPresent(registeredAResult -> assertThat(registeredAResult.getAddConnections()).containsExactlyInAnyOrderElementsOf(addConnectionsExpectedA));
 	}
+
+	@Test
+	@Tag("RegisteredRepositoryIT")
+	@DisplayName("registeredA disconnects B and C should empty their sets")
+	@Transactional
+	public void registeredADisconnectsBandCShouldEmptyTheirSets() {
+		// GIVEN
+		registeredA.addConnection(registeredB);
+		registeredA.addConnection(registeredC);
+		registeredRepository.saveAndFlush(registeredA);
+
+		// WHEN
+		registeredA.removeConnection(registeredB);
+		registeredA.removeConnection(registeredC);
+		registeredRepository.saveAndFlush(registeredA);
+
+		
+		// THEN
+		Optional<Registered> registeredAResultOpt = registeredRepository.findById("aaa@aaa.com");
+		Optional<Registered> registeredBResultOpt = registeredRepository.findById("bbb@bbb.com");
+		Optional<Registered> registeredCResultOpt = registeredRepository.findById("ccc@ccc.com");
+
+		assertThat(registeredAResultOpt).isNotEmpty();
+		assertThat(registeredBResultOpt).isNotEmpty();
+		assertThat(registeredCResultOpt).isNotEmpty();
+
+		registeredAResultOpt.ifPresent(registeredAResult -> assertThat(registeredAResult.getAddConnections()).isEmpty());
+	}
 	
 	@Test
 	@Tag("RegisteredRepositoryIT")
@@ -187,6 +215,54 @@ class RegisteredRepositoryIT {
 
 	@Test
 	@Tag("RegisteredRepositoryIT")
+	@DisplayName("registeredB after removing add and added should clean his FK in connection")
+	@Transactional
+	public void registeredBAfterRemovingAddAndAddedFromApplicationShouldCleanHisFKInConnection() {
+		// GIVEN
+		registeredA.addConnection(registeredB);
+		registeredA.addConnection(registeredC); // A added to C
+		registeredRepository.saveAndFlush(registeredA);
+		
+		registeredB.addConnection(registeredA);
+		registeredB.addConnection(registeredC);
+		registeredRepository.saveAndFlush(registeredB);
+
+		registeredC.addConnection(registeredB);
+		registeredRepository.saveAndFlush(registeredC);
+
+		Set<Registered> addConnectionsExpectedA = new HashSet<>();
+		addConnectionsExpectedA.add(registeredC);
+
+		Set<Registered> addedConnectionsExpectedC = new HashSet<>();
+		addedConnectionsExpectedC.add(registeredA);
+
+		// addConnections Expected C size should be 0
+		// addedConnections Expected A size should be 0
+
+		// WHEN
+		registeredB.removeConnection(registeredA);
+		registeredB.removeConnection(registeredC);
+		registeredRepository.saveAndFlush(registeredB);
+		registeredRepository.findAllAddedToEmail("bbb@bbb.com", Pageable.unpaged())
+			.forEach(added -> registeredRepository.findById(added.getEmail()).get()
+			.removeConnection(registeredB));
+		registeredRepository.flush();
+
+		// THEN
+		assertThat(registeredRepository.findById("aaa@aaa.com")).isNotEmpty();
+		assertThat(registeredRepository.findById("bbb@bbb.com")).isNotEmpty();
+		assertThat(registeredRepository.findById("ccc@ccc.com")).isNotEmpty();
+
+		assertThat(registeredRepository.findAllAddByEmail("aaa@aaa.com", Pageable.unpaged())).containsExactlyInAnyOrderElementsOf(addConnectionsExpectedA);
+		assertThat(registeredRepository.findAllAddByEmail("bbb@bbb.com", Pageable.unpaged())).isEmpty();
+		assertThat(registeredRepository.findAllAddByEmail("ccc@ccc.com", Pageable.unpaged())).isEmpty();
+		assertThat(registeredRepository.findAllAddedToEmail("aaa@aaa.com", Pageable.unpaged())).isEmpty();
+		assertThat(registeredRepository.findAllAddedToEmail("bbb@bbb.com", Pageable.unpaged())).isEmpty();
+		assertThat(registeredRepository.findAllAddedToEmail("ccc@ccc.com", Pageable.unpaged())).containsExactlyInAnyOrderElementsOf(addedConnectionsExpectedC);
+	}
+
+	@Test
+	@Tag("RegisteredRepositoryIT")
 	@DisplayName("registeredB after removing added and himself from application should clean his FK in connection")
 	@Transactional
 	public void registeredBAfterRemovingAddedAndHimselfFromApplicationShouldCleanHisFKInConnection() {
@@ -195,9 +271,14 @@ class RegisteredRepositoryIT {
 		addConnectionsExpectedA.add(registeredC);
 
 		// addConnections Expected C size should be 0
+		
+		Set<Registered> addedConnectionsExpectedC = new HashSet<>();
+		addedConnectionsExpectedC.add(registeredA);
+		
+		// addedConnections Expected A size should be 0
 
 		registeredA.addConnection(registeredB);
-		registeredA.addConnection(registeredC);
+		registeredA.addConnection(registeredC); // A added to C
 		registeredRepository.saveAndFlush(registeredA);
 		
 		registeredB.addConnection(registeredA);
@@ -222,8 +303,6 @@ class RegisteredRepositoryIT {
 		assertThat(registeredRepository.findAllAddByEmail("aaa@aaa.com", Pageable.unpaged())).containsExactlyInAnyOrderElementsOf(addConnectionsExpectedA);
 		assertThat(registeredRepository.findAllAddByEmail("ccc@ccc.com", Pageable.unpaged())).isEmpty();
 		assertThat(registeredRepository.findAllAddedToEmail("aaa@aaa.com", Pageable.unpaged())).isEmpty();
-
-		
+		assertThat(registeredRepository.findAllAddedToEmail("ccc@ccc.com", Pageable.unpaged())).containsExactlyInAnyOrderElementsOf(addedConnectionsExpectedC);
 	}
-
 }

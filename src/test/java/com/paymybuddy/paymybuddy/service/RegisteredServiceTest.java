@@ -139,6 +139,22 @@ public class RegisteredServiceTest {
 		
 		@Test
 		@Tag("RegisteredServiceTest")
+		@DisplayName("test createRegistered should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void createRegisteredTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
+			//GIVEN
+			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
+			when(registeredRepository.existsById(anyString())).thenReturn(false);
+			when(roleRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+				() -> registeredService.createRegistered(registeredDTO, request))
+				.getMessage()).isEqualTo("Error while creating your profile");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
 		@DisplayName("test createRegistered should throw UnexpectedRollbackException on IllegalArgumentException")
 		public void createRegisteredTestShouldThrowUnexpectedRollbackExceptionOnIllegalArgumentException() {
 			//GIVEN

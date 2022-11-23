@@ -64,9 +64,6 @@ public class Registered implements Serializable {
 	@JoinTable(name = "connection", joinColumns = @JoinColumn(name = "email_added", referencedColumnName = "email", nullable = false), inverseJoinColumns = @JoinColumn(name = "email_add", referencedColumnName = "email", nullable = false))
 	private Set<Registered> addConnections = new HashSet<>();
 	
-	//@ManyToMany(cascade = CascadeType.MERGE, mappedBy ="addConnections")
-	//private Set<Registered> addedConnections = new HashSet<>();		
-	
 	@OneToMany(mappedBy = "sender", cascade = CascadeType.REFRESH)
 	private List<Transaction> sendedTransactions = new ArrayList<>();
 
@@ -89,12 +86,10 @@ public class Registered implements Serializable {
 
 	public void addConnection(Registered registered) {
 		addConnections.add(registered);
-		//registered.getAddedConnections().add(this);
 	}
 	
 	public void removeConnection(Registered registered) {
 		addConnections.remove(registered);
-		//registered.getAddedConnections().remove(this);
 	}
 	
 	public void addSendedTransaction(Transaction transaction) {
