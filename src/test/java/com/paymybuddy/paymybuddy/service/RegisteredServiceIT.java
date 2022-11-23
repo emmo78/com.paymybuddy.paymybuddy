@@ -327,6 +327,9 @@ public class RegisteredServiceIT {
 			registeredA.addConnection(registeredB);
 			registeredA.addConnection(registeredC);
 			registeredRepository.saveAndFlush(registeredA);
+			
+			registeredB.addConnection(registeredA);
+			registeredRepository.saveAndFlush(registeredB);
 
 			registeredC.addConnection(registeredB);
 			registeredRepository.saveAndFlush(registeredC);
