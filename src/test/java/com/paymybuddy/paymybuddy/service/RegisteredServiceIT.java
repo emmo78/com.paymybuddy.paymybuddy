@@ -35,6 +35,7 @@ import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.model.Role;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
+import com.paymybuddy.paymybuddy.repository.RoleRepository;
 
 @SpringBootTest
 public class RegisteredServiceIT {
@@ -276,6 +277,9 @@ public class RegisteredServiceIT {
 	@TestInstance(Lifecycle.PER_CLASS)
 	class RemoveRegisteredTests {
 		
+		@Autowired
+		RoleRepository roleRepository; 
+		
 		@BeforeAll
 		public void setUpForAllTests() {
 			requestMock = new MockHttpServletRequest();
@@ -302,10 +306,12 @@ public class RegisteredServiceIT {
 		public void removeRegisteredTestShouldRemoveRegisteredAndDeleteHim() {
 			
 			//GIVEN
+			
 			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
 			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
 			Registered registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "cccIban");
 
+			registeredB.addRole(roleRepository.findById(1).get());
 			registeredRepository.saveAndFlush(registeredA);
 			registeredRepository.saveAndFlush(registeredB);
 			registeredRepository.saveAndFlush(registeredC);
