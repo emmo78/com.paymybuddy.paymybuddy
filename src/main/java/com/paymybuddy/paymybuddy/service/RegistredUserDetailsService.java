@@ -2,6 +2,7 @@ package com.paymybuddy.paymybuddy.service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -45,11 +46,9 @@ public class RegistredUserDetailsService implements UserDetailsService {
 		}
 		log.info("Login : registerd={} : success", emailLc);
 
-		List<GrantedAuthority> grantedAuthorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
+		List<GrantedAuthority> grantedAuthorities = registered.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
 
-		// org.springframework.security.core.userdetails.User;
-		User user = new User(registered.getEmail(), registered.getPassword(), grantedAuthorities);  
-
-		return user;		
+		// org.springframework.security.core.userdetails.User;   
+		return new User(registered.getEmail(), registered.getPassword(), grantedAuthorities);		
 	}
 }
