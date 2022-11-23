@@ -33,6 +33,7 @@ import org.springframework.web.context.request.WebRequest;
 import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.model.Registered;
+import com.paymybuddy.paymybuddy.model.Role;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 
 @SpringBootTest
@@ -92,9 +93,13 @@ public class RegisteredServiceIT {
 		@Test
 		@Tag("RegisteredServiceIT")
 		@DisplayName("IT createARegisterd should commit it and return RegisterdDTO with no Password")
+		@Transactional
 		public void createRegisteredITShouldCommitItAndReturnRegisterdDTOWithNoPassword() {
 			
 			//GIVEN
+			Role roleExpected = new Role();
+			roleExpected.setRoleId(1);
+			roleExpected.setRoleName("USER");
 
 			//WHEN
 			RegisteredDTO registeredDTOResult = registeredService.createRegistered(registeredDTO, request);
@@ -118,6 +123,7 @@ public class RegisteredServiceIT {
 							"02/28/1991",
 							null,
 							"0.00");
+			assertThat(registeredResultOpt.get().getRoles().get(0)).usingRecursiveComparison().isEqualTo(roleExpected);
 		}
 		
 		@Test

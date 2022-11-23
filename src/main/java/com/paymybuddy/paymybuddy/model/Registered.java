@@ -73,6 +73,10 @@ public class Registered implements Serializable {
 	@OneToMany(mappedBy = "receiver", cascade = CascadeType.REFRESH)
 	private List<Transaction> receivedTransactions = new ArrayList<>();
 	
+	@ManyToMany
+	@JoinTable(name = "registered_role", joinColumns = @JoinColumn(name = "email_role", referencedColumnName = "email", nullable = false), inverseJoinColumns = @JoinColumn(name = "granted_role", referencedColumnName = "role_id", nullable = false))
+	List<Role> roles = new ArrayList<>();
+	
 	//convenience for testing
 	public Registered(String email, String password, String firstName, String lastName, LocalDate birthDate, String iban) {
 		this.email = email;
@@ -102,5 +106,8 @@ public class Registered implements Serializable {
 		receivedTransactions.add(transaction);
 		transaction.setReceiver(this);
 	}
-
+	
+	public void addRole(Role role) {
+		roles.add(role);
+	}
 }

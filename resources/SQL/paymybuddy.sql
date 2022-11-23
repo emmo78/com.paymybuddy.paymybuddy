@@ -30,4 +30,23 @@ CREATE TABLE transaction(
 	PRIMARY KEY(transaction_id), 
 	FOREIGN KEY(email_sender) REFERENCES registered(email) ON DELETE SET NULL, 
 	FOREIGN KEY(email_receiver ) REFERENCES registered(email) ON DELETE SET NULL 
-); 
+);
+
+CREATE TABLE role( 
+	role_id INT AUTO_INCREMENT, 
+	role_name VARCHAR(10), 
+	PRIMARY KEY(role_id) 
+);
+
+CREATE TABLE registered_role( 
+	granted_role INT NOT NULL, 
+	email_role VARCHAR(320) NOT NULL, 
+	PRIMARY KEY(granted_role, email_role), 
+	FOREIGN KEY(granted_role) REFERENCES role(role_id), 
+	FOREIGN KEY(email_role) REFERENCES registered(email) 
+);
+
+INSERT INTO 'role'('role_name')
+VALUES ('USER'); 
+
+ 

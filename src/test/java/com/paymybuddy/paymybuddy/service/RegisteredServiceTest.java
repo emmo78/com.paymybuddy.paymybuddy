@@ -3,6 +3,7 @@ package com.paymybuddy.paymybuddy.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -50,10 +51,11 @@ import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.dto.service.RegisteredDTOService;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
-import com.paymybuddy.paymybuddy.exception.ResourceNotFoundException;
 import com.paymybuddy.paymybuddy.exception.WithdrawException;
 import com.paymybuddy.paymybuddy.model.Registered;
+import com.paymybuddy.paymybuddy.model.Role;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
+import com.paymybuddy.paymybuddy.repository.RoleRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class RegisteredServiceTest {
@@ -66,6 +68,9 @@ public class RegisteredServiceTest {
 	
 	@Mock
 	private RegisteredRepository registeredRepository;
+	
+	@Mock
+	private RoleRepository roleRepository;
 	
 	@Spy
 	private RequestService requestService = new RequestServiceImpl();
@@ -84,9 +89,13 @@ public class RegisteredServiceTest {
 		
 		private RegisteredDTO registeredDTO;
 		private Registered registered;
+		private Role role;
 		
 		@BeforeAll
 		public void setUpForAllTests() {
+			role = new Role();
+			role.setRoleId(1);
+			role.setRoleName("USER");
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
 			requestMock.setRequestURI("/createRegistered");
@@ -97,6 +106,7 @@ public class RegisteredServiceTest {
 		public void unSetForAllTests() {
 			requestMock = null;
 			request = null;
+			role = null;
 		}
 		
 		@BeforeEach
@@ -134,6 +144,7 @@ public class RegisteredServiceTest {
 			//GIVEN
 			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
 			when(registeredRepository.existsById(anyString())).thenReturn(false);
+			when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role));
 			when(registeredRepository.save(any(Registered.class))).thenThrow(new IllegalArgumentException());
 			
 			//WHEN
@@ -150,6 +161,7 @@ public class RegisteredServiceTest {
 			//GIVEN
 			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
 			when(registeredRepository.existsById(anyString())).thenReturn(false);
+			when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role));
 			when(registeredRepository.save(any(Registered.class))).thenThrow(new OptimisticLockingFailureException(""));
 			
 			//WHEN
@@ -166,6 +178,7 @@ public class RegisteredServiceTest {
 			//GIVEN
 			when(registeredDTOService.registeredFromDTO(any(RegisteredDTO.class))).thenReturn(registered);
 			when(registeredRepository.existsById(anyString())).thenReturn(false);
+			when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role));
 			when(registeredRepository.save(any(Registered.class))).thenThrow(new RuntimeException(""));
 			
 			//WHEN
@@ -174,7 +187,6 @@ public class RegisteredServiceTest {
 				() -> registeredService.createRegistered(registeredDTO, request))
 				.getMessage()).isEqualTo("Error while creating your profile");
 		}
-
 	}
 	
 	@Nested
@@ -199,16 +211,16 @@ public class RegisteredServiceTest {
 		
 		@Test
 		@Tag("RegisteredServiceTest")
-		@DisplayName("test getRegistered should throw ResourceNotFoundException")
+		@DisplayName("test getRegistered should throw UnexpectedRollbackException on ResourceNotFoundException")
 		public void getRegisteredTestShouldThrowsResourceNotFoundException() {
 			//GIVEN
 			when(registeredRepository.findById(anyString())).thenReturn(Optional.ofNullable(null));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> registeredService.getRegistered("aaa@aaa.com", request))
-				.getMessage()).isEqualTo("Your email is not found");
+				.getMessage()).isEqualTo("Error while getting your profile");
 		}
 		
 		@Test
