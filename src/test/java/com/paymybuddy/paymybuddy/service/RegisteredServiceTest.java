@@ -752,7 +752,7 @@ public class RegisteredServiceTest {
 			Registered registeredAResult = registeredResultCapt.getValue();
 			Registered registerdBResullt = registeredAResult.getAddConnections().stream().collect(Collectors.toList()).get(0);
 			assertThat(registerdBResullt).isEqualTo(registeredB);
-			assertThat(registerdBResullt.getAddedConnections()).containsOnly(registeredA);
+			//assertThat(registerdBResullt.getAddedConnections()).containsOnly(registeredA);
 		}
 		
 		
@@ -869,7 +869,7 @@ public class RegisteredServiceTest {
 			verify(registeredRepository, times(1)).save(registeredResultCapt.capture());
 			Registered registeredAResult = registeredResultCapt.getValue();
 			assertThat(registeredAResult.getAddConnections()).isEmpty();
-			assertThat(registeredB.getAddedConnections()).isEmpty();
+			//assertThat(registeredB.getAddedConnections()).isEmpty();
 		}
 		
 		

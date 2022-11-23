@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -74,12 +73,6 @@ class RegisteredRepositoryIT {
 		addConnectionsExpectedA.add(registeredB);
 		addConnectionsExpectedA.add(registeredC);
 
-		Set<Registered> addedConnectionsExpectedB = new HashSet<>();
-		addedConnectionsExpectedB.add(registeredA);
-
-		Set<Registered> addedConnectionsExpectedC = new HashSet<>();
-		addedConnectionsExpectedC.add(registeredA);
-
 		// WHEN
 		registeredA.addConnection(registeredB);
 		registeredA.addConnection(registeredC);
@@ -95,105 +88,8 @@ class RegisteredRepositoryIT {
 		assertThat(registeredCResultOpt).isNotEmpty();
 
 		registeredAResultOpt.ifPresent(registeredAResult -> assertThat(registeredAResult.getAddConnections()).containsExactlyInAnyOrderElementsOf(addConnectionsExpectedA));
-		registeredBResultOpt.ifPresent(registeredBResult -> assertThat(registeredBResult.getAddedConnections()).containsExactlyInAnyOrderElementsOf(addedConnectionsExpectedB));
-		registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddedConnections()).containsExactlyInAnyOrderElementsOf(addedConnectionsExpectedC));
 	}
-
-	@Test
-	@Tag("RegisteredRepositoryIT")
-	@DisplayName("registeredB disconnects added A and C should remove them from their sets")
-	@Transactional
-	public void registeredBDisconnectsAddedAandCShouldRemoveThemFromTheirSets() {
-		// GIVEN
-		Set<Registered> addConnectionsExpectedA = new HashSet<>();
-		addConnectionsExpectedA.add(registeredC);
-
-		Set<Registered> addedConnectionsExpectedC = new HashSet<>();
-		addedConnectionsExpectedC.add(registeredA);
-
-		// addedConnections Expected B size should be 0
-		// addConnections Expected C size should be 0
-
-		registeredA.addConnection(registeredB);
-		registeredA.addConnection(registeredC);
-		registeredRepository.saveAndFlush(registeredA);
-
-		registeredC.addConnection(registeredB);
-		registeredRepository.saveAndFlush(registeredC);
-
-		// WHEN
-		registeredB = registeredRepository.findById("bbb@bbb.com").get();
-		// if the set is modified at any time after the iterator is created, in any way
-		// except through the iterator's own remove method, the Iterator throws a
-		// ConcurrentModificationException.
-		Set<Registered> addedToB = registeredB.getAddedConnections().stream().collect(Collectors.toSet());
-		addedToB.forEach(added -> added.removeConnection(registeredB));
-		registeredRepository.saveAndFlush(registeredB);
-
-		// THEN
-		Optional<Registered> registeredAResultOpt = registeredRepository.findById("aaa@aaa.com");
-		Optional<Registered> registeredBResultOpt = registeredRepository.findById("bbb@bbb.com");
-		Optional<Registered> registeredCResultOpt = registeredRepository.findById("ccc@ccc.com");
-
-		assertThat(registeredAResultOpt).isNotEmpty();
-		assertThat(registeredBResultOpt).isNotEmpty();
-		assertThat(registeredCResultOpt).isNotEmpty();
-
-		registeredAResultOpt.ifPresent(registeredAResult -> assertThat(registeredAResult.getAddConnections()).containsExactlyInAnyOrderElementsOf(addConnectionsExpectedA));
-		registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddedConnections()).containsExactlyInAnyOrderElementsOf(addedConnectionsExpectedC));
-		registeredBResultOpt.ifPresent(registeredBResult -> assertThat(registeredBResult.getAddedConnections()).hasSize(0));
-		registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddConnections()).hasSize(0));
-	}
-
-	@Test
-	@Tag("RegisteredRepositoryIT")
-	@DisplayName("registeredB remove from application removing added A and C should remove them from their sets")
-	@Transactional
-	public void registeredBRemoveFromApplicationRemovingAddedAandCshouldRemoveThemFromTheirSets() {
-		// GIVEN
-		Set<Registered> addConnectionsExpectedA = new HashSet<>();
-		addConnectionsExpectedA.add(registeredC);
-
-		Set<Registered> addedConnectionsExpectedC = new HashSet<>();
-		addedConnectionsExpectedC.add(registeredA);
-
-		// addedConnections Expected B size should be 0
-		// addConnections Expected C size should be 0
-
-		registeredA.addConnection(registeredB);
-		registeredA.addConnection(registeredC);
-		registeredRepository.saveAndFlush(registeredA);
-		
-		registeredB.addConnection(registeredA);
-		registeredRepository.saveAndFlush(registeredB);
-
-		registeredC.addConnection(registeredB);
-		registeredRepository.saveAndFlush(registeredC);
-
-		// WHEN
-		registeredB = registeredRepository.findById("bbb@bbb.com").get();
-		// if the set is modified at any time after the iterator is created, in any way
-		// except through the iterator's own remove method, the Iterator throws a
-		// ConcurrentModificationException.
-		Set<Registered> addedToB = registeredB.getAddedConnections().stream().collect(Collectors.toSet());
-		addedToB.forEach(added -> added.removeConnection(registeredB));
-		registeredRepository.deleteById("bbb@bbb.com");
-		registeredRepository.flush();
-
-		// THEN
-		Optional<Registered> registeredAResultOpt = registeredRepository.findById("aaa@aaa.com");
-		Optional<Registered> registeredBResultOpt = registeredRepository.findById("bbb@bbb.com");
-		Optional<Registered> registeredCResultOpt = registeredRepository.findById("ccc@ccc.com");
-
-		assertThat(registeredAResultOpt).isNotEmpty();
-		assertThat(registeredBResultOpt).isEmpty();
-		assertThat(registeredCResultOpt).isNotEmpty();
-
-		registeredAResultOpt.ifPresent(registeredAResult -> assertThat(registeredAResult.getAddConnections()).containsExactlyInAnyOrderElementsOf(addConnectionsExpectedA));
-		registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddedConnections()).containsExactlyInAnyOrderElementsOf(addedConnectionsExpectedC));
-		registeredCResultOpt.ifPresent(registeredCResult -> assertThat(registeredCResult.getAddConnections()).hasSize(0));
-	}
-
+	
 	@Test
 	@Tag("RegisteredRepositoryIT")
 	@DisplayName("test findAllAddByEmail should return expected pages")
@@ -225,7 +121,6 @@ class RegisteredRepositoryIT {
 		
 		// THEN
 		assertThat(pageRegisteredResult.getContent()).containsExactlyElementsOf(registerdAddByAExpected);	
-
 	}
 
 	@Test
@@ -288,7 +183,47 @@ class RegisteredRepositoryIT {
 		
 		// THEN
 		assertThat(pageRegisteredResult).containsExactlyElementsOf(pageRegisteredResult);
+	}
 
+	@Test
+	@Tag("RegisteredRepositoryIT")
+	@DisplayName("registeredB after removing added and himself from application should clean his FK in connection")
+	@Transactional
+	public void registeredBAfterRemovingAddedAndHimselfFromApplicationShouldCleanHisFKInConnection() {
+		// GIVEN
+		Set<Registered> addConnectionsExpectedA = new HashSet<>();
+		addConnectionsExpectedA.add(registeredC);
+
+		// addConnections Expected C size should be 0
+
+		registeredA.addConnection(registeredB);
+		registeredA.addConnection(registeredC);
+		registeredRepository.saveAndFlush(registeredA);
+		
+		registeredB.addConnection(registeredA);
+		registeredB.addConnection(registeredC);
+		registeredRepository.saveAndFlush(registeredB);
+
+		registeredC.addConnection(registeredB);
+		registeredRepository.saveAndFlush(registeredC);
+
+		// WHEN
+		registeredRepository.findAllAddedToEmail("bbb@bbb.com", Pageable.unpaged())
+			.forEach(added -> registeredRepository.findById(added.getEmail()).get()
+			.removeConnection(registeredB));
+		registeredRepository.deleteById("bbb@bbb.com");
+		registeredRepository.flush();
+
+		// THEN
+		assertThat(registeredRepository.findById("aaa@aaa.com")).isNotEmpty();
+		assertThat(registeredRepository.findById("bbb@bbb.com")).isEmpty();
+		assertThat(registeredRepository.findById("ccc@ccc.com")).isNotEmpty();
+
+		assertThat(registeredRepository.findAllAddByEmail("aaa@aaa.com", Pageable.unpaged())).containsExactlyInAnyOrderElementsOf(addConnectionsExpectedA);
+		assertThat(registeredRepository.findAllAddByEmail("ccc@ccc.com", Pageable.unpaged())).isEmpty();
+		assertThat(registeredRepository.findAllAddedToEmail("aaa@aaa.com", Pageable.unpaged())).isEmpty();
+
+		
 	}
 
 }
