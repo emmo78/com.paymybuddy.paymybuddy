@@ -1,6 +1,5 @@
 package com.paymybuddy.paymybuddy.service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +43,7 @@ public class RegistredUserDetailsService implements UserDetailsService {
 			log.error("Login : {} : {} ", emailLc, e.toString());
 			throw new UnexpectedRollbackException("Error while getting your profile");
 		}
-		log.info("Login : registerd={} : success", emailLc);
+		log.info("Login : registered={} : success", emailLc);
 
 		List<GrantedAuthority> grantedAuthorities = registered.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
 

@@ -24,6 +24,4 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 			countQuery = "SELECT COUNT(*) FROM transaction t WHERE t.email_sender = :email OR t.email_receiver = :email",
 			nativeQuery = true)
 	Page<Transaction> findAllTransactionsByEmailSenderOrReceiver(@Param("email") String email, Pageable pageRequest);
-	
-	//Page<Transaction> findByEmailSenderOrReceiver(String email, Pageable pageRequest);
 }
