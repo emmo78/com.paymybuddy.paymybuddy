@@ -44,9 +44,29 @@ public class TransactionDTOServiceTest {
 	public void transactionToDTOSenderTestShouldHaveReceiverFalseAndNegativeAmount() {
 		//GIVEN
 		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
-		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
-		Registered registeredBReceiver = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "bbbIban");
-		Transaction transaction = new Transaction(dateTimeTransaction, 100);
+
+		Registered registeredASender = new Registered();
+		registeredASender.setEmail("aaa@aaa.com");
+		registeredASender.setPassword("aaaPasswd");
+		registeredASender.setFirstName("Aaa");
+		registeredASender.setLastName("AAA");
+		registeredASender.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredASender.setIban("aaaIban");
+		registeredASender.setBalance(100);
+
+		Registered registeredBReceiver = new Registered();
+		registeredBReceiver.setEmail("bbb@bbb.com");
+		registeredBReceiver.setPassword("bbbPasswd");
+		registeredBReceiver.setFirstName("Bbb");
+		registeredBReceiver.setLastName("BBB");
+		registeredBReceiver.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredBReceiver.setIban("bbbIban");
+		registeredBReceiver.setBalance(200);
+		
+		Transaction transaction = new Transaction();
+		transaction.setDateTime(dateTimeTransaction);
+		transaction.setAmount(100);
+		transaction.monetize();
 		transaction.setSender(registeredASender);
 		transaction.setReceiver(registeredBReceiver);
 		when(dateStringPattern.getDateTimeStringPattern()).thenReturn("MM/dd/yyyy HH:mm:ss");
@@ -79,8 +99,18 @@ public class TransactionDTOServiceTest {
 	public void transactionToDTOSenderTestShouldHaveEamilReceiverNull() {
 		//GIVEN
 		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
-		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
-		Transaction transaction = new Transaction(dateTimeTransaction, 100);
+		Registered registeredASender = new Registered();
+		registeredASender.setEmail("aaa@aaa.com");
+		registeredASender.setPassword("aaaPasswd");
+		registeredASender.setFirstName("Aaa");
+		registeredASender.setLastName("AAA");
+		registeredASender.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredASender.setIban("aaaIban");
+		registeredASender.setBalance(100);
+		Transaction transaction = new Transaction();
+		transaction.setDateTime(dateTimeTransaction);
+		transaction.setAmount(100);
+		transaction.monetize();
 		transaction.setSender(registeredASender);
 		transaction.setReceiver(null);
 		when(dateStringPattern.getDateTimeStringPattern()).thenReturn("MM/dd/yyyy HH:mm:ss");
@@ -113,9 +143,28 @@ public class TransactionDTOServiceTest {
 	public void transactionToDTOReceiverTestShouldHaveReceiverTrueAndFeeZero() {
 		//GIVEN
 		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
-		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
-		Registered registeredBReceiver = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "bbbIban");
-		Transaction transaction = new Transaction(dateTimeTransaction, 100);
+		Registered registeredASender = new Registered();
+		registeredASender.setEmail("aaa@aaa.com");
+		registeredASender.setPassword("aaaPasswd");
+		registeredASender.setFirstName("Aaa");
+		registeredASender.setLastName("AAA");
+		registeredASender.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredASender.setIban("aaaIban");
+		registeredASender.setBalance(100);
+
+		Registered registeredBReceiver = new Registered();
+		registeredBReceiver.setEmail("bbb@bbb.com");
+		registeredBReceiver.setPassword("bbbPasswd");
+		registeredBReceiver.setFirstName("Bbb");
+		registeredBReceiver.setLastName("BBB");
+		registeredBReceiver.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredBReceiver.setIban("bbbIban");
+		registeredBReceiver.setBalance(200);
+
+		Transaction transaction = new Transaction();
+		transaction.setDateTime(dateTimeTransaction);
+		transaction.setAmount(100);
+		transaction.monetize();
 		transaction.setSender(registeredASender);
 		transaction.setReceiver(registeredBReceiver);
 		when(dateStringPattern.getDateTimeStringPattern()).thenReturn("MM/dd/yyyy HH:mm:ss");
@@ -148,8 +197,20 @@ public class TransactionDTOServiceTest {
 	public void transactionToDTOReceiverTestShouldHaveEamilSenderNull() {
 		//GIVEN
 		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
-		Registered registeredBReceiver = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "bbbIban");
-		Transaction transaction = new Transaction(dateTimeTransaction, 100);
+
+		Registered registeredBReceiver = new Registered();
+		registeredBReceiver.setEmail("bbb@bbb.com");
+		registeredBReceiver.setPassword("bbbPasswd");
+		registeredBReceiver.setFirstName("Bbb");
+		registeredBReceiver.setLastName("BBB");
+		registeredBReceiver.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredBReceiver.setIban("bbbIban");
+		registeredBReceiver.setBalance(200);
+
+		Transaction transaction = new Transaction();
+		transaction.setDateTime(dateTimeTransaction);
+		transaction.setAmount(100);
+		transaction.monetize();
 		transaction.setSender(null);
 		transaction.setReceiver(registeredBReceiver);
 		when(dateStringPattern.getDateTimeStringPattern()).thenReturn("MM/dd/yyyy HH:mm:ss");

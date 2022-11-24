@@ -113,7 +113,14 @@ public class RegisteredServiceTest {
 		public void setUpForEachTests() {
 			registeredDTO = new RegisteredDTO();
 			registeredDTO.setEmail("Aaa@Aaa.com");
-			registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+			registered = new Registered();
+			registered.setEmail("aaa@aaa.com");
+			registered.setPassword("aaaPasswd");
+			registered.setFirstName("Aaa");
+			registered.setLastName("AAA");
+			registered.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registered.setIban("aaaIban");
+			registered.setBalance(100);
 		}
 		
 		@AfterEach
@@ -306,22 +313,22 @@ public class RegisteredServiceTest {
 			registeredDTO.setIban("FR7601234567890123456789"); //expect updated
 			registeredDTO.setBalance(null); //NOT Updated
 
-			registered = new Registered(
-					"aaa@aaa.com",
-					null,
-					"Aaa",
-					null,
-					LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
-					"FR7601234567890123456789");
+			registered = new Registered();
+			registered.setEmail("aaa@aaa.com");
+			registered.setPassword(null);
+			registered.setFirstName("Aaa");
+			registered.setLastName(null);
+			registered.setBirthDate(LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registered.setIban("FR7601234567890123456789");
 			registered.setBalance(0);
-			
-			registeredToUpate =  new Registered(
-					"aaa@aaa.com",
-					passwordEncoder.encode("aaaPasswd"),
-					"Aaa",
-					"AAA",
-					LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")),
-					null);
+
+			registeredToUpate = new Registered();
+			registeredToUpate.setEmail("aaa@aaa.com");
+			registeredToUpate.setPassword(passwordEncoder.encode("aaaPasswd"));
+			registeredToUpate.setFirstName("Aaa");
+			registeredToUpate.setLastName("AAA");
+			registeredToUpate.setBirthDate(LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredToUpate.setIban(null);
 			registeredToUpate.setBalance(100);
 		}
 		
@@ -457,8 +464,24 @@ public class RegisteredServiceTest {
 		@DisplayName("test getRegistrants should return page of RegisterdForListDTO")
 		public void getRegistrantsTestShouldReturnPageOfRegisterdForListDTO() {
 			//GIVEN
-			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
-			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
+			Registered 	registeredA = new Registered();
+			registeredA.setEmail("aaa@aaa.com");
+			registeredA.setPassword("aaaPasswd");
+			registeredA.setFirstName("Aaa");
+			registeredA.setLastName("AAA");
+			registeredA.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredA.setIban("aaaIban");
+			registeredA.setBalance(100);
+
+			Registered 	registeredB = new Registered();
+			registeredB.setEmail("bbb@bbb.com");
+			registeredB.setPassword("bbbPasswd");
+			registeredB.setFirstName("Bbb");
+			registeredB.setLastName("BBB");
+			registeredB.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredB.setIban("bbbIban");
+			registeredB.setBalance(200);
+
 			RegisteredForListDTO registeredForListDTOA = new RegisteredForListDTO("aaa@aaa.com", "Aaa", "AAA");
 			RegisteredForListDTO registeredForListDTOB = new RegisteredForListDTO("bbb@bbb.com", "Bbb", "BBB");
 			List<RegisteredForListDTO> registrantsDTOExpected = Arrays.asList(registeredForListDTOA, registeredForListDTOB);
@@ -528,9 +551,25 @@ public class RegisteredServiceTest {
 		@Tag("RegisteredServiceTest")
 		@DisplayName("test getAllAddBy should return page of RegisterdForListDTO")
 		public void getAllAddByTestShouldReturnPageOfRegisterdForListDTO() {
-			//GIVEN : C add A and B
-			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
-			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
+			//GIVEN : C has added A and B
+			Registered 	registeredA = new Registered();
+			registeredA.setEmail("aaa@aaa.com");
+			registeredA.setPassword("aaaPasswd");
+			registeredA.setFirstName("Aaa");
+			registeredA.setLastName("AAA");
+			registeredA.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredA.setIban("aaaIban");
+			registeredA.setBalance(100);
+
+			Registered 	registeredB = new Registered();
+			registeredB.setEmail("bbb@bbb.com");
+			registeredB.setPassword("bbbPasswd");
+			registeredB.setFirstName("Bbb");
+			registeredB.setLastName("BBB");
+			registeredB.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredB.setIban("bbbIban");
+			registeredB.setBalance(200);
+			
 			RegisteredForListDTO registeredForListDTOA = new RegisteredForListDTO("aaa@aaa.com", "Aaa", "AAA");
 			RegisteredForListDTO registeredForListDTOB = new RegisteredForListDTO("bbb@bbb.com", "Bbb", "BBB");
 			List<RegisteredForListDTO> registrantsDTOExpected = Arrays.asList(registeredForListDTOA, registeredForListDTOB);
@@ -601,8 +640,24 @@ public class RegisteredServiceTest {
 		@DisplayName("test getAllNotAddBy should return page of RegisterdForListDTO")
 		public void getAllNotAddByTestShouldReturnPageOfRegisterdForListDTO() {
 			//GIVEN : C can add A and B
-			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
-			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
+			Registered 	registeredA = new Registered();
+			registeredA.setEmail("aaa@aaa.com");
+			registeredA.setPassword("aaaPasswd");
+			registeredA.setFirstName("Aaa");
+			registeredA.setLastName("AAA");
+			registeredA.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredA.setIban("aaaIban");
+			registeredA.setBalance(100);
+
+			Registered 	registeredB = new Registered();
+			registeredB.setEmail("bbb@bbb.com");
+			registeredB.setPassword("bbbPasswd");
+			registeredB.setFirstName("Bbb");
+			registeredB.setLastName("BBB");
+			registeredB.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredB.setIban("bbbIban");
+			registeredB.setBalance(200);
+			
 			RegisteredForListDTO registeredForListDTOA = new RegisteredForListDTO("aaa@aaa.com", "Aaa", "AAA");
 			RegisteredForListDTO registeredForListDTOB = new RegisteredForListDTO("bbb@bbb.com", "Bbb", "BBB");
 			List<RegisteredForListDTO> registrantsDTOExpected = Arrays.asList(registeredForListDTOA, registeredForListDTOB);
@@ -672,9 +727,25 @@ public class RegisteredServiceTest {
 		@Tag("RegisteredServiceTest")
 		@DisplayName("test getAllAddedTo should return page of RegisterdForListDTO")
 		public void getAllAddedToTestShouldReturnPageOfRegisterdForListDTO() {
-			//GIVEN : A and B add C so C was added by A and B
-			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
-			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
+			//GIVEN : A and B has added C so C was added by A and B
+			Registered 	registeredA = new Registered();
+			registeredA.setEmail("aaa@aaa.com");
+			registeredA.setPassword("aaaPasswd");
+			registeredA.setFirstName("Aaa");
+			registeredA.setLastName("AAA");
+			registeredA.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredA.setIban("aaaIban");
+			registeredA.setBalance(100);
+
+			Registered 	registeredB = new Registered();
+			registeredB.setEmail("bbb@bbb.com");
+			registeredB.setPassword("bbbPasswd");
+			registeredB.setFirstName("Bbb");
+			registeredB.setLastName("BBB");
+			registeredB.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredB.setIban("bbbIban");
+			registeredB.setBalance(200);
+			
 			RegisteredForListDTO registeredForListDTOA = new RegisteredForListDTO("aaa@aaa.com", "Aaa", "AAA");
 			RegisteredForListDTO registeredForListDTOB = new RegisteredForListDTO("bbb@bbb.com", "Bbb", "BBB");
 			List<RegisteredForListDTO> registrantsDTOExpected = Arrays.asList(registeredForListDTOA, registeredForListDTOB);
@@ -741,9 +812,23 @@ public class RegisteredServiceTest {
 		
 		@BeforeEach
 		public void setUpForEachTests() {
-			registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
-			registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "bbbIban");
-		}
+			registeredA = new Registered();
+			registeredA.setEmail("aaa@aaa.com");
+			registeredA.setPassword("aaaPasswd");
+			registeredA.setFirstName("Aaa");
+			registeredA.setLastName("AAA");
+			registeredA.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredA.setIban("aaaIban");
+			registeredA.setBalance(100);
+
+			registeredB = new Registered();
+			registeredB.setEmail("bbb@bbb.com");
+			registeredB.setPassword("bbbPasswd");
+			registeredB.setFirstName("Bbb");
+			registeredB.setLastName("BBB");
+			registeredB.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredB.setIban("bbbIban");
+			registeredB.setBalance(200);		}
 		
 		@AfterEach
 		public void unSetForEachTests() {
@@ -857,9 +942,23 @@ public class RegisteredServiceTest {
 		
 		@BeforeEach
 		public void setUpForEachTests() {
-			registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
-			registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "bbbIban");
-		}
+			registeredA = new Registered();
+			registeredA.setEmail("aaa@aaa.com");
+			registeredA.setPassword("aaaPasswd");
+			registeredA.setFirstName("Aaa");
+			registeredA.setLastName("AAA");
+			registeredA.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredA.setIban("aaaIban");
+			registeredA.setBalance(100);
+
+			registeredB = new Registered();
+			registeredB.setEmail("bbb@bbb.com");
+			registeredB.setPassword("bbbPasswd");
+			registeredB.setFirstName("Bbb");
+			registeredB.setLastName("BBB");
+			registeredB.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredB.setIban("bbbIban");
+			registeredB.setBalance(200);		}
 		
 		@AfterEach
 		public void unSetForEachTests() {
@@ -973,7 +1072,14 @@ public class RegisteredServiceTest {
 		
 		@BeforeEach
 		public void setUpForEachTests() {
-			registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+			registeredA = new Registered();
+			registeredA.setEmail("aaa@aaa.com");
+			registeredA.setPassword("aaaPasswd");
+			registeredA.setFirstName("Aaa");
+			registeredA.setLastName("AAA");
+			registeredA.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredA.setIban("aaaIban");
+			registeredA.setBalance(100);
 		}
 		
 		@AfterEach
@@ -1050,7 +1156,13 @@ public class RegisteredServiceTest {
 		
 		@BeforeEach
 		public void setUpForEachTests() {
-			registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+			registeredA = new Registered();
+			registeredA.setEmail("aaa@aaa.com");
+			registeredA.setPassword("aaaPasswd");
+			registeredA.setFirstName("Aaa");
+			registeredA.setLastName("AAA");
+			registeredA.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredA.setIban("aaaIban");
 			registeredA.setBalance(100);
 		}
 		
@@ -1069,7 +1181,7 @@ public class RegisteredServiceTest {
 			when(registeredRepository.save(any(Registered.class))).thenReturn(registeredA);
 			
 			//WHEN
-			registeredService.depositFromBank("aaa@aaa.com", 110.0, request);
+			registeredService.depositFromBank("aaa@aaa.com", 110.00, request);
 			//THEN
 			verify(registeredRepository, times(1)).save(registeredResultCapt.capture());
 			assertThat(registeredResultCapt.getValue().getBalance()).isEqualTo(210d);
@@ -1156,7 +1268,13 @@ public class RegisteredServiceTest {
 		
 		@BeforeEach
 		public void setUpForEachTests() {
-			registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+			registeredA = new Registered();
+			registeredA.setEmail("aaa@aaa.com");
+			registeredA.setPassword("aaaPasswd");
+			registeredA.setFirstName("Aaa");
+			registeredA.setLastName("AAA");
+			registeredA.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredA.setIban("aaaIban");
 			registeredA.setBalance(120);
 		}
 		

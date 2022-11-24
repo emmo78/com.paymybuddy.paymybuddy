@@ -73,9 +73,24 @@ public class TransactionServiceIT {
 	@DisplayName("IT createATransaction should commit it and return transactionDTO for Sender")
 	public void createATransactionITShouldCommitItAndReturnTransactionDTOSender() {
 		//GIVEN
-		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
-		Registered registeredBReceiver = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
-		registeredASender.setBalance(100.5);
+		Registered registeredASender = new Registered();
+		registeredASender.setEmail("aaa@aaa.com");
+		registeredASender.setPassword("aaaPasswd");
+		registeredASender.setFirstName("Aaa");
+		registeredASender.setLastName("AAA");
+		registeredASender.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredASender.setIban("aaaIban");
+		registeredASender.setBalance(100.50);
+
+		Registered registeredBReceiver = new Registered();
+		registeredBReceiver.setEmail("bbb@bbb.com");
+		registeredBReceiver.setPassword("bbbPasswd");
+		registeredBReceiver.setFirstName("Bbb");
+		registeredBReceiver.setLastName("BBB");
+		registeredBReceiver.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredBReceiver.setIban("bbbIban");
+		registeredBReceiver.setBalance(0);
+
 		registeredRepository.saveAndFlush(registeredASender);
 		registeredRepository.saveAndFlush(registeredBReceiver);
 		
@@ -113,8 +128,14 @@ public class TransactionServiceIT {
 		//GIVEN
 		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
-		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
-		registeredASender.setBalance(100.0);
+		Registered registeredASender = new Registered();
+		registeredASender.setEmail("aaa@aaa.com");
+		registeredASender.setPassword("aaaPasswd");
+		registeredASender.setFirstName("Aaa");
+		registeredASender.setLastName("AAA");
+		registeredASender.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredASender.setIban("aaaIban");
+		registeredASender.setBalance(100);
 		registeredRepository.saveAndFlush(registeredASender);
 		
 		//WHEN
@@ -133,7 +154,13 @@ public class TransactionServiceIT {
 		//GIVEN
 		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
-		Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+		Registered registeredASender = new Registered();
+		registeredASender.setEmail("aaa@aaa.com");
+		registeredASender.setPassword("aaaPasswd");
+		registeredASender.setFirstName("Aaa");
+		registeredASender.setLastName("AAA");
+		registeredASender.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredASender.setIban("aaaIban");
 		registeredASender.setBalance(100.5);
 		registeredRepository.saveAndFlush(registeredASender);
 		
@@ -144,5 +171,5 @@ public class TransactionServiceIT {
 			.getMessage()).isEqualTo("Error while creating money transfer");
 		assertThat(transactionRepository.count()).isZero();
 		assertThat(registeredRepository.findById("aaa@aaa.com").get().getBalance()).isEqualTo(100.5);
-	}	
+	}
 }

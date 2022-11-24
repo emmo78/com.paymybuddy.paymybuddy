@@ -49,6 +49,7 @@ public class TransactionServiceImpl implements TransactionService {
 	public TransactionDTO createATransaction(TransactionDTO transactionDTO, WebRequest request) throws UnexpectedRollbackException, InsufficentFundsException{
 		Transaction transaction = null; 
 		try {
+			//no CascadeType.PERSIST
 			//Throws MappingException | IllegalArgumentException | OptimisticLockingFailureException
 			Transaction transactionEnclosingScope = transactionRepository.save(transactionDTOService.transactionFromNewTransactionDTO(transactionDTO));
 			double amount = transactionEnclosingScope.getAmount();
@@ -61,15 +62,16 @@ public class TransactionServiceImpl implements TransactionService {
 								+" from bank");
 					}
 					sender.setBalance(difference);
-					sender.addSendedTransaction(transactionEnclosingScope);
+					transactionEnclosingScope.setSender(sender);
 				}, () -> { 
 					throw new ResourceNotFoundException("Registered sender not found for transaction");
 				});
 			//Throws: IllegalArgumentException | ResourceNotFoundException
 			registeredRepository.findById(transactionDTO.getEmailReceiver()).ifPresentOrElse(receiver -> {
-				receiver.setBalance(receiver.getBalance()+amount);
-				receiver.addReceivedTransaction(transactionEnclosingScope);},
-					() -> {throw new ResourceNotFoundException("Registered receiver "+transactionDTO.getEmailReceiver()+" not found for transaction");});
+					receiver.setBalance(receiver.getBalance()+amount);
+					transactionEnclosingScope.setReceiver(receiver);
+				},() -> {
+					throw new ResourceNotFoundException("Registered receiver "+transactionDTO.getEmailReceiver()+" not found for transaction");});
 			//CascadeType.MERGE => Update Registered sender & receiver cf IT test
 			//Throws: IllegalArgumentException | OptimisticLockingFailureException
 			transaction = transactionRepository.save(transactionEnclosingScope);

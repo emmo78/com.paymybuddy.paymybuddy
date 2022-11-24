@@ -40,12 +40,51 @@ class RegisteredRepositoryIT {
 
 	@BeforeEach
 	public void setUpPerTest() {
-		registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
-		registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
-		registeredC = new Registered("ccc@ccc.com", "cccPasswd", "Ccc", "CCC", LocalDate.parse("03/03/1993", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "cccIban");
-		registeredD = new Registered("ddd@ddd.com", "dddPasswd", "Ddd", "DDD", LocalDate.parse("04/04/1994", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "dddIban");
-		registeredE = new Registered("eee@ddd.com", "eeePasswd", "Eee", "DDD", LocalDate.parse("05/05/1994", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "eeeIban");
+		registeredA = new Registered();
+		registeredA.setEmail("aaa@aaa.com");
+		registeredA.setPassword("aaaPasswd");
+		registeredA.setFirstName("Aaa");
+		registeredA.setLastName("AAA");
+		registeredA.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredA.setIban("aaaIban");
+		registeredA.setBalance(100);
 
+		registeredB = new Registered();
+		registeredB.setEmail("bbb@bbb.com");
+		registeredB.setPassword("bbbPasswd");
+		registeredB.setFirstName("Bbb");
+		registeredB.setLastName("BBB");
+		registeredB.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredB.setIban("bbbIban");
+		registeredB.setBalance(200);
+
+		registeredC = new Registered();
+		registeredC.setEmail("ccc@ccc.com");
+		registeredC.setPassword("cccPasswd");
+		registeredC.setFirstName("Ccc");
+		registeredC.setLastName("CCC");
+		registeredC.setBirthDate(LocalDate.parse("03/23/1993", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredC.setIban("cccIban");
+		registeredC.setBalance(300);
+
+		registeredD = new Registered();
+		registeredD.setEmail("ddd@ddd.com");
+		registeredD.setPassword("dddPasswd");
+		registeredD.setFirstName("Ddd");
+		registeredD.setLastName("DDD");
+		registeredD.setBirthDate(LocalDate.parse("04/24/1994", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredD.setIban("dddIban");
+		registeredD.setBalance(400);
+		
+		registeredE = new Registered();
+		registeredE.setEmail("eee@eee.com");
+		registeredE.setPassword("eeePasswd");
+		registeredE.setFirstName("Eee");
+		registeredE.setLastName("EEE");
+		registeredE.setBirthDate(LocalDate.parse("05/25/1995", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registeredE.setIban("eeeIban");
+		registeredE.setBalance(500);
+		
 		registeredRepository.saveAndFlush(registeredA);
 		registeredRepository.saveAndFlush(registeredB);
 		registeredRepository.saveAndFlush(registeredE); // No respect of Alphabetical order

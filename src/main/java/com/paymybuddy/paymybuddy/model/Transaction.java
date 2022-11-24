@@ -58,12 +58,6 @@ public class Transaction implements Serializable {
 	@JoinColumn(name = "email_receiver")
 	private Registered receiver;
 
-	public Transaction(LocalDateTime dateTime, double amount) {
-		this.dateTime = dateTime;
-		this.amount = amount;
-		monetize();
-	}
-	
 	public void monetize() {
 		fee = BigDecimal.valueOf(amount * 0.005).setScale(2, RoundingMode.HALF_UP).doubleValue();
 	}
