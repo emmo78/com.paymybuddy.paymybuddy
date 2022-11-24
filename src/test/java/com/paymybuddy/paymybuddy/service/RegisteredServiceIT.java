@@ -306,6 +306,7 @@ public class RegisteredServiceIT {
 		@AfterEach
 		public void unSetForEachTests() {
 			registeredRepository.deleteAll();
+			transactionRepository.deleteAll();
 		}
 		
 		@Test
