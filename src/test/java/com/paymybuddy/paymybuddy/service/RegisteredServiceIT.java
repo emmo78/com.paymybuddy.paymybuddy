@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -51,10 +50,13 @@ public class RegisteredServiceIT {
 	@Autowired
 	private RegisteredRepository registeredRepository;
 	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
 	private MockHttpServletRequest requestMock;
 	private WebRequest request;
 	private RegisteredDTO registeredDTO;
-	private PasswordEncoder passwordEncoder;
+	
 	
 	@Nested
 	@Tag("createRegisteredIT")
@@ -64,7 +66,6 @@ public class RegisteredServiceIT {
 		
 		@BeforeAll
 		public void setUpForAllTests() {
-			passwordEncoder = new BCryptPasswordEncoder();
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
 			requestMock.setRequestURI("/createRegistered");
@@ -73,7 +74,6 @@ public class RegisteredServiceIT {
 
 		@AfterAll
 		public void unSetForAllTests() {
-			passwordEncoder = null;
 			requestMock=null;
 			request=null;
 		}
@@ -181,7 +181,6 @@ public class RegisteredServiceIT {
 		
 		@BeforeAll
 		public void setUpForAllTests() {
-			passwordEncoder = new BCryptPasswordEncoder();
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
 			requestMock.setRequestURI("/updateRegistered");
@@ -190,7 +189,6 @@ public class RegisteredServiceIT {
 
 		@AfterAll
 		public void unSetForAllTests() {
-			passwordEncoder = null;
 			requestMock=null;
 			request=null;
 		}

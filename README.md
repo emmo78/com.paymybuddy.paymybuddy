@@ -47,7 +47,7 @@ CREATE TABLE transaction(
 
 CREATE TABLE role(   
 	role_id INT AUTO_INCREMENT,   
-	role_name VARCHAR(10),   
+	role_name VARCHAR(10) NOT NULL,   
 	PRIMARY KEY(role_id)   
 );
 
