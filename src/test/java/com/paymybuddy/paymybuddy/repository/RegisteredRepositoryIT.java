@@ -249,7 +249,7 @@ class RegisteredRepositoryIT {
 		Page<Registered> pageRegisteredResult = registeredRepository.findAllAddedToEmail("aaa@aaa.com", pageRequest);
 		
 		// THEN
-		assertThat(pageRegisteredResult).containsExactlyElementsOf(pageRegisteredResult);
+		assertThat(pageRegisteredResult).containsExactlyElementsOf(registerdAddedToAExpected);
 	}
 
 	@Test
