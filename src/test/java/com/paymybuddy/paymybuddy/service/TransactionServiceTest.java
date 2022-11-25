@@ -100,7 +100,11 @@ public class TransactionServiceTest {
 		@BeforeEach
 		public void setUpForEachTests() {
 			transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
-			transaction = new Transaction(LocalDateTime.now(), 100.0);
+			transaction = new Transaction();
+			transaction.setDateTime(LocalDateTime.now());
+			transaction.setAmount(100);
+			transaction.monetize();
+
 		}
 		
 		@AfterEach
@@ -175,7 +179,13 @@ public class TransactionServiceTest {
 		@DisplayName("test createATransaction should throw InsufficentFundsException")
 		public void createATransactionTestShouldThrowInsufficentFundsException() {
 			//GIVEN
-			Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+			Registered registeredASender = new Registered();
+			registeredASender.setEmail("aaa@aaa.com");
+			registeredASender.setPassword("aaaPasswd");
+			registeredASender.setFirstName("Aaa");
+			registeredASender.setLastName("AAA");
+			registeredASender.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredASender.setIban("aaaIban");
 			registeredASender.setBalance(100.0);
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
 			when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
@@ -194,7 +204,13 @@ public class TransactionServiceTest {
 		@DisplayName("test createATransaction should throw UnexpectedRollbackException on ResourceNotFoundException for Receiver")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundExceptionForReceiver() {
 			//GIVEN
-			Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+			Registered registeredASender = new Registered();
+			registeredASender.setEmail("aaa@aaa.com");
+			registeredASender.setPassword("aaaPasswd");
+			registeredASender.setFirstName("Aaa");
+			registeredASender.setLastName("AAA");
+			registeredASender.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredASender.setIban("aaaIban");
 			registeredASender.setBalance(100.5);
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
 			when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
@@ -212,7 +228,13 @@ public class TransactionServiceTest {
 		@DisplayName("test createATransaction should throw UnexpectedRollbackException on any RuntimeException")
 		public void createATransactionTestShouldThrowUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			//GIVEN
-			Registered registeredASender = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
+			Registered registeredASender = new Registered();
+			registeredASender.setEmail("aaa@aaa.com");
+			registeredASender.setPassword("aaaPasswd");
+			registeredASender.setFirstName("Aaa");
+			registeredASender.setLastName("AAA");
+			registeredASender.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredASender.setIban("aaaIban");
 			registeredASender.setBalance(100.5);
 			when(transactionDTOService.transactionFromNewTransactionDTO(any(TransactionDTO.class))).thenReturn(transaction);
 			when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
@@ -255,18 +277,46 @@ public class TransactionServiceTest {
 		@DisplayName("test getRegisteredAllTransaction should give Page with TranscationDTO sended and received for email")
 		public void getRegisteredAllTransactionTestShouldGivePageWithTransactionDTOSendedAndReceivedForEmail() {
 			//GIVEN
-			Registered registeredA = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/01/1991", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "aaaIban");
-			Registered registeredB = new Registered("bbb@bbb.com", "bbbPasswd", "Bbb", "BBB", LocalDate.parse("02/02/1992", DateTimeFormatter.ofPattern("dd/MM/yyyy")), "bbbIban");
-			Transaction transactionAtoB = new Transaction(LocalDateTime.now(), 100);
+			Registered registeredA = new Registered();
+			registeredA.setEmail("aaa@aaa.com");
+			registeredA.setPassword("aaaPasswd");
+			registeredA.setFirstName("Aaa");
+			registeredA.setLastName("AAA");
+			registeredA.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredA.setIban("aaaIban");
+			registeredA.setBalance(100);
+
+			Registered registeredB = new Registered();
+			registeredB.setEmail("bbb@bbb.com");
+			registeredB.setPassword("bbbPasswd");
+			registeredB.setFirstName("Bbb");
+			registeredB.setLastName("BBB");
+			registeredB.setBirthDate(LocalDate.parse("02/22/1992", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+			registeredB.setIban("bbbIban");
+			registeredB.setBalance(200);
+			
+			Transaction transactionAtoB = new Transaction();
+			transactionAtoB.setDateTime(LocalDateTime.now());
+			transactionAtoB.setAmount(100);
+			transactionAtoB.monetize();
 			transactionAtoB.setSender(registeredA);
 			transactionAtoB.setReceiver(registeredB);
-			Transaction transactionBtoA = new Transaction(LocalDateTime.now(), 100);
+			Transaction transactionBtoA = new Transaction();
+			transactionBtoA.setDateTime(LocalDateTime.now());
+			transactionBtoA.setAmount(100);
+			transactionBtoA.monetize();
 			transactionBtoA.setSender(registeredB);
 			transactionBtoA.setReceiver(registeredA);
-			Transaction transactionAtoNull = new Transaction(LocalDateTime.now(), 100);
+			Transaction transactionAtoNull = new Transaction();
+			transactionAtoNull.setDateTime(LocalDateTime.now());
+			transactionAtoNull.setAmount(100);
+			transactionAtoNull.monetize();
 			transactionAtoNull.setSender(registeredA);
 			transactionAtoNull.setReceiver(null);
-			Transaction transactionNulltoA = new Transaction(LocalDateTime.now(), 100);
+			Transaction transactionNulltoA = new Transaction();
+			transactionNulltoA.setDateTime(LocalDateTime.now());
+			transactionNulltoA.setAmount(100);
+			transactionNulltoA.monetize();
 			transactionNulltoA.setSender(null);
 			transactionNulltoA.setReceiver(registeredA);
 			

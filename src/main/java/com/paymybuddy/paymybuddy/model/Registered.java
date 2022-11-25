@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicInsert;
@@ -64,43 +63,19 @@ public class Registered implements Serializable {
 	@JoinTable(name = "connection", joinColumns = @JoinColumn(name = "email_added", referencedColumnName = "email", nullable = false), inverseJoinColumns = @JoinColumn(name = "email_add", referencedColumnName = "email", nullable = false))
 	private Set<Registered> addConnections = new HashSet<>();
 	
-	@ManyToMany(cascade = CascadeType.MERGE, mappedBy ="addConnections")
-	private Set<Registered> addedConnections = new HashSet<>();		
+	@ManyToMany
+	@JoinTable(name = "registered_role", joinColumns = @JoinColumn(name = "email_role", referencedColumnName = "email", nullable = false), inverseJoinColumns = @JoinColumn(name = "granted_role", referencedColumnName = "role_id", nullable = false))
+	List<Role> roles = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "sender", cascade = CascadeType.REFRESH)
-	private List<Transaction> sendedTransactions = new ArrayList<>();
-
-	@OneToMany(mappedBy = "receiver", cascade = CascadeType.REFRESH)
-	private List<Transaction> receivedTransactions = new ArrayList<>();
-	
-	//convenience for testing
-	public Registered(String email, String password, String firstName, String lastName, LocalDate birthDate, String iban) {
-		this.email = email;
-		this.password = password;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.birthDate = birthDate;
-		this.iban = iban;
-	}
-
 	public void addConnection(Registered registered) {
 		addConnections.add(registered);
-		registered.getAddedConnections().add(this);
 	}
 	
 	public void removeConnection(Registered registered) {
 		addConnections.remove(registered);
-		registered.getAddedConnections().remove(this);
 	}
-	
-	public void addSendedTransaction(Transaction transaction) {
-		sendedTransactions.add(transaction);
-		transaction.setSender(this);
+		
+	public void addRole(Role role) {
+		roles.add(role);
 	}
-
-	public void addReceivedTransaction(Transaction transaction) {
-		receivedTransactions.add(transaction);
-		transaction.setReceiver(this);
-	}
-
 }

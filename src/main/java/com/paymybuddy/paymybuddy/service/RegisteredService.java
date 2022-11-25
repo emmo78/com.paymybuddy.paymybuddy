@@ -10,10 +10,9 @@ import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.exception.ResourceNotFoundException;
 import com.paymybuddy.paymybuddy.exception.WithdrawException;
-import com.paymybuddy.paymybuddy.model.Registered;
 
 public interface RegisteredService {
-	Registered getRegistered(String email, WebRequest request) throws ResourceNotFoundException ,UnexpectedRollbackException;
+	RegisteredDTO getRegistered(String email, WebRequest request) throws ResourceNotFoundException ,UnexpectedRollbackException;
 	RegisteredDTO createRegistered(RegisteredDTO registeredDTO, WebRequest request) throws ResourceConflictException, UnexpectedRollbackException;
 	RegisteredDTO updateRegistered(RegisteredDTO registeredDTO, WebRequest request) throws UnexpectedRollbackException;
 	void removeRegistered(String email, WebRequest request) throws UnexpectedRollbackException;

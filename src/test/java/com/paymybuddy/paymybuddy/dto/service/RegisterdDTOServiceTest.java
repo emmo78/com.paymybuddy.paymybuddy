@@ -43,7 +43,13 @@ class RegisterdDTOServiceTest {
 	@DisplayName("test registeredToDTO should not map password")
 	public void registeredToDTOTestShouldNotMapPassword() {
 		//GIVEN
-		Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+		Registered registered = new Registered();
+		registered.setEmail("aaa@aaa.com");
+		registered.setPassword("aaaPasswd");
+		registered.setFirstName("Aaa");
+		registered.setLastName("AAA");
+		registered.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registered.setIban("aaaIban");
 		registered.setBalance(100);
 		when(dateStringPattern.getDateStringPattern()).thenReturn("MM/dd/yyyy");
 		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
@@ -74,7 +80,14 @@ class RegisterdDTOServiceTest {
 	@DisplayName("test registeredToForListDTO should not map password")
 	public void registeredToForListDTOTestShouldNotMapPassword() {
 		//GIVEN
-		Registered registered = new Registered("aaa@aaa.com", "aaaPasswd", "Aaa", "AAA", LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")), "aaaIban");
+		Registered registered = new Registered();
+		registered.setEmail("aaa@aaa.com");
+		registered.setPassword("aaaPasswd");
+		registered.setFirstName("Aaa");
+		registered.setLastName("AAA");
+		registered.setBirthDate(LocalDate.parse("01/21/1991", DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+		registered.setIban("aaaIban");
+		registered.setBalance(100);
 		
 		//WHEN
 		RegisteredForListDTO registeredForListDTOResult = registerdDTOService.registeredToForListDTO(registered);

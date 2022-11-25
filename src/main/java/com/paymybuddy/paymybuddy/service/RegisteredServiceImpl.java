@@ -20,6 +20,7 @@ import com.paymybuddy.paymybuddy.exception.ResourceNotFoundException;
 import com.paymybuddy.paymybuddy.exception.WithdrawException;
 import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
+import com.paymybuddy.paymybuddy.repository.RoleRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,18 +38,21 @@ public class RegisteredServiceImpl implements RegisteredService {
 	private RegisteredRepository registeredRepository;
 	
 	@Autowired
+	private RoleRepository roleRepository;
+	
+	@Autowired
 	private RequestService requestService;
 
 	@Override
-	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
-	public Registered getRegistered(String email, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
-		Registered registered = null;
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
+	public RegisteredDTO getRegistered(String email, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
+		RegisteredDTO registeredDTO = null;
 		try {
 			//Throws ResourceNotFoundException | IllegalArgumentException
-			registered = registeredRepository.findById(email.toLowerCase()).orElseThrow(() -> new ResourceNotFoundException("Your email is not found"));
+			registeredDTO = registeredDTOService.registeredToDTO(registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registrered not found")));
 		} catch (ResourceNotFoundException rnfe) {
 			log.error("{} : {} ", requestService.requestToString(request), rnfe.toString());
-			throw new ResourceNotFoundException(rnfe.getMessage());
+			throw new UnexpectedRollbackException("Error while getting your profile");
 		} catch(IllegalArgumentException re) {
 			log.error("{} : {} ", requestService.requestToString(request), re.toString());
 			throw new UnexpectedRollbackException("Error while getting your profile");
@@ -56,8 +60,8 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting your profile");
 		}
-		log.info("{} : registered={} gotten",  requestService.requestToString(request), registered.getEmail());
-		return registered;
+		log.info("{} : registered={} gotten",  requestService.requestToString(request), registeredDTO.getEmail());
+		return registeredDTO;
 	}
 
 	@Override
@@ -69,12 +73,13 @@ public class RegisteredServiceImpl implements RegisteredService {
 			if (registeredRepository.existsById(registered.getEmail())) {
 				throw new ResourceConflictException("User already exists");
 			}
+			registered.addRole(roleRepository.findById(1).orElseThrow(() -> new ResourceNotFoundException("Role not found")));
 			//Throws IllegalArgumentException | OptimisticLockingFailureException
 			createdRegisteredDTO = registeredDTOService.registeredToDTO(registeredRepository.save(registered));			
 		} catch(ResourceConflictException rce) {
 			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), rce.toString());
 			throw new ResourceConflictException(rce.getMessage());
-		} catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+		} catch(ResourceNotFoundException | IllegalArgumentException | OptimisticLockingFailureException re) {
 			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), re.toString());
 			throw new UnexpectedRollbackException("Error while creating your profile");
 		} catch(Exception e) {
