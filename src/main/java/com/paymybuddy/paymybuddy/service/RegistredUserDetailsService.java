@@ -34,16 +34,16 @@ public class RegistredUserDetailsService implements UserDetailsService {
 		try {
 			registered = registeredRepository.findById(emailLc).orElseThrow(() -> new ResourceNotFoundException("Registered "+emailLc+" not found"));
 		} catch (ResourceNotFoundException rnfe) {
-			log.error("Login : {} : {} ", emailLc, rnfe.toString());
+			log.error("/login : {} : {} ", emailLc, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
 		} catch(IllegalArgumentException re) {
-			log.error("Login : {} : {} ", emailLc, re.toString());
+			log.error("/login : {} : {} ", emailLc, re.toString());
 			throw new UnexpectedRollbackException("Error while getting your profile");
 		} catch (Exception e) {
-			log.error("Login : {} : {} ", emailLc, e.toString());
+			log.error("/login : {} : {} ", emailLc, e.toString());
 			throw new UnexpectedRollbackException("Error while getting your profile");
 		}
-		log.info("Login : registered={} : success", emailLc);
+		log.info("/login : registered={} found", emailLc);
 
 		List<GrantedAuthority> grantedAuthorities = registered.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
 

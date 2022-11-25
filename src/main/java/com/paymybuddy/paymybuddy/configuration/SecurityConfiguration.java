@@ -33,9 +33,21 @@ public class SecurityConfiguration  {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
-			.authorizeHttpRequests((authz) -> authz
-				.anyRequest().authenticated()
-			).formLogin();
+			.authorizeHttpRequests(authz -> authz
+					.antMatchers("/").permitAll()
+					.antMatchers("/user/*").hasRole("USER")
+					.antMatchers("/admin/*").hasRole("ADMIN")
+	                .anyRequest().authenticated())
+			.formLogin(form -> form
+					.loginPage("/login")
+					.defaultSuccessUrl("/user/home")
+					.failureUrl("/login?error=true")
+					.permitAll())
+			.logout(logout -> logout                                                
+		            .logoutUrl("/logout")                                            
+		            .logoutSuccessUrl("/")                                      
+		            .invalidateHttpSession(true)                                        
+		            .deleteCookies("JSESSIONID"));
 		return http.build();
 	}
 }
