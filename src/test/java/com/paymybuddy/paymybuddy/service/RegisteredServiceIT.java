@@ -105,7 +105,7 @@ public class RegisteredServiceIT {
 			//GIVEN
 			Role roleExpected = new Role();
 			roleExpected.setRoleId(1);
-			roleExpected.setRoleName("USER");
+			roleExpected.setRoleName("ROLE_USER");
 
 			//WHEN
 			RegisteredDTO registeredDTOResult = registeredService.createRegistered(registeredDTO, request);

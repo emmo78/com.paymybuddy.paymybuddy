@@ -42,7 +42,7 @@ public class RegistredUserDetailsServiceTest {
 		//GIVEN
 		Role role = new Role();
 		role.setRoleId(1);
-		role.setRoleName("USER");
+		role.setRoleName("ROLE_USER");
 		Registered registered = new Registered();
 		registered.setEmail("aaa@aaa.com");
 		registered.setPassword("aaaPasswd");
@@ -62,7 +62,7 @@ public class RegistredUserDetailsServiceTest {
 				u -> u.getAuthorities().stream().collect(Collectors.toList()).get(0).getAuthority(),
 				UserDetails::getUsername,
 				UserDetails::getPassword).containsExactly(
-						"USER",
+						"ROLE_USER",
 						"aaa@aaa.com",
 						"aaaPasswd");
 	}

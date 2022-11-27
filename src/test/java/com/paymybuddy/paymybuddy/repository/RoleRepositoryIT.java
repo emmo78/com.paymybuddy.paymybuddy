@@ -26,7 +26,7 @@ public class RoleRepositoryIT {
 		//GIVEN
 		Role roleExpected = new Role();
 		roleExpected.setRoleId(1);
-		roleExpected.setRoleName("USER");
+		roleExpected.setRoleName("ROLE_USER");
 		
 		//WHEN
 		Role roleResulted = roleRepository.findById(1).get();

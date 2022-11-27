@@ -60,7 +60,7 @@ CREATE TABLE registered_role(
 );
 
 INSERT INTO role (role_name)  
-VALUES ('USER'); 
+VALUES ('ROLE_USER'); 
 
 
 ## Prerequisites

@@ -40,14 +40,9 @@ public class SecurityConfiguration  {
 	                .anyRequest().authenticated())
 			.formLogin(form -> form
 					.loginPage("/login")
-					.defaultSuccessUrl("/user/home")
-					.failureUrl("/login?error=true")
+					.defaultSuccessUrl("/user/home", true)
 					.permitAll())
-			.logout(logout -> logout                                                
-		            .logoutUrl("/logout")                                            
-		            .logoutSuccessUrl("/")                                      
-		            .invalidateHttpSession(true)                                        
-		            .deleteCookies("JSESSIONID"));
+			.logout(logout -> logout.permitAll());
 		return http.build();
 	}
 }

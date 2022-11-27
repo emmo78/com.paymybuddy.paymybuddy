@@ -86,16 +86,15 @@
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-log4j2</artifactId>
 		</dependency>
-		<!--
 		<dependency>
-			https://docs.spring.io/spring-boot/docs/1.5.16.RELEASE/reference/html/using-boot-devtools.html -->
-			<!-- Application automatically restarts whenever files on the classpath change 
+			<!-- https://docs.spring.io/spring-boot/docs/1.5.16.RELEASE/reference/html/using-boot-devtools.html -->
+			<!-- Application automatically restarts whenever files on the classpath change --> 
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
-		-->
+		
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 		<!-- https://projectlombok.org/features/all -->
 		<dependency>
@@ -244,7 +243,7 @@
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>4.7.2.1</version>
+				<version>4.7.3.0</version>
 			</plugin>
 			
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-report-plugin -->
