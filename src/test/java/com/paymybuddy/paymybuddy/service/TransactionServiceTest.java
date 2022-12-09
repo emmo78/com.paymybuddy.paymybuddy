@@ -109,6 +109,7 @@ public class TransactionServiceTest {
 		
 		@AfterEach
 		public void unSetForEachTests() {
+			transactionService=null;
 			transactionDTO = null;
 			transaction = null;
 		}
@@ -270,6 +271,11 @@ public class TransactionServiceTest {
 			pageRequest = null;
 			requestMock = null;
 			request = null;
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			transactionService=null;
 		}
 
 		@Test
