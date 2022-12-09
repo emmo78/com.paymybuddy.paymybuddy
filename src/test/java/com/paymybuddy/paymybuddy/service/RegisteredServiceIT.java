@@ -65,7 +65,7 @@ public class RegisteredServiceIT {
 	class CreateRegisteredIT {
 		
 		@BeforeAll
-		public void setUpForAllTests() {
+		public void setUpForAllTests() {			
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
 			requestMock.setRequestURI("/createRegistered");

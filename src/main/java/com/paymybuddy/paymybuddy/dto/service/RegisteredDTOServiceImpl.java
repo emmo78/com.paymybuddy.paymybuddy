@@ -7,7 +7,6 @@ import java.util.Locale;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,17 +15,17 @@ import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.model.Registered;
 
+import lombok.AllArgsConstructor;
+
 @Service
+@AllArgsConstructor
 public class RegisteredDTOServiceImpl implements RegisteredDTOService {
 		
-	@Autowired
-	private ModelMapper modelMapper;
+	private final ModelMapper modelMapper;
 	
-	@Autowired
-	private DateTimePatternProperties dateStringPattern;
+	private final DateTimePatternProperties dateStringPattern;
 	
-	@Autowired
-	PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 	
 	@Override
 	public RegisteredDTO registeredToDTO(Registered registered) {

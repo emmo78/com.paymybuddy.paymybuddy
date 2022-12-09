@@ -36,5 +36,6 @@
         <!-- LOG at DEBUG level -->
 		<Logger name="com.paymybuddy.paymybuddy.configuration" level="debug"></Logger>
 		<Logger name="com.paymybuddy.paymybuddy.service" level="debug"></Logger>
+		<Logger name="com.paymybuddy.paymybuddy.controller" level="debug"></Logger>
     </Loggers>
 </Configuration>

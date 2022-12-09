@@ -10,7 +10,6 @@ import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.MappingException;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
@@ -18,14 +17,15 @@ import com.paymybuddy.paymybuddy.dto.TransactionDTO;
 import com.paymybuddy.paymybuddy.exception.ParseRuntimeException;
 import com.paymybuddy.paymybuddy.model.Transaction;
 
+import lombok.AllArgsConstructor;
+
 @Service
+@AllArgsConstructor
 public class TransactionDTOServiceImpl implements TransactionDTOService {
 	
-	@Autowired
-	private ModelMapper modelMapper;
+	private final ModelMapper modelMapper;
 	
-	@Autowired
-	private DateTimePatternProperties dateStringPattern;
+	private final DateTimePatternProperties dateStringPattern;
 	
 	@Override
 	public TransactionDTO transactionToDTOSender(Transaction transaction) {

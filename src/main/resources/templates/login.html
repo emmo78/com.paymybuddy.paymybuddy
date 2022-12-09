@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <!-- En-tête de la page -->
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<!-- <link rel="stylesheet" type="text/css" href="../../css/myFile.css" th:href="@{/css/myFile.css}" /> -->
+		<!-- <link rel="stylesheet" type="text/css" href="/css/myFile.css" th:href="@{/css/myFile.css}" /> -->
         <title>Log In</title>
     </head>
 
     <body>
-        <!-- Corps de la page -->
-  
 		<h1>Please Log In</h1>
 		
 		<div th:if="${param.error}">
@@ -21,18 +18,20 @@
 		</div>
 
 		<form th:action="@{/login}" method="post">
-
-			<div>
-			<input type="text" name="username" placeholder="Username"/>
-			</div>
-
-			<div>
-			<input type="password" name="password" placeholder="Password"/>
-			</div>
-
-			<input type="submit" value="Log in" />
-
+			<p>
+				<label for="username">Enter your email</label><br/>
+				<input type="text" name="username" placeholder="Email" id="username"/><br/>
+	
+				<label for="password">Enter your password</label><br/>
+				<input type="password" name="password" placeholder="Password" id="password"/><br/>
+	
+				<input type="submit" value="Log in" />
+			</p>
 		</form>
+		
+		<div>
+		<a th:href="@{/register}"><button type="button">Register</button></a>
+		</div>
 
 	</body>
 </html>

@@ -58,7 +58,7 @@ public class Registered implements Serializable {
 	private String iban;
 
 	@Column(name = "balance")
-	private double balance = 0;
+	private double balance;
 
 	@ManyToMany(cascade = CascadeType.MERGE)
 	@JoinTable(name = "connection", joinColumns = @JoinColumn(name = "email_added", referencedColumnName = "email", nullable = false), inverseJoinColumns = @JoinColumn(name = "email_add", referencedColumnName = "email", nullable = false))

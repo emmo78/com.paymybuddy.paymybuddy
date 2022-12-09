@@ -2,11 +2,9 @@ package com.paymybuddy.paymybuddy.service;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,26 +20,21 @@ import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 import com.paymybuddy.paymybuddy.repository.RoleRepository;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class RegisteredServiceImpl implements RegisteredService {
 		
-	@Autowired
-	PasswordEncoder passwordEncoder;
+	private final RegisteredDTOService registeredDTOService;
 	
-	@Autowired
-	private RegisteredDTOService registeredDTOService;
+	private final RegisteredRepository registeredRepository;
 	
-	@Autowired
-	private RegisteredRepository registeredRepository;
+	private final RoleRepository roleRepository;
 	
-	@Autowired
-	private RoleRepository roleRepository;
-	
-	@Autowired
-	private RequestService requestService;
+	private final RequestService requestService;
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
