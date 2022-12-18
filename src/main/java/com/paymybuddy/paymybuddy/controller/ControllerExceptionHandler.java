@@ -1,7 +1,5 @@
 package com.paymybuddy.paymybuddy.controller;
 
-import java.security.Principal;
-
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;

@@ -40,12 +40,12 @@ public class UserController {
 	
 	@GetMapping("/user/home")
 	public String welcomePage(Principal user, Model model, WebRequest request) {
-		String email = user.getName();
-		log.info("{} : {} : registered={} logged in",
+		RegisteredDTO registeredDTO = registeredService.getRegistered(user.getName(), request);
+		log.info("{} : {} : registered={} logged in user's home",
 				requestService.requestToString(request),
 				((ServletWebRequest) request).getHttpMethod(),
-				email);
-		model.addAttribute("user", email);
+				registeredDTO.getEmail());
+		model.addAttribute("user", registeredDTO);
 		return "userhome";
 	}
 }

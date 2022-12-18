@@ -38,15 +38,12 @@ public class RegisteredServiceImpl implements RegisteredService {
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
-	public RegisteredDTO getRegistered(String email, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
+	public RegisteredDTO getRegistered(String email, WebRequest request) throws UnexpectedRollbackException {
 		RegisteredDTO registeredDTO = null;
 		try {
 			//Throws ResourceNotFoundException | IllegalArgumentException
 			registeredDTO = registeredDTOService.registeredToDTO(registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registrered not found")));
-		} catch (ResourceNotFoundException rnfe) {
-			log.error("{} : {} ", requestService.requestToString(request), rnfe.toString());
-			throw new UnexpectedRollbackException("Error while getting your profile");
-		} catch(IllegalArgumentException re) {
+		} catch(ResourceNotFoundException | IllegalArgumentException re) {
 			log.error("{} : {} ", requestService.requestToString(request), re.toString());
 			throw new UnexpectedRollbackException("Error while getting your profile");
 		} catch (Exception e) {

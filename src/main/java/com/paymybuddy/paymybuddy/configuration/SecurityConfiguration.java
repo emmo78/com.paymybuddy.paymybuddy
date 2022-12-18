@@ -35,7 +35,7 @@ public class SecurityConfiguration  {
 		http
 			.authorizeHttpRequests(authz -> authz
 					.requestMatchers("/","/register", "/createRegistered").permitAll()
-					.requestMatchers("/user/*").hasRole("USER")
+					.requestMatchers("/user/**").hasRole("USER")
 					.requestMatchers("/admin/*").hasRole("ADMIN")
 	                .anyRequest().authenticated())
 			.formLogin(form -> form
