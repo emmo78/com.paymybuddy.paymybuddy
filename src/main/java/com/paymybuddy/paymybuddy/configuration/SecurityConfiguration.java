@@ -43,7 +43,6 @@ public class SecurityConfiguration  {
 					.defaultSuccessUrl("/user/home", true)
 					.permitAll())
 			.logout(logout -> logout.permitAll());
-
 		return http.build();
 	}
 }
