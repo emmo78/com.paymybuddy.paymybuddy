@@ -9,11 +9,14 @@
 		<h1><span th:text="${user.firstName}+' '+${user.lastName}+', '"></span>Welcome !</h1>		
 
 		<form th:action="@{/logout}" method="post">
-			<input type="submit" value="Sign Out"/>
+			<p>
+				<input type="submit" value="Log Off"/>
+			</p>
 		</form>
 		
-		
-
-
+		<div>
+			<a th:href="@{/user/home/transfert}"><button type="button">Transfert</button></a>
+			<a th:href="@{/user/home/bank}"><button type="button">Bank</button></a>
+		</div>
 	</body>
 </html>

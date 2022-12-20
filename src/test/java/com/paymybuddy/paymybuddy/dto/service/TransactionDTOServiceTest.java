@@ -242,7 +242,9 @@ public class TransactionDTOServiceTest {
 	@DisplayName("test transactionFromNewTransactionDTO should have LocalDateTime.now() and fee")
 	public void transactionFromNewTransactionDTOTestShouldHaveLocalDateTimeNowAndFee() {
 		//GIVEN
-		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+		TransactionDTO transactionDTO = new TransactionDTO();
+		transactionDTO.setEmailSender("aaa@aaa.com");
+		transactionDTO.setEmailReceiver("bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
 		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
 		
@@ -269,7 +271,9 @@ public class TransactionDTOServiceTest {
 	@DisplayName("test transactionFromNewTransactionDTO should throw a MappingException")
 	public void transactionFromNewTransactionDTOTestShouldThrowMappingException() {
 		//GIVEN
-		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+		TransactionDTO transactionDTO = new TransactionDTO();
+		transactionDTO.setEmailSender("aaa@aaa.com");
+		transactionDTO.setEmailReceiver("bbb@bbb.com");
 		transactionDTO.setAmount("A");
 		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
 		

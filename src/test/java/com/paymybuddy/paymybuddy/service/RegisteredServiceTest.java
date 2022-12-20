@@ -566,7 +566,7 @@ public class RegisteredServiceTest {
 		
 		@Test
 		@Tag("RegisteredServiceTest")
-		@DisplayName("test getAllAddBy should return page of RegisterdForListDTO")
+		@DisplayName("test getAllAddBy should return page of RegisteredForListDTO")
 		public void getAllAddByTestShouldReturnPageOfRegisterdForListDTO() {
 			//GIVEN : C has added A and B
 			Registered 	registeredA = new Registered();

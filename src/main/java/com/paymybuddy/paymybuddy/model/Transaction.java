@@ -48,6 +48,9 @@ public class Transaction implements Serializable {
 	
 	@Column(name = "fee")
 	private double fee;
+	
+	@Column(name = "description")
+	private String description;
 
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "email_sender")

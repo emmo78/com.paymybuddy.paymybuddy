@@ -1,7 +1,9 @@
 package com.paymybuddy.paymybuddy.controller;
 
 import java.security.Principal;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
@@ -12,6 +14,8 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
+import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
+import com.paymybuddy.paymybuddy.dto.TransactionDTO;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.service.RegisteredService;
 import com.paymybuddy.paymybuddy.service.RequestService;
@@ -47,5 +51,15 @@ public class UserController {
 				registeredDTO.getEmail());
 		model.addAttribute("user", registeredDTO);
 		return "userhome";
+	}
+	
+	@GetMapping("user/home/transfert")
+	public String transfertPage(Principal user, Model model, WebRequest request) {
+		String email = user.getName();
+		model.addAttribute("user", email);
+		model.addAttribute("allAddBy", registeredService.getAllAddBy(email, Pageable.unpaged(), request).stream().map(RegisteredForListDTO::getEmail).sorted().collect(Collectors.toList()));
+		model.addAttribute("transactionDTO", new TransactionDTO(email));
+		
+		return "transfert";
 	}
 }
