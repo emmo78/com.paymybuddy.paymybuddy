@@ -1,6 +1,7 @@
 package com.paymybuddy.paymybuddy.controller;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
@@ -53,13 +54,13 @@ public class UserController {
 		return "userhome";
 	}
 	
-	@GetMapping("user/home/transfert")
+	@GetMapping("/user/home/transfert")
 	public String transfertPage(Principal user, Model model, WebRequest request) {
 		String email = user.getName();
 		model.addAttribute("user", email);
-		model.addAttribute("allAddBy", registeredService.getAllAddBy(email, Pageable.unpaged(), request).stream().map(RegisteredForListDTO::getEmail).sorted().collect(Collectors.toList()));
+		List<String> emails = registeredService.getAllAddBy(email, Pageable.unpaged(), request).stream().map(RegisteredForListDTO::getEmail).sorted().collect(Collectors.toList());
+		model.addAttribute("allAddBy", emails);
 		model.addAttribute("transactionDTO", new TransactionDTO(email));
-		
 		return "transfert";
 	}
 }

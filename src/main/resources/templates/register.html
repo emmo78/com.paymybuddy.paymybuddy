@@ -7,7 +7,7 @@
     </head>
 
     <body>
-    	<p th:if="${not #strings.isEmpty(errorMessage)}">Try another email<span th:text="' : '+${errorMessage}"></span></p>
+    	<p th:if="${param.errorMessage}">Try another email<span th:text="' : '+${param.errorMessage}"></span></p>
     	<form method="POST" th:action="@{/createRegistered}" th:object="${registeredDTO}">
 			<p>
 				<label for="email">Email</label><br/>
@@ -31,7 +31,7 @@
 				<label for="password">Password</label><br/>
 				<input type="password" th:field="*{password}" required placeholder="up to 13 characters UTF8"/><br/>
 
-				<input type="submit" value="Create"/>
+				<input type="submit" th:value="'Create'"/>
 			</p>
 		</form>
     

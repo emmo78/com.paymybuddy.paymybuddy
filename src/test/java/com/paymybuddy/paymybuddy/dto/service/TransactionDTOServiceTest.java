@@ -96,7 +96,7 @@ public class TransactionDTOServiceTest {
 	@Test
 	@Tag("TransactionDTOServiceTest")
 	@DisplayName("test transactionToDTOSender should have email receiver null")
-	public void transactionToDTOSenderTestShouldHaveEamilReceiverNull() {
+	public void transactionToDTOSenderTestShouldHaveEmailReceiverNull() {
 		//GIVEN
 		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
 		Registered registeredASender = new Registered();
@@ -246,6 +246,7 @@ public class TransactionDTOServiceTest {
 		transactionDTO.setEmailSender("aaa@aaa.com");
 		transactionDTO.setEmailReceiver("bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
+		transactionDTO.setDescription("Description");
 		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
 		
 		//WHEN
@@ -255,11 +256,13 @@ public class TransactionDTOServiceTest {
 		assertThat(transactionExpected).extracting(
 				Transaction::getAmount,
 				Transaction::getFee,
+				Transaction::getDescription,
 				transaction -> transaction.getSender().getEmail(),
 				transaction -> transaction.getReceiver().getEmail()
 				).containsExactly(
 						100d,
 						0.5,
+						"Description",
 						"aaa@aaa.com",
 						"bbb@bbb.com"
 						);

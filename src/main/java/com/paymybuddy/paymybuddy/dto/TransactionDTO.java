@@ -17,5 +17,6 @@ public class TransactionDTO  {
 	private boolean receiver;
 	public TransactionDTO(String emailSender) {
 		this.emailSender=emailSender;
+		amount="0.00";
 	}
 }

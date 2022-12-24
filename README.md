@@ -37,8 +37,8 @@ CREATE TABLE transaction(
    transaction_id BIGINT AUTO_INCREMENT,  
    date_time DATETIME NOT NULL,  
    amount DOUBLE NOT NULL,  
-   fee DOUBLE NOT NULL,
-   description VARCHAR(25),
+   fee DOUBLE NOT NULL,  
+   description VARCHAR(25),  
    email_sender VARCHAR(320),  
    email_receiver VARCHAR(320),  
    PRIMARY KEY(transaction_id),  
@@ -61,7 +61,52 @@ CREATE TABLE registered_role(
 );
 
 INSERT INTO role (role_name)  
-VALUES ('ROLE_USER'); 
+VALUES ('ROLE_USER');  
+
+--------------For Testing---------------
+
+use paymybuddy;
+
+INSERT INTO `paymybuddy`.`registered`
+ (`email`, `password`, `first_name`, `last_name`, `birth_date`, `iban`, `balance`) 
+VALUES 
+ ('aaa@aaa.com', '$2y$10$rfi4JiEqe8hpCv1sTb4vzul5Vlj3XB81xD.pBZxPnTfF84e4C.4me', 'Aaa', 'AAA', 19910121, 'AA010123456789', 100), -- "aaaPasswd"
+ ('bbb@bbb.com', '$2y$10$w8ep0Ezq5XziuiRR5rn79usHZo65HtWryR1bmzVOEWLnLndkMGz7m', 'Bbb', 'BBB', 19920222, 'BB020123456789', 200), -- "bbbPasswd"
+ ('ccc@ccc.com', '$2y$10$EmIfscKBh0XzLvUaz3TngOb0bakl0qYA/cgRzgrN4qeFCZ9zd7DJu', 'Ccc', 'CCC', 19930323, 'CC030123456789', 300), -- "cccPasswd"
+ ('ddd@ddd.com', '$2y$10$ZPDghQCwWC67GWlRn2Qdc.ct43NwK.tpNL1r1dcCl8t6Vqr.QpPQa', 'Ddd', 'DDD', 19940424, 'DD040123456789', 400), -- "dddPasswd"
+ ('eee@eee.com', '$2y$10$J6D/NxgLZHcHP3Hzdt/ruO7lLz4iHZ9GsX7I7rJ2c1G1yzKxRGL6m', 'Eee', 'EEE', 19950525, 'EE050123456789', 500); -- "dddPasswd"
+
+INSERT INTO `paymybuddy`.`registered_role`
+ (`granted_role`, `email_role`)
+VALUES
+ ('1', 'aaa@aaa.com'),
+ ('1', 'bbb@bbb.com'),
+ ('1', 'ccc@ccc.com'),
+ ('1', 'ddd@ddd.com'),
+ ('1', 'eee@eee.com');
+
+INSERT INTO `paymybuddy`.`connection`
+ (`email_add`, `email_added`)
+VALUES
+ ('bbb@bbb.com', 'aaa@aaa.com'),
+ ('ccc@ccc.com', 'aaa@aaa.com'),
+ ('aaa@aaa.com', 'bbb@bbb.com'),
+ ('ccc@ccc.com', 'bbb@bbb.com'),
+ ('bbb@bbb.com', 'ccc@ccc.com'),
+ ('ddd@ddd.com', 'ccc@ccc.com'),
+ ('aaa@aaa.com', 'ddd@ddd.com');
+
+
+
+
+--------------After Testing---------------
+TRUNCATE `paymybuddy`.`connection`;
+TRUNCATE `paymybuddy`.`registered_role`;
+SET FOREIGN_KEY_CHECKS = 0; 
+TRUNCATE `paymybuddy`.`registered`;
+SET FOREIGN_KEY_CHECKS = 1;
+TRUNCATE `paymybuddy`.`transaction`;
+ALTER TABLE `paymybuddy`.`transaction` AUTO_INCREMENT = 1;
 
 
 ## Prerequisites

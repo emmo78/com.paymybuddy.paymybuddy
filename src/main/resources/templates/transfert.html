@@ -6,6 +6,35 @@
         <title>Transfert</title>
     </head>
 	<body>
-
+		<table>
+			<thead>
+				<tr>
+					<th>email</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:if="${allAddBy.empty}">
+					<td>Aucun connecté</td>
+				</tr>
+				<tr th:each="email: ${allAddBy}">
+					<td><span th:text="${email}"> Email </span></td>
+				</tr>
+			</tbody>
+		</table>
+		<p th:if="${param.errorMessage}" th:text="${param.errorMessage}"></p>
+	    <form method="POST" th:action="@{/createTransfert}" th:object="${transactionDTO}">
+	    	<div>
+	    		<input type="hidden" th:field="*{emailSender}">
+	    		<select th:field="*{emailReceiver}" required>
+	    			<option th:if="${allAddBy.empty}" value="">No people added</option>
+	    			<option th:unless="${allAddBy.empty}" value="">Select a connection</option>
+ 					<option th:each="email : ${allAddBy}" th:value="${email}" th:text="${email}"></option>
+				</select>
+				<input th:unless="${allAddBy.empty}" type="text" th:field="*{description}" size=25 maxlength="25" placeholder="Description max 25 caracters"/>				
+				<!-- fee = 0.5 % so to have 1 cent need min transfert amount : 0.01/0.005 = 2 -->
+				<input th:unless="${allAddBy.empty}" type="number" min="2.00" th:field="*{amount}" placeholder="min 2.00"/>
+				<input th:unless="${allAddBy.empty}" type="submit" th:value="'Create'"/>
+			</div>			
+		</form>
 	</body>
 </html>

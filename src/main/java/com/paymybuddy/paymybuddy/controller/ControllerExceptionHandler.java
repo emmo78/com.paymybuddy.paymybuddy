@@ -8,6 +8,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.paymybuddy.paymybuddy.exception.InsufficentFundsException;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.service.RequestService;
 
@@ -31,6 +32,17 @@ public class ControllerExceptionHandler {
 		attributes.addAttribute("errorMessage", errorMessage);
         return "redirect:/register";
     }
+	
+	@ExceptionHandler(InsufficentFundsException.class)
+	public String insufficentFundsException(InsufficentFundsException ex, WebRequest request,  RedirectAttributes attributes) {
+		String errorMessage = ex.getMessage();
+		log.error("{} : {} : {}",
+				requestService.requestToString(request),
+				((ServletWebRequest) request).getHttpMethod(),
+				errorMessage);
+		attributes.addAttribute("errorMessage", errorMessage);
+        return "redirect:/user/home/transfert";
+      }
 	
 	@ExceptionHandler(UnexpectedRollbackException.class)
     public String unexpectedRollbackException(UnexpectedRollbackException ex, WebRequest request, Model model) {

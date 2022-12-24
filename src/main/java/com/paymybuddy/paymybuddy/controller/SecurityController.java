@@ -29,11 +29,10 @@ public class SecurityController {
 	}
 	
 	@GetMapping("/register")
-	public String register(@RequestParam(name = "errorMessage") Optional<String> errorMessageOpt, Principal user, Model model, WebRequest request) {
+	public String register(Principal user, Model model, WebRequest request) {
 		if (isAuthenticated(user)) {
 			return "redirect:/user/home";
 		}
-		errorMessageOpt.ifPresent(em -> model.addAttribute("errorMessage",em));
 		model.addAttribute("registeredDTO", new RegisteredDTO());
 		return "register";
 	}

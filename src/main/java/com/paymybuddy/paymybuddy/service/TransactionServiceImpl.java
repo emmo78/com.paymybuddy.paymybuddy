@@ -49,6 +49,10 @@ public class TransactionServiceImpl implements TransactionService {
 			//Throws MappingException | IllegalArgumentException | OptimisticLockingFailureException
 			Transaction transactionEnclosingScope = transactionRepository.save(transactionDTOService.transactionFromNewTransactionDTO(transactionDTO));
 			double amount = transactionEnclosingScope.getAmount();
+			// fee = 0.5 % so to have 1 cent need min transfert amount : 0.01/0.005 = 2.00
+			if (amount < 2.0) {
+				throw new InsufficentFundsException("Insufficient amount, min = 2.00");
+			}
 			//Throws: IllegalArgumentException | ResourceNotFoundException
 			registeredRepository.findById(transactionDTO.getEmailSender()).ifPresentOrElse(sender -> {
 					double difference = sender.getBalance()-(amount+transactionEnclosingScope.getFee());
