@@ -76,24 +76,26 @@ public class UserController {
 		Page<TransactionDTO> transactions = transactionService.getRegisteredAllTransaction(email, pageRequest, request);
 		model.addAttribute("transactions", transactions);
 		int lastPage = transactions.getTotalPages()-1;
-		if (lastPage>=0) {
-			if (index-2 <= 0) {
-				model.addAttribute("pageInterval", createInterval(1, lastPage+1));
-			} else if (index+2 > lastPage) {
-				if (lastPage-4 <= 0) {
-					model.addAttribute("pageInterval", createInterval(1, lastPage+1));
-				} else {
-					model.addAttribute("pageInterval", createInterval(lastPage-3, lastPage+1));
-				}
-			} else {
-				model.addAttribute("pageInterval", createInterval(index-1, index+3));
-			}
-		}
+		model.addAttribute("pageInterval", pageInterval(index, lastPage));
 		return "transfert";
 	}
 	
 	private List<Integer> pageInterval(int index, int lastPage) {
-		return null;
+		if (lastPage>=0) {
+			if (index-2 <= 0) {
+				return createInterval(1, lastPage+1);
+			} else if (index+2 > lastPage) {
+				if (lastPage-4 <= 0) {
+					return createInterval(1, lastPage+1);
+				} else {
+					return createInterval(lastPage-3, lastPage+1);
+				}
+			} else {
+				return createInterval(index-1, index+3);
+			}
+		} else {
+			return null;
+		}
 	}
 	
 	private List<Integer> createInterval(int min, int max) {
