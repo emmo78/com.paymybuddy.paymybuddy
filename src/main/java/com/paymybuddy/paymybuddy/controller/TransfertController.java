@@ -7,11 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
-import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.dto.TransactionDTO;
 import com.paymybuddy.paymybuddy.exception.InsufficentFundsException;
-import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
-import com.paymybuddy.paymybuddy.service.RegisteredService;
 import com.paymybuddy.paymybuddy.service.RequestService;
 import com.paymybuddy.paymybuddy.service.TransactionService;
 

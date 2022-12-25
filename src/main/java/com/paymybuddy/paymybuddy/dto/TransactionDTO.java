@@ -19,4 +19,11 @@ public class TransactionDTO  {
 		this.emailSender=emailSender;
 		amount="0.00";
 	}
+	public String getEmail() {
+		if (receiver) {
+			return emailSender;
+		} else {
+			return emailReceiver;
+		}
+	}
 }

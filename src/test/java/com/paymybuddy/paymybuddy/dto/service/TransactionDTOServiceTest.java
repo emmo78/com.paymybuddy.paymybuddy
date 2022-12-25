@@ -40,8 +40,8 @@ public class TransactionDTOServiceTest {
 
 	@Test
 	@Tag("TransactionDTOServiceTest")
-	@DisplayName("test transactionToDTOSender should have receiver false and negative amount")
-	public void transactionToDTOSenderTestShouldHaveReceiverFalseAndNegativeAmount() {
+	@DisplayName("test transactionToDTOSender should have receiver false, negative amount and return emailReceiver")
+	public void transactionToDTOSenderTestShouldHaveReceiverFalseNegativeAmountAndReturnEmailReceiver() {
 		//GIVEN
 		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
 
@@ -82,14 +82,16 @@ public class TransactionDTOServiceTest {
 				TransactionDTO::getFee,
 				TransactionDTO::getEmailSender,
 				TransactionDTO::getEmailReceiver,
-				TransactionDTO::isReceiver
+				TransactionDTO::isReceiver,
+				TransactionDTO::getEmail
 				).containsExactly(
 						"10/23/2022 18:43:55",
 						"-100.00",
 						"-0.50",
 						"aaa@aaa.com",
 						"bbb@bbb.com",
-						false
+						false,
+						"bbb@bbb.com"
 				);
 	}
 
@@ -126,21 +128,23 @@ public class TransactionDTOServiceTest {
 				TransactionDTO::getFee,
 				TransactionDTO::getEmailSender,
 				TransactionDTO::getEmailReceiver,
-				TransactionDTO::isReceiver
+				TransactionDTO::isReceiver,
+				TransactionDTO::getEmail
 				).containsExactly(
 						"10/23/2022 18:43:55",
 						"-100.00",
 						"-0.50",
 						"aaa@aaa.com",
 						null,
-						false
+						false,
+						null
 				);
 	}
 	
 	@Test
 	@Tag("TransactionDTOServiceTest")
-	@DisplayName("test transactionToDTOReceiver should have receiver true and fee to zero")
-	public void transactionToDTOReceiverTestShouldHaveReceiverTrueAndFeeZero() {
+	@DisplayName("test transactionToDTOReceiver should have receiver true, fee to zero and return emailSender")
+	public void transactionToDTOReceiverTestShouldHaveReceiverTrueFeeZeroAndReturnEmailSender() {
 		//GIVEN
 		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
 		Registered registeredASender = new Registered();
@@ -180,14 +184,16 @@ public class TransactionDTOServiceTest {
 				TransactionDTO::getFee,
 				TransactionDTO::getEmailSender,
 				TransactionDTO::getEmailReceiver,
-				TransactionDTO::isReceiver
+				TransactionDTO::isReceiver,
+				TransactionDTO::getEmail
 				).containsExactly(
 						"10/23/2022 18:43:55",
 						"100.00",
 						"0.00",
 						"aaa@aaa.com",
 						"bbb@bbb.com",
-						true
+						true,
+						"aaa@aaa.com"
 				);
 	}
 
@@ -226,14 +232,16 @@ public class TransactionDTOServiceTest {
 				TransactionDTO::getFee,
 				TransactionDTO::getEmailSender,
 				TransactionDTO::getEmailReceiver,
-				TransactionDTO::isReceiver
+				TransactionDTO::isReceiver,
+				TransactionDTO::getEmail
 				).containsExactly(
 						"10/23/2022 18:43:55",
 						"100.00",
 						"0.00",
 						null,
 						"bbb@bbb.com",
-						true
+						true,
+						null
 				);
 	}
 	
