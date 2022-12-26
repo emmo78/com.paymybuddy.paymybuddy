@@ -28,6 +28,7 @@ import com.paymybuddy.paymybuddy.service.RegisteredService;
 import com.paymybuddy.paymybuddy.service.RequestService;
 import com.paymybuddy.paymybuddy.service.TransactionService;
 
+import jakarta.servlet.ServletException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,7 +43,7 @@ public class UserController {
 
 	private final RequestService requestService;
 	
-	@PostMapping("/createRegistered")
+	@PostMapping("/createregistered")
 	public String createRegistered(@ModelAttribute RegisteredDTO registeredDTO, WebRequest request) throws ResourceConflictException, UnexpectedRollbackException {
 		RegisteredDTO registeredDTOCreated = registeredService.createRegistered(registeredDTO, request);
 		log.info("{} : {} : registered={} created and persisted",
@@ -52,7 +53,7 @@ public class UserController {
 		return "redirect:/";
 	}
 	
-	@PostMapping("/updateRegistered")
+	@PostMapping("/user/updateregistered")
 	public String updateRegistered(@ModelAttribute RegisteredDTO registeredDTO, WebRequest request) throws UnexpectedRollbackException {
 		RegisteredDTO registeredDTOUpdated = registeredService.updateRegistered(registeredDTO, request);
 		log.info("{} : {} : registered={} updated and persisted",
@@ -60,6 +61,14 @@ public class UserController {
 				((ServletWebRequest) request).getHttpMethod(),
 				registeredDTOUpdated.getEmail());
 		return "redirect:/user/home/profile";
+	}
+	
+	@GetMapping("/user/removeregistered")
+	public String removeRegistered(Principal user, WebRequest request) throws ServletException {
+		String email = user.getName();
+		registeredService.removeRegistered(email, request);
+		((ServletWebRequest) request).getRequest().logout();
+		return "redirect:/";
 	}
 
 	@GetMapping("/user/home")
@@ -110,7 +119,32 @@ public class UserController {
 		return "profileadd";
 	}
 	
+	@GetMapping("/user/home/profile/addby")
+	public String profilAddByPage(@RequestParam(name = "removeEmail") Optional<String> emailToRemoveOpt, @RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
+		String email = user.getName();
+		emailToRemoveOpt.ifPresent(emailToRemove -> registeredService.removeConnection(email, emailToRemove, request));
+		int index = Integer.parseInt(pageNumberOpt.orElseGet(()-> "0"));
+		Pageable pageRequest = PageRequest.of(index, 3, Sort.by("last_name", "first_name").ascending());
+		Page<RegisteredForListDTO> allAddBy = registeredService.getAllAddBy(email, pageRequest, request);
+		model.addAttribute("allAddBy", allAddBy);
+		int lastPage = allAddBy.getTotalPages()-1;
+		model.addAttribute("pageInterval", pageInterval(index, lastPage));
+		return "profileaddby";
+	}
 	
+	@GetMapping("/user/home/profile/addedto")
+	public String profilAddedToPage(@RequestParam(name = "removeEmail") Optional<String> emailToRemoveOpt, @RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
+		String email = user.getName();
+		emailToRemoveOpt.ifPresent(emailToRemove -> registeredService.removeConnection(emailToRemove, email, request));
+		int index = Integer.parseInt(pageNumberOpt.orElseGet(()-> "0"));
+		Pageable pageRequest = PageRequest.of(index, 3, Sort.by("last_name", "first_name").ascending());
+		Page<RegisteredForListDTO> allAddedTo = registeredService.getAllAddedTo(email, pageRequest, request);
+		model.addAttribute("allAddedTo", allAddedTo);
+		int lastPage = allAddedTo.getTotalPages()-1;
+		model.addAttribute("pageInterval", pageInterval(index, lastPage));
+		return "profileaddedto";
+	}
+
 	
 	private List<Integer> pageInterval(int index, int lastPage) {
 		if (lastPage>=0) {

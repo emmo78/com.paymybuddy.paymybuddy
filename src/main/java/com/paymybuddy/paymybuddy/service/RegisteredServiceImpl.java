@@ -252,8 +252,8 @@ public class RegisteredServiceImpl implements RegisteredService {
 	public void removeConnection(String email, String emailToRemove, WebRequest request) throws UnexpectedRollbackException {
 		try {
 			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
-			Registered registeredToAdd = registeredRepository.findById(emailToRemove).orElseThrow(() -> new ResourceNotFoundException("Registered to remove not found"));
-			registered.removeConnection(registeredToAdd);
+			Registered registeredToRemove = registeredRepository.findById(emailToRemove).orElseThrow(() -> new ResourceNotFoundException("Registered to remove not found"));
+			registered.removeConnection(registeredToRemove);
 			registeredRepository.save(registered);
 		} catch(IllegalArgumentException | OptimisticLockingFailureException | ResourceNotFoundException re) {
 			log.error("{} : {} ", requestService.requestToString(request), re.toString());

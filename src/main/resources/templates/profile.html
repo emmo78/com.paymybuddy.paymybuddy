@@ -14,10 +14,12 @@
 	  		<a th:href="@{/user/home/profile/addby}">
 							<button type="button">Manage Added Connections</button>				
 			</a>
-			
+			<a th:href="@{/user/home/profile/addedto}">
+							<button type="button">Manage Added To Connections</button>				
+			</a>
     	</div>
     	
-    	<form method="POST" th:action="@{/updateRegistered}" th:object="${user}">
+    	<form method="POST" th:action="@{/user/updateregistered}" th:object="${user}">
 			<p>
 				<input type="hidden" th:field="*{email}">
 
@@ -36,6 +38,11 @@
 				<input type="submit" th:value="'Update'"/>
 			</p>
 		</form>
+		<div>
+    		<a th:href="@{/user/removeregistered}">
+				<button type="button">Delete account</button>				
+			</a>
+		</div>
     
 	</body>  
 		

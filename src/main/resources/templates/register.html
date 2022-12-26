@@ -8,7 +8,7 @@
 
     <body>
     	<p th:if="${param.errorMessage}">Try another email<span th:text="' : '+${param.errorMessage}"></span></p>
-    	<form method="POST" th:action="@{/createRegistered}" th:object="${registeredDTO}">
+    	<form method="POST" th:action="@{/createregistered}" th:object="${registeredDTO}">
 			<p>
 				<label for="email">Email</label><br/>
 				<input type="text" th:field="*{email}" required placeholder="alias@domain up to 64@255 characters"/><br/>

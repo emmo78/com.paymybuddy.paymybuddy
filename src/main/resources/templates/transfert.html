@@ -12,7 +12,7 @@
 			</a>
 		</p>
 		<p th:if="${param.errorMessage}" th:text="${param.errorMessage}"></p>
-	    <form method="POST" th:action="@{/createTransfert}" th:object="${transactionDTO}">
+	    <form method="POST" th:action="@{/createtransfert}" th:object="${transactionDTO}">
 			<fieldset>
 			<legend>Send Money, balance = <span th:text="${user.balance}"></span></legend>
 		    	<p>

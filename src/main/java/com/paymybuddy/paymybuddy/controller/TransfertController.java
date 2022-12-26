@@ -24,7 +24,7 @@ public class TransfertController {
 	
 	private final RequestService requestService;
 
-	@PostMapping("/createTransfert")
+	@PostMapping("/createtransfert")
 	public String createTransfert(@ModelAttribute TransactionDTO transactionDTO, WebRequest request) throws InsufficentFundsException, UnexpectedRollbackException {
 		TransactionDTO transactionDTOCreated = transactionService.createATransaction(transactionDTO, request);
 		log.info("{} : {} : transaction sender={} receiver={} amount={} fee={} persisted",
