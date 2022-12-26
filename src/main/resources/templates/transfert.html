@@ -6,6 +6,11 @@
         <title>Transfert</title>
     </head>
 	<body>
+		<p>
+			<a th:href="@{/user/home/profile/add}">
+					<button type="button">Add</button>
+			</a>
+		</p>
 		<p th:if="${param.errorMessage}" th:text="${param.errorMessage}"></p>
 	    <form method="POST" th:action="@{/createTransfert}" th:object="${transactionDTO}">
 			<fieldset>
