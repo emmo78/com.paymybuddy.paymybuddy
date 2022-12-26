@@ -1,5 +1,7 @@
 package com.paymybuddy.paymybuddy.controller;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
@@ -67,6 +70,10 @@ public class UserController {
 	public String removeRegistered(Principal user, WebRequest request) throws ServletException {
 		String email = user.getName();
 		registeredService.removeRegistered(email, request);
+		log.info("{} : {} : registered={} removed from base",
+				requestService.requestToString(request),
+				((ServletWebRequest) request).getHttpMethod(),
+				email);
 		((ServletWebRequest) request).getRequest().logout();
 		return "redirect:/";
 	}
@@ -82,7 +89,7 @@ public class UserController {
 		return "userhome";
 	}
 	
-	@GetMapping("/user/home/transfert")
+	@GetMapping("/user/home/transfer")
 	public String transfertPage(@RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
 		String email = user.getName();
 		RegisteredDTO registeredDTO = registeredService.getRegistered(user.getName(), request);
@@ -96,7 +103,7 @@ public class UserController {
 		model.addAttribute("transactions", transactions);
 		int lastPage = transactions.getTotalPages()-1;
 		model.addAttribute("pageInterval", pageInterval(index, lastPage));
-		return "transfert";
+		return "transfer";
 	}
 	
 	@GetMapping("/user/home/profile")
@@ -109,7 +116,14 @@ public class UserController {
 	@GetMapping("/user/home/profile/add")
 	public String profileAddPage(@RequestParam(name = "addEmail") Optional<String> emailToAddOpt, @RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
 		String email = user.getName();
-		emailToAddOpt.ifPresent(emailToAdd -> registeredService.addConnection(email, emailToAdd, request));
+		emailToAddOpt.ifPresent(emailToAdd -> {
+			registeredService.addConnection(email, emailToAdd, request);
+			log.info("{} : {} : {} add connection {} persisted",
+					requestService.requestToString(request),
+					((ServletWebRequest) request).getHttpMethod(),
+					email,
+					emailToAdd);
+		});
 		int index = Integer.parseInt(pageNumberOpt.orElseGet(()-> "0"));
 		Pageable pageRequest = PageRequest.of(index, 3, Sort.by("last_name", "first_name").ascending());
 		Page<RegisteredForListDTO> allNotAdd = registeredService.getAllNotAddBy(email, pageRequest, request);
@@ -122,7 +136,14 @@ public class UserController {
 	@GetMapping("/user/home/profile/addby")
 	public String profilAddByPage(@RequestParam(name = "removeEmail") Optional<String> emailToRemoveOpt, @RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
 		String email = user.getName();
-		emailToRemoveOpt.ifPresent(emailToRemove -> registeredService.removeConnection(email, emailToRemove, request));
+		emailToRemoveOpt.ifPresent(emailToRemove -> {
+			registeredService.removeConnection(email, emailToRemove, request);
+			log.info("{} : {} : {} remove connection {} persisted",
+					requestService.requestToString(request),
+					((ServletWebRequest) request).getHttpMethod(),
+					email,
+					emailToRemove);		
+		});
 		int index = Integer.parseInt(pageNumberOpt.orElseGet(()-> "0"));
 		Pageable pageRequest = PageRequest.of(index, 3, Sort.by("last_name", "first_name").ascending());
 		Page<RegisteredForListDTO> allAddBy = registeredService.getAllAddBy(email, pageRequest, request);
@@ -135,7 +156,14 @@ public class UserController {
 	@GetMapping("/user/home/profile/addedto")
 	public String profilAddedToPage(@RequestParam(name = "removeEmail") Optional<String> emailToRemoveOpt, @RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
 		String email = user.getName();
-		emailToRemoveOpt.ifPresent(emailToRemove -> registeredService.removeConnection(emailToRemove, email, request));
+		emailToRemoveOpt.ifPresent(emailToRemove -> {
+			registeredService.removeConnection(emailToRemove, email, request);
+			log.info("{} : {} : {} remove connection {} persisted",
+					requestService.requestToString(request),
+					((ServletWebRequest) request).getHttpMethod(),
+					emailToRemove,
+					email);
+		});
 		int index = Integer.parseInt(pageNumberOpt.orElseGet(()-> "0"));
 		Pageable pageRequest = PageRequest.of(index, 3, Sort.by("last_name", "first_name").ascending());
 		Page<RegisteredForListDTO> allAddedTo = registeredService.getAllAddedTo(email, pageRequest, request);
@@ -144,7 +172,38 @@ public class UserController {
 		model.addAttribute("pageInterval", pageInterval(index, lastPage));
 		return "profileaddedto";
 	}
-
+	
+	@GetMapping("/user/home/bank")
+	public String profilTransferMoneyBank(Principal user, Model model, WebRequest request) {
+		RegisteredDTO registeredDTO = registeredService.getRegistered(user.getName(), request);
+		model.addAttribute("user", registeredDTO);
+		return "profilbank";
+	}
+	
+	@PostMapping("/user/home/bank")
+	public String transferMoneyBank(@RequestParam(name = "amount") String amountS, @RequestParam(name = "action") String action, Principal user, WebRequest request) {
+		String email = user.getName();
+		double amount = BigDecimal.valueOf(Double.parseDouble(amountS)).setScale(2, RoundingMode.HALF_UP).doubleValue();
+		if (action.equals("deposit")&&amount>0) {
+			registeredService.depositFromBank(email, amount, request);
+		} else if(action.equals("withdraw")&&amount>0) {
+			registeredService.withdrawToBank(email, amount, request);
+		}
+		return "redirect:/user/home/bank";
+	}
+	
+	@GetMapping("/user/home/contact")
+	public String contact(Principal user, Model model, WebRequest request) {
+		String email = user.getName();
+		model.addAttribute("user", email);
+		return "contact";
+	}
+	
+	@PostMapping("/user/home/contact")
+	public String contactProcessing(RedirectAttributes attributes, @RequestParam(name = "contact") String contact) {
+		attributes.addAttribute("contact", contact);
+		return "redirect:/user/home/contact";
+	}
 	
 	private List<Integer> pageInterval(int index, int lastPage) {
 		if (lastPage>=0) {

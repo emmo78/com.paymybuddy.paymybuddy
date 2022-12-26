@@ -118,7 +118,9 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), e.toString());
 			throw new UnexpectedRollbackException("Error while updating your profile");
 		}
-		log.info("{} : registered={} updated and persisted", requestService.requestToString(request), updatedRegisteredDTO.getEmail());
+		log.info("{} : registered={} updated and persisted",
+			requestService.requestToString(request),
+			updatedRegisteredDTO.getEmail());
 		return updatedRegisteredDTO;
 	}
 
@@ -138,7 +140,9 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while removing your profile");
 		}
-		log.info("{} : removed and deleted", requestService.requestToString(request));
+		log.info("{} : registered={} removed and deleted",
+			requestService.requestToString(request),
+			email);
 	}
 
 	@Override
@@ -178,8 +182,9 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting connections you added");
 		}
-		log.info("{} : page all add by, number : {} of {}",
+		log.info("{} : registered={} : page all add by, number : {} of {}",
 			requestService.requestToString(request),
+			email,
 			pageRegisteredForListDTO.getNumber()+1,
 			pageRegisteredForListDTO.getTotalPages());
 		return pageRegisteredForListDTO;
@@ -200,8 +205,9 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting connections you can add");
 		}
-		log.info("{} : page all not add by, number : {} of {}",
+		log.info("{} : registered={} : page all not add by, number : {} of {}",
 			requestService.requestToString(request),
+			email,
 			pageRegisteredForListDTO.getNumber()+1,
 			pageRegisteredForListDTO.getTotalPages());
 		return pageRegisteredForListDTO;
@@ -222,8 +228,9 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting connected to you");
 		}
-		log.info("{} : page all connected to, number : {} of {}",
+		log.info("{} : registered={} : page all connected to, number : {} of {}",
 			requestService.requestToString(request),
+			email,
 			pageRegisteredForListDTO.getNumber()+1,
 			pageRegisteredForListDTO.getTotalPages());
 		return pageRegisteredForListDTO;
@@ -244,7 +251,10 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while adding connection");
 		}
-		log.info("{} : added and persisted", requestService.requestToString(request));
+		log.info("{} : {} add connection {} persisted",
+			requestService.requestToString(request),
+			email,
+			emailToAdd);
 	}
 
 	@Override
@@ -262,8 +272,10 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while removing connection");
 		}
-		log.info("{} : removed and persisted", requestService.requestToString(request));
-		
+		log.info("{} : {} remove connection {} persisted",
+			requestService.requestToString(request),
+			email,
+			emailToRemove);		
 	}
 
 	@Override

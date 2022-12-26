@@ -57,7 +57,7 @@ public class TransactionServiceImpl implements TransactionService {
 			registeredRepository.findById(transactionDTO.getEmailSender()).ifPresentOrElse(sender -> {
 					double difference = sender.getBalance()-(amount+transactionEnclosingScope.getFee());
 					if (difference < 0) {
-						throw new InsufficentFundsException("Insufficient funds for transaction : you need to transfert : "
+						throw new InsufficentFundsException("Insufficient funds for transaction : you need to transfer : "
 								+String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", Math.abs(difference))
 								+" from bank");
 					}

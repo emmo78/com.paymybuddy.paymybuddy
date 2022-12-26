@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.paymybuddy.paymybuddy.exception.InsufficentFundsException;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
+import com.paymybuddy.paymybuddy.exception.WithdrawException;
 import com.paymybuddy.paymybuddy.service.RequestService;
 
 import lombok.AllArgsConstructor;
@@ -42,7 +43,18 @@ public class ControllerExceptionHandler {
 				errorMessage);
 		attributes.addAttribute("errorMessage", errorMessage);
         return "redirect:/user/home/transfert";
-      }
+    }
+	
+	@ExceptionHandler(WithdrawException.class)
+	public String withdrawExceptionException(WithdrawException ex, WebRequest request,  RedirectAttributes attributes) {
+		String errorMessage = ex.getMessage();
+		log.error("{} : {} : {}",
+				requestService.requestToString(request),
+				((ServletWebRequest) request).getHttpMethod(),
+				errorMessage);
+		attributes.addAttribute("errorMessage", errorMessage);
+        return "redirect:/user/home/bank";
+    }
 	
 	@ExceptionHandler(UnexpectedRollbackException.class)
     public String unexpectedRollbackException(UnexpectedRollbackException ex, WebRequest request, Model model) {

@@ -18,13 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @Slf4j
 @AllArgsConstructor
-public class TransfertController {
+public class TransferController {
 	
 	private final TransactionService transactionService;
 	
 	private final RequestService requestService;
 
-	@PostMapping("/createtransfert")
+	@PostMapping("/createtransfer")
 	public String createTransfert(@ModelAttribute TransactionDTO transactionDTO, WebRequest request) throws InsufficentFundsException, UnexpectedRollbackException {
 		TransactionDTO transactionDTOCreated = transactionService.createATransaction(transactionDTO, request);
 		log.info("{} : {} : transaction sender={} receiver={} amount={} fee={} persisted",
@@ -34,7 +34,7 @@ public class TransfertController {
 				transactionDTOCreated.getEmailReceiver(),
 				transactionDTOCreated.getAmount(),
 				transactionDTOCreated.getFee());	
-		return "redirect:/user/home/transfert";
+		return "redirect:/user/home/transfer";
 	}
 
 }
