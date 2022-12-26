@@ -52,6 +52,16 @@ public class UserController {
 		return "redirect:/";
 	}
 	
+	@PostMapping("/updateRegistered")
+	public String updateRegistered(@ModelAttribute RegisteredDTO registeredDTO, WebRequest request) throws UnexpectedRollbackException {
+		RegisteredDTO registeredDTOUpdated = registeredService.updateRegistered(registeredDTO, request);
+		log.info("{} : {} : registered={} updated and persisted",
+				requestService.requestToString(request),
+				((ServletWebRequest) request).getHttpMethod(),
+				registeredDTOUpdated.getEmail());
+		return "redirect:/user/home/profile";
+	}
+
 	@GetMapping("/user/home")
 	public String welcomePage(Principal user, Model model, WebRequest request) {
 		RegisteredDTO registeredDTO = registeredService.getRegistered(user.getName(), request);
@@ -80,18 +90,27 @@ public class UserController {
 		return "transfert";
 	}
 	
+	@GetMapping("/user/home/profile")
+	public String profilePage(Principal user, Model model, WebRequest request) {
+		RegisteredDTO registeredDTO = registeredService.getRegistered(user.getName(), request);
+		model.addAttribute("user", registeredDTO);
+		return "profile";
+	}
+	
 	@GetMapping("/user/home/profile/add")
-	public String profilAddPage(@RequestParam(name = "addEmail") Optional<String> emailToAddOpt, @RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
+	public String profileAddPage(@RequestParam(name = "addEmail") Optional<String> emailToAddOpt, @RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
 		String email = user.getName();
 		emailToAddOpt.ifPresent(emailToAdd -> registeredService.addConnection(email, emailToAdd, request));
 		int index = Integer.parseInt(pageNumberOpt.orElseGet(()-> "0"));
-		Pageable pageRequest = PageRequest.of(0, 5, Sort.by("last_name", "first_name").ascending());
+		Pageable pageRequest = PageRequest.of(index, 3, Sort.by("last_name", "first_name").ascending());
 		Page<RegisteredForListDTO> allNotAdd = registeredService.getAllNotAddBy(email, pageRequest, request);
 		model.addAttribute("allNotAdd", allNotAdd);
 		int lastPage = allNotAdd.getTotalPages()-1;
 		model.addAttribute("pageInterval", pageInterval(index, lastPage));
 		return "profileadd";
 	}
+	
+	
 	
 	private List<Integer> pageInterval(int index, int lastPage) {
 		if (lastPage>=0) {

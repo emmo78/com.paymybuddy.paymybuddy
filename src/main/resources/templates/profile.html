@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<!-- <link rel="stylesheet" type="text/css" href="/css/myFile.css" th:href="@{/css/myFile.css}" /> -->
+        <title>Profile</title>
+    </head>
+
+    <body>
+    	<div>
+    		<a th:href="@{/user/home/profile/add}">
+							<button type="button">Add Connection</button>				
+			</a>
+	  		<a th:href="@{/user/home/profile/addby}">
+							<button type="button">Manage Added Connections</button>				
+			</a>
+			
+    	</div>
+    	
+    	<form method="POST" th:action="@{/updateRegistered}" th:object="${user}">
+			<p>
+				<input type="hidden" th:field="*{email}">
+
+				<label for="firstName">First name</label><br/> 
+				<input type="text" th:field="*{firstName}" placeholder="Firstname up to 30 characters"/><br/>
+
+				<label for="lastName">Last name</label><br/>
+				<input type="text" th:field="*{lastName}" placeholder="Lastname up to 30 characters"/><br/>
+				
+				<label for="birthDate">Birth date</label><br/>
+				<input type="text" th:field="*{birthDate}" placeholder="MM/dd/yyyy"/><br/>
+				
+				<label for="iban">Iban</label><br/>
+				<input type="text" th:field="*{iban}" required placeholder="FR76012345678901234567890123456789"/><br/>			
+	
+				<input type="submit" th:value="'Update'"/>
+			</p>
+		</form>
+    
+	</body>  
+		
+</html>
