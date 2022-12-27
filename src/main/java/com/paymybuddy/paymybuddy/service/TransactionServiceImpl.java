@@ -4,7 +4,6 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.modelmapper.MappingException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,26 +22,23 @@ import com.paymybuddy.paymybuddy.model.Transaction;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 import com.paymybuddy.paymybuddy.repository.TransactionRepository;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
-	@Autowired 
-	private TransactionDTOService transactionDTOService;
+	private final TransactionDTOService transactionDTOService;
 	
-	@Autowired
-	private TransactionRepository transactionRepository;
+	private final TransactionRepository transactionRepository;
 	
-	@Autowired
-	private RegisteredRepository registeredRepository;
+	private final RegisteredRepository registeredRepository;
 	
-	@Autowired
-	private RequestService requestService;
+	private final RequestService requestService;
 	
-	@Autowired
-	private DateTimePatternProperties dateStringPattern;
+	private final DateTimePatternProperties dateStringPattern;
 	
 	@Override
 	@Transactional(rollbackFor = {UnexpectedRollbackException.class, InsufficentFundsException.class})
@@ -53,11 +49,15 @@ public class TransactionServiceImpl implements TransactionService {
 			//Throws MappingException | IllegalArgumentException | OptimisticLockingFailureException
 			Transaction transactionEnclosingScope = transactionRepository.save(transactionDTOService.transactionFromNewTransactionDTO(transactionDTO));
 			double amount = transactionEnclosingScope.getAmount();
+			// fee = 0.5 % so to have 1 cent need minimum transfer amount : 0.01/0.005 = 2.00
+			if (amount < 2.0) {
+				throw new InsufficentFundsException("Insufficient amount, min = 2.00");
+			}
 			//Throws: IllegalArgumentException | ResourceNotFoundException
 			registeredRepository.findById(transactionDTO.getEmailSender()).ifPresentOrElse(sender -> {
 					double difference = sender.getBalance()-(amount+transactionEnclosingScope.getFee());
 					if (difference < 0) {
-						throw new InsufficentFundsException("Insufficient funds for transaction : you need to transfert : "
+						throw new InsufficentFundsException("Insufficient funds for transaction : you need to transfer : "
 								+String.format(new Locale(dateStringPattern.getLocalLanguage()) ,"%.2f", Math.abs(difference))
 								+" from bank");
 					}

@@ -1,6 +1,5 @@
 package com.paymybuddy.paymybuddy.configuration;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,15 +11,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import lombok.AllArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class SecurityConfiguration  {
 	
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 	
-	@Autowired
-	UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
 	
 	@Bean
 	public AuthenticationManager authenticationManager() {
@@ -34,20 +34,15 @@ public class SecurityConfiguration  {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 			.authorizeHttpRequests(authz -> authz
-					.antMatchers("/").permitAll()
-					.antMatchers("/user/*").hasRole("USER")
-					.antMatchers("/admin/*").hasRole("ADMIN")
+					.requestMatchers("/","/register", "/createregistered").permitAll()
+					.requestMatchers("/user/**").hasRole("USER")
+					.requestMatchers("/admin/*").hasRole("ADMIN")
 	                .anyRequest().authenticated())
 			.formLogin(form -> form
 					.loginPage("/login")
-					.defaultSuccessUrl("/user/home")
-					.failureUrl("/login?error=true")
+					.defaultSuccessUrl("/user/home", true)
 					.permitAll())
-			.logout(logout -> logout                                                
-		            .logoutUrl("/logout")                                            
-		            .logoutSuccessUrl("/")                                      
-		            .invalidateHttpSession(true)                                        
-		            .deleteCookies("JSESSIONID"));
+			.logout(logout -> logout.permitAll());
 		return http.build();
 	}
 }

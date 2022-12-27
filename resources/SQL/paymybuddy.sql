@@ -34,7 +34,7 @@ CREATE TABLE transaction(
 
 CREATE TABLE role( 
 	role_id INT AUTO_INCREMENT, 
-	role_name VARCHAR(10), 
+	role_name VARCHAR(15), 
 	PRIMARY KEY(role_id) 
 );
 
@@ -47,6 +47,6 @@ CREATE TABLE registered_role(
 );
 
 INSERT INTO 'role'('role_name')
-VALUES ('USER'); 
+VALUES ('ROLE_USER'); 
 
  

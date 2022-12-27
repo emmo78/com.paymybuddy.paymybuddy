@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -65,7 +65,7 @@ public class RegisteredServiceIT {
 	class CreateRegisteredIT {
 		
 		@BeforeAll
-		public void setUpForAllTests() {
+		public void setUpForAllTests() {			
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
 			requestMock.setRequestURI("/createRegistered");
@@ -105,7 +105,7 @@ public class RegisteredServiceIT {
 			//GIVEN
 			Role roleExpected = new Role();
 			roleExpected.setRoleId(1);
-			roleExpected.setRoleName("USER");
+			roleExpected.setRoleName("ROLE_USER");
 
 			//WHEN
 			RegisteredDTO registeredDTOResult = registeredService.createRegistered(registeredDTO, request);

@@ -99,7 +99,9 @@ public class TransactionServiceTest {
 		
 		@BeforeEach
 		public void setUpForEachTests() {
-			transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+			transactionDTO = new TransactionDTO();
+			transactionDTO.setEmailSender("aaa@aaa.com");
+			transactionDTO.setEmailReceiver("bbb@bbb.com");
 			transaction = new Transaction();
 			transaction.setDateTime(LocalDateTime.now());
 			transaction.setAmount(100);
@@ -109,6 +111,7 @@ public class TransactionServiceTest {
 		
 		@AfterEach
 		public void unSetForEachTests() {
+			transactionService=null;
 			transactionDTO = null;
 			transaction = null;
 		}
@@ -271,6 +274,11 @@ public class TransactionServiceTest {
 			requestMock = null;
 			request = null;
 		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			transactionService=null;
+		}
 
 		@Test
 		@Tag("TransactionServiceTest")
@@ -320,19 +328,27 @@ public class TransactionServiceTest {
 			transactionNulltoA.setSender(null);
 			transactionNulltoA.setReceiver(registeredA);
 			
-			TransactionDTO transactionAtoBDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+			TransactionDTO transactionAtoBDTO = new TransactionDTO();
+			transactionAtoBDTO.setEmailSender("aaa@aaa.com");
+			transactionAtoBDTO.setEmailReceiver("bbb@bbb.com");
 			transactionAtoBDTO.setAmount("-100.00");
 			transactionAtoBDTO.setFee("-0.50");
 			transactionAtoBDTO.setReceiver(false);
-			TransactionDTO transactionBtoADTO = new TransactionDTO("bbb@bbb.com", "aaa@aaa.com");
+			TransactionDTO transactionBtoADTO = new TransactionDTO();
+			transactionBtoADTO.setEmailSender("bbb@bbb.com");
+			transactionBtoADTO.setEmailReceiver("aaa@aaa.com");
 			transactionBtoADTO.setAmount("100.00");
 			transactionBtoADTO.setFee("0.00");
 			transactionBtoADTO.setReceiver(true);
-			TransactionDTO transactionAtoNullDTO = new TransactionDTO("aaa@aaa.com", null);
+			TransactionDTO transactionAtoNullDTO = new TransactionDTO();
+			transactionAtoNullDTO.setEmailSender("aaa@aaa.com");
+			transactionAtoNullDTO.setEmailReceiver(null);
 			transactionAtoNullDTO.setAmount("-100.00");
 			transactionAtoNullDTO.setFee("-0.50");
 			transactionAtoNullDTO.setReceiver(false);
-			TransactionDTO transactionNulltoADTO = new TransactionDTO(null, "aaa@aaa.com");
+			TransactionDTO transactionNulltoADTO = new TransactionDTO();
+			transactionNulltoADTO.setEmailSender(null);
+			transactionNulltoADTO.setEmailReceiver("aaa@aaa.com");
 			transactionNulltoADTO.setAmount("100.00");
 			transactionNulltoADTO.setFee("0.00");
 			transactionNulltoADTO.setReceiver(true);

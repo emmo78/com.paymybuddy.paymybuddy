@@ -2,11 +2,9 @@ package com.paymybuddy.paymybuddy.service;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,38 +20,30 @@ import com.paymybuddy.paymybuddy.model.Registered;
 import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 import com.paymybuddy.paymybuddy.repository.RoleRepository;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class RegisteredServiceImpl implements RegisteredService {
 		
-	@Autowired
-	PasswordEncoder passwordEncoder;
+	private final RegisteredDTOService registeredDTOService;
 	
-	@Autowired
-	private RegisteredDTOService registeredDTOService;
+	private final RegisteredRepository registeredRepository;
 	
-	@Autowired
-	private RegisteredRepository registeredRepository;
+	private final RoleRepository roleRepository;
 	
-	@Autowired
-	private RoleRepository roleRepository;
-	
-	@Autowired
-	private RequestService requestService;
+	private final RequestService requestService;
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
-	public RegisteredDTO getRegistered(String email, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
+	public RegisteredDTO getRegistered(String email, WebRequest request) throws UnexpectedRollbackException {
 		RegisteredDTO registeredDTO = null;
 		try {
 			//Throws ResourceNotFoundException | IllegalArgumentException
 			registeredDTO = registeredDTOService.registeredToDTO(registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registrered not found")));
-		} catch (ResourceNotFoundException rnfe) {
-			log.error("{} : {} ", requestService.requestToString(request), rnfe.toString());
-			throw new UnexpectedRollbackException("Error while getting your profile");
-		} catch(IllegalArgumentException re) {
+		} catch(ResourceNotFoundException | IllegalArgumentException re) {
 			log.error("{} : {} ", requestService.requestToString(request), re.toString());
 			throw new UnexpectedRollbackException("Error while getting your profile");
 		} catch (Exception e) {
@@ -128,7 +118,9 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : registered={} : {} ", requestService.requestToString(request), registeredDTO.getEmail(), e.toString());
 			throw new UnexpectedRollbackException("Error while updating your profile");
 		}
-		log.info("{} : registered={} updated and persisted", requestService.requestToString(request), updatedRegisteredDTO.getEmail());
+		log.info("{} : registered={} updated and persisted",
+			requestService.requestToString(request),
+			updatedRegisteredDTO.getEmail());
 		return updatedRegisteredDTO;
 	}
 
@@ -148,7 +140,9 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while removing your profile");
 		}
-		log.info("{} : removed and deleted", requestService.requestToString(request));
+		log.info("{} : registered={} removed and deleted",
+			requestService.requestToString(request),
+			email);
 	}
 
 	@Override
@@ -188,8 +182,9 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting connections you added");
 		}
-		log.info("{} : page all add by, number : {} of {}",
+		log.info("{} : registered={} : page all add by, number : {} of {}",
 			requestService.requestToString(request),
+			email,
 			pageRegisteredForListDTO.getNumber()+1,
 			pageRegisteredForListDTO.getTotalPages());
 		return pageRegisteredForListDTO;
@@ -210,8 +205,9 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting connections you can add");
 		}
-		log.info("{} : page all not add by, number : {} of {}",
+		log.info("{} : registered={} : page all not add by, number : {} of {}",
 			requestService.requestToString(request),
+			email,
 			pageRegisteredForListDTO.getNumber()+1,
 			pageRegisteredForListDTO.getTotalPages());
 		return pageRegisteredForListDTO;
@@ -232,8 +228,9 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting connected to you");
 		}
-		log.info("{} : page all connected to, number : {} of {}",
+		log.info("{} : registered={} : page all connected to, number : {} of {}",
 			requestService.requestToString(request),
+			email,
 			pageRegisteredForListDTO.getNumber()+1,
 			pageRegisteredForListDTO.getTotalPages());
 		return pageRegisteredForListDTO;
@@ -254,7 +251,10 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while adding connection");
 		}
-		log.info("{} : added and persisted", requestService.requestToString(request));
+		log.info("{} : {} add connection {} persisted",
+			requestService.requestToString(request),
+			email,
+			emailToAdd);
 	}
 
 	@Override
@@ -262,8 +262,8 @@ public class RegisteredServiceImpl implements RegisteredService {
 	public void removeConnection(String email, String emailToRemove, WebRequest request) throws UnexpectedRollbackException {
 		try {
 			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
-			Registered registeredToAdd = registeredRepository.findById(emailToRemove).orElseThrow(() -> new ResourceNotFoundException("Registered to remove not found"));
-			registered.removeConnection(registeredToAdd);
+			Registered registeredToRemove = registeredRepository.findById(emailToRemove).orElseThrow(() -> new ResourceNotFoundException("Registered to remove not found"));
+			registered.removeConnection(registeredToRemove);
 			registeredRepository.save(registered);
 		} catch(IllegalArgumentException | OptimisticLockingFailureException | ResourceNotFoundException re) {
 			log.error("{} : {} ", requestService.requestToString(request), re.toString());
@@ -272,8 +272,10 @@ public class RegisteredServiceImpl implements RegisteredService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while removing connection");
 		}
-		log.info("{} : removed and persisted", requestService.requestToString(request));
-		
+		log.info("{} : {} remove connection {} persisted",
+			requestService.requestToString(request),
+			email,
+			emailToRemove);		
 	}
 
 	@Override

@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -129,9 +129,9 @@ class TransactionRepositoryIT {
 
 	@Test
 	@Tag("TransactionRepositoryIT")
-	@DisplayName("After A sended to B and C all remove from application, FK for all should be null")
+	@DisplayName("After A sent to B and C all remove from application, FK for all should be null")
 	@Transactional // object references an unsaved transient instance
-	public void afterASendedToBandCAllremoveFromApplicationSoAllFKShouldBeNull() {
+	public void afterASentToBandCAllremoveFromApplicationSoAllFKShouldBeNull() {
 		// GIVEN
 		Transaction transactionAtoB = new Transaction();
 		transactionAtoB.setDateTime(LocalDateTime.now());

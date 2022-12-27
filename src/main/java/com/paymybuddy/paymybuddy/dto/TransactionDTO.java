@@ -11,11 +11,19 @@ public class TransactionDTO  {
 	private String dateTime;
 	private String amount;
 	private String fee;
+	private String description;
 	private String emailSender;
 	private String emailReceiver;
 	private boolean receiver;
-	public TransactionDTO(String emailSender, String emailReceiver) {
-		this.emailSender = emailSender;
-		this.emailReceiver = emailReceiver;
+	public TransactionDTO(String emailSender) {
+		this.emailSender=emailSender;
+		amount="0.00";
+	}
+	public String getEmail() {
+		if (receiver) {
+			return emailSender;
+		} else {
+			return emailReceiver;
+		}
 	}
 }

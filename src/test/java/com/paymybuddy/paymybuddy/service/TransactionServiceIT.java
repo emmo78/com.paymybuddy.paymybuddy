@@ -94,7 +94,9 @@ public class TransactionServiceIT {
 		registeredRepository.saveAndFlush(registeredASender);
 		registeredRepository.saveAndFlush(registeredBReceiver);
 		
-		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+		TransactionDTO transactionDTO = new TransactionDTO();
+		transactionDTO.setEmailSender("aaa@aaa.com");
+		transactionDTO.setEmailReceiver("bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
 		
 		//WHEN
@@ -126,7 +128,9 @@ public class TransactionServiceIT {
 	@DisplayName("IT createATransaction with InsufficentFundsException should Rollback")
 	public void createATransactionITShouldRollbackOnInsufficentFundsException() {
 		//GIVEN
-		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+		TransactionDTO transactionDTO = new TransactionDTO();
+		transactionDTO.setEmailSender("aaa@aaa.com");
+		transactionDTO.setEmailReceiver("bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
 		Registered registeredASender = new Registered();
 		registeredASender.setEmail("aaa@aaa.com");
@@ -152,7 +156,9 @@ public class TransactionServiceIT {
 	@DisplayName("IT createATransaction with ResourceNotFoundException for Receiver should Rollback")
 	public void createATransactionITShouldRollbackOnResourceNotFoundException() {
 		//GIVEN
-		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+		TransactionDTO transactionDTO = new TransactionDTO();
+		transactionDTO.setEmailSender("aaa@aaa.com");
+		transactionDTO.setEmailReceiver("bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
 		Registered registeredASender = new Registered();
 		registeredASender.setEmail("aaa@aaa.com");

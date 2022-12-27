@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<!-- <link rel="stylesheet" type="text/css" href="/css/myFile.css" th:href="@{/css/myFile.css}" /> -->
+        <title>Profile Bank</title>
+    </head>
+
+	<body>
+		<p>Balance = <span th:text="${user.balance}"></span></p>
+		<p th:if="${param.errorMessage}" th:text="${param.errorMessage}"></p>
+		<form th:action="@{/user/home/bank}" method="post">
+			<p>
+				<label for="amount">Transfer amount</label><br/>
+				<input type="number" name="amount" min="0.00" step="0.01" placeholder="0.00" required id="amount"/><br/>
+	
+				Choose action<br/>
+				<input type="radio" name="action" value="deposit" id="deposit" checked/><label for="deposit">Deposit from bank</label><br/>
+				<input type="radio" name="action" value="withdraw" id="withdraw"/><label for="withdraw">Withdraw to bank</label><br/>
+
+				<input type="submit" value="Transfer"/>
+			</p>
+		</form>
+
+	</body>
+</html>

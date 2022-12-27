@@ -125,6 +125,7 @@ public class RegisteredServiceTest {
 		
 		@AfterEach
 		public void unSetForEachTests() {
+			registeredService=null;
 			registeredDTO = null;
 			registered = null;
 		}
@@ -232,6 +233,11 @@ public class RegisteredServiceTest {
 			request = null;
 		}
 		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredService=null;
+		}
+		
 		@Test
 		@Tag("RegisteredServiceTest")
 		@DisplayName("test getRegistered should throw UnexpectedRollbackException on ResourceNotFoundException")
@@ -334,6 +340,7 @@ public class RegisteredServiceTest {
 		
 		@AfterEach
 		public void unSetForEachTests() {
+			registeredService=null;
 			registeredDTO = null;
 			registered = null;
 			registeredToUpate = null;
@@ -459,6 +466,11 @@ public class RegisteredServiceTest {
 			request = null;
 		}
 		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredService=null;
+		}
+		
 		@Test
 		@Tag("RegisteredServiceTest")
 		@DisplayName("test getRegistrants should return page of RegisterdForListDTO")
@@ -547,9 +559,14 @@ public class RegisteredServiceTest {
 			request = null;
 		}
 		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredService=null;
+		}
+		
 		@Test
 		@Tag("RegisteredServiceTest")
-		@DisplayName("test getAllAddBy should return page of RegisterdForListDTO")
+		@DisplayName("test getAllAddBy should return page of RegisteredForListDTO")
 		public void getAllAddByTestShouldReturnPageOfRegisterdForListDTO() {
 			//GIVEN : C has added A and B
 			Registered 	registeredA = new Registered();
@@ -633,6 +650,11 @@ public class RegisteredServiceTest {
 			pageRequest = null;
 			requestMock = null;
 			request = null;
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredService=null;
 		}
 		
 		@Test
@@ -721,6 +743,11 @@ public class RegisteredServiceTest {
 			pageRequest = null;
 			requestMock = null;
 			request = null;
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			registeredService=null;
 		}
 		
 		@Test
@@ -832,6 +859,7 @@ public class RegisteredServiceTest {
 		
 		@AfterEach
 		public void unSetForEachTests() {
+			registeredService=null;
 			registeredA = null;
 			registeredB = null;
 		}
@@ -962,6 +990,7 @@ public class RegisteredServiceTest {
 		
 		@AfterEach
 		public void unSetForEachTests() {
+			registeredService=null;
 			registeredA = null;
 			registeredB = null;
 		}
@@ -1084,6 +1113,7 @@ public class RegisteredServiceTest {
 		
 		@AfterEach
 		public void unSetForEachTests() {
+			registeredService=null;
 			registeredA = null;
 		}
 		
@@ -1168,6 +1198,7 @@ public class RegisteredServiceTest {
 		
 		@AfterEach
 		public void unSetForEachTests() {
+			registeredService=null;
 			registeredA = null;
 		}
 		
@@ -1280,6 +1311,7 @@ public class RegisteredServiceTest {
 		
 		@AfterEach
 		public void unSetForEachTests() {
+			registeredService=null;
 			registeredA = null;
 		}
 		

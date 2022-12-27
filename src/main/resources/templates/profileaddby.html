@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<!-- <link rel="stylesheet" type="text/css" href="/css/myFile.css" th:href="@{/css/myFile.css}" /> -->
+        <title>Profile AddBy</title>
+    </head>
+	<body>
+		<h2>Remove</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Email</th>
+					<th>LastName</th>
+					<th>FirstName</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:if="${allAddBy.empty}">
+					<td colspan="4">No one was added !</td>
+				</tr>
+				<tr th:each="registered : ${allAddBy}">
+					<td th:text="${registered.email}">Email</td>
+					<td th:text="${registered.lastName}">LastName</td>
+					<td th:text="${registered.firstName}">FirstName</td>
+					<td>
+						<a th:href="@{/user/home/profile/addby(removeEmail=${registered.email})}">
+							<button type="button">Remove</button>				
+						</a>
+					</td> 
+				</tr>
+			</tbody>
+		</table>
+		<div th:if="${pageInterval}" th:with="index = ${allAddBy.getNumber()}">
+			<div th:unless="(${index}<=0)">
+				<a th:href="@{/user/home/profile/addby(pageNumber=(${index}-1))}">
+					<button type="button">-</button>
+				</a>
+			</div>
+			<ul>
+				<li th:each="pageNum : ${pageInterval}">
+					<a th:href="@{/user/home/profile/addby(pageNumber=(${pageNum}-1))}">
+						<button type="button">
+							<span th:text="${pageNum}"></span>
+							<span th:if="(${pageNum}eq(${index}+1))">*</span>
+						</button>
+					</a>
+				</li>
+			</ul>
+			<div th:if="(${index}lt(${allAddBy.getTotalPages()}-1))">
+				<a th:href="@{/user/home/profile/addby(pageNumber=(${index}+1))}">
+					<button type="button">+</button>
+				</a>
+			</div>
+		</div>
+	</body>
+</html>

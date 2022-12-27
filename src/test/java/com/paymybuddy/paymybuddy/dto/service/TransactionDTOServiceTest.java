@@ -40,8 +40,8 @@ public class TransactionDTOServiceTest {
 
 	@Test
 	@Tag("TransactionDTOServiceTest")
-	@DisplayName("test transactionToDTOSender should have receiver false and negative amount")
-	public void transactionToDTOSenderTestShouldHaveReceiverFalseAndNegativeAmount() {
+	@DisplayName("test transactionToDTOSender should have receiver false, negative amount and return emailReceiver")
+	public void transactionToDTOSenderTestShouldHaveReceiverFalseNegativeAmountAndReturnEmailReceiver() {
 		//GIVEN
 		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
 
@@ -82,21 +82,23 @@ public class TransactionDTOServiceTest {
 				TransactionDTO::getFee,
 				TransactionDTO::getEmailSender,
 				TransactionDTO::getEmailReceiver,
-				TransactionDTO::isReceiver
+				TransactionDTO::isReceiver,
+				TransactionDTO::getEmail
 				).containsExactly(
 						"10/23/2022 18:43:55",
 						"-100.00",
 						"-0.50",
 						"aaa@aaa.com",
 						"bbb@bbb.com",
-						false
+						false,
+						"bbb@bbb.com"
 				);
 	}
 
 	@Test
 	@Tag("TransactionDTOServiceTest")
 	@DisplayName("test transactionToDTOSender should have email receiver null")
-	public void transactionToDTOSenderTestShouldHaveEamilReceiverNull() {
+	public void transactionToDTOSenderTestShouldHaveEmailReceiverNull() {
 		//GIVEN
 		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
 		Registered registeredASender = new Registered();
@@ -126,21 +128,23 @@ public class TransactionDTOServiceTest {
 				TransactionDTO::getFee,
 				TransactionDTO::getEmailSender,
 				TransactionDTO::getEmailReceiver,
-				TransactionDTO::isReceiver
+				TransactionDTO::isReceiver,
+				TransactionDTO::getEmail
 				).containsExactly(
 						"10/23/2022 18:43:55",
 						"-100.00",
 						"-0.50",
 						"aaa@aaa.com",
 						null,
-						false
+						false,
+						null
 				);
 	}
 	
 	@Test
 	@Tag("TransactionDTOServiceTest")
-	@DisplayName("test transactionToDTOReceiver should have receiver true and fee to zero")
-	public void transactionToDTOReceiverTestShouldHaveReceiverTrueAndFeeZero() {
+	@DisplayName("test transactionToDTOReceiver should have receiver true, fee to zero and return emailSender")
+	public void transactionToDTOReceiverTestShouldHaveReceiverTrueFeeZeroAndReturnEmailSender() {
 		//GIVEN
 		LocalDateTime dateTimeTransaction = LocalDateTime.of(2022, 10, 23, 18, 43, 55);
 		Registered registeredASender = new Registered();
@@ -180,14 +184,16 @@ public class TransactionDTOServiceTest {
 				TransactionDTO::getFee,
 				TransactionDTO::getEmailSender,
 				TransactionDTO::getEmailReceiver,
-				TransactionDTO::isReceiver
+				TransactionDTO::isReceiver,
+				TransactionDTO::getEmail
 				).containsExactly(
 						"10/23/2022 18:43:55",
 						"100.00",
 						"0.00",
 						"aaa@aaa.com",
 						"bbb@bbb.com",
-						true
+						true,
+						"aaa@aaa.com"
 				);
 	}
 
@@ -226,14 +232,16 @@ public class TransactionDTOServiceTest {
 				TransactionDTO::getFee,
 				TransactionDTO::getEmailSender,
 				TransactionDTO::getEmailReceiver,
-				TransactionDTO::isReceiver
+				TransactionDTO::isReceiver,
+				TransactionDTO::getEmail
 				).containsExactly(
 						"10/23/2022 18:43:55",
 						"100.00",
 						"0.00",
 						null,
 						"bbb@bbb.com",
-						true
+						true,
+						null
 				);
 	}
 	
@@ -242,8 +250,11 @@ public class TransactionDTOServiceTest {
 	@DisplayName("test transactionFromNewTransactionDTO should have LocalDateTime.now() and fee")
 	public void transactionFromNewTransactionDTOTestShouldHaveLocalDateTimeNowAndFee() {
 		//GIVEN
-		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+		TransactionDTO transactionDTO = new TransactionDTO();
+		transactionDTO.setEmailSender("aaa@aaa.com");
+		transactionDTO.setEmailReceiver("bbb@bbb.com");
 		transactionDTO.setAmount("100.00");
+		transactionDTO.setDescription("Description");
 		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
 		
 		//WHEN
@@ -253,11 +264,13 @@ public class TransactionDTOServiceTest {
 		assertThat(transactionExpected).extracting(
 				Transaction::getAmount,
 				Transaction::getFee,
+				Transaction::getDescription,
 				transaction -> transaction.getSender().getEmail(),
 				transaction -> transaction.getReceiver().getEmail()
 				).containsExactly(
 						100d,
 						0.5,
+						"Description",
 						"aaa@aaa.com",
 						"bbb@bbb.com"
 						);
@@ -269,7 +282,9 @@ public class TransactionDTOServiceTest {
 	@DisplayName("test transactionFromNewTransactionDTO should throw a MappingException")
 	public void transactionFromNewTransactionDTOTestShouldThrowMappingException() {
 		//GIVEN
-		TransactionDTO transactionDTO = new TransactionDTO("aaa@aaa.com", "bbb@bbb.com");
+		TransactionDTO transactionDTO = new TransactionDTO();
+		transactionDTO.setEmailSender("aaa@aaa.com");
+		transactionDTO.setEmailReceiver("bbb@bbb.com");
 		transactionDTO.setAmount("A");
 		when(dateStringPattern.getLocalLanguage()).thenReturn("en");
 		

@@ -2,7 +2,7 @@ package com.paymybuddy.paymybuddy.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -26,7 +26,7 @@ public class RoleRepositoryIT {
 		//GIVEN
 		Role roleExpected = new Role();
 		roleExpected.setRoleId(1);
-		roleExpected.setRoleName("USER");
+		roleExpected.setRoleName("ROLE_USER");
 		
 		//WHEN
 		Role roleResulted = roleRepository.findById(1).get();
