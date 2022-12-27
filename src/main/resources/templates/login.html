@@ -7,31 +7,35 @@
     </head>
 
     <body>
-		<h1>Please Log In</h1>
-		
-		<div th:if="${param.error}">
-			Wrong user or password.
-		</div>
-		
-		<div th:if="${param.logout}">
-			You have been logged out.
-		</div>
-
-		<form th:action="@{/login}" method="post">
-			<p>
-				<label for="username">Enter your email</label><br/>
-				<input type="text" name="username" placeholder="Email" id="username"/><br/>
+		<div id="main_wrapper">			
+			<h1>Pay My Buddy</h1>
+			
+			<div th:if="${param.error}">
+				Wrong user or password.
+			</div>
+			
+			<div th:if="${param.logout}">
+				You have been logged out.
+			</div>
 	
-				<label for="password">Enter your password</label><br/>
-				<input type="password" name="password" placeholder="Password" id="password"/><br/>
-	
-				<input type="submit" value="Log in" />
-			</p>
-		</form>
+			<form th:action="@{/login}" method="post">
+				<p>
+					<label for="username">Enter your email</label><br/>
+					<input type="text" name="username" placeholder="Email" id="username"/><br/>
 		
-		<div>
-		<a th:href="@{/register}"><button type="button">Register</button></a>
+					<label for="password">Enter your password</label><br/>
+					<input type="password" name="password" placeholder="Password" id="password"/><br/>
+					
+					<label for="remember">Remember me</label><br/>
+	        		<input type="checkbox" name="remember" id="remember"/>  
+		
+					<input type="submit" value="Log in" />
+				</p>
+			</form>
+			
+			<div>
+			<a th:href="@{/register}"><button type="button">Register</button></a>
+			</div>
 		</div>
-
 	</body>
 </html>

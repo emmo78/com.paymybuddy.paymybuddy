@@ -146,7 +146,7 @@ public class TransactionServiceIT {
 		//THEN
 		assertThat(assertThrows(InsufficentFundsException.class,
 				() -> transactionService.createATransaction(transactionDTO, request))
-				.getMessage()).isEqualTo("Insufficient funds for transaction : you need to transfert : 0.50 from bank");
+				.getMessage()).isEqualTo("Insufficient funds for transaction : you need to transfer : 0.50 from bank");
 		assertThat(transactionRepository.count()).isZero();
 		assertThat(registeredRepository.findById("aaa@aaa.com").get().getBalance()).isEqualTo(100d);
 	}

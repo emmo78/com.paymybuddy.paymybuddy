@@ -22,6 +22,8 @@
 			</a>
     	</div>
     	
+    	<p th:if="${param.errorMessage}"><span th:text="${param.errorMessage}"></span></p>
+    	
     	<form method="POST" th:action="@{/user/updateregistered}" th:object="${user}">
 			<p>
 				<input type="hidden" th:field="*{email}">
@@ -36,7 +38,7 @@
 				<input type="text" th:field="*{birthDate}" placeholder="MM/dd/yyyy"/><br/>
 				
 				<label for="iban">Iban</label><br/>
-				<input type="text" th:field="*{iban}" required placeholder="FR76012345678901234567890123456789"/><br/>			
+				<input type="text" th:field="*{iban}" placeholder="FR76012345678901234567890123456789"/><br/>			
 	
 				<input type="submit" th:value="'Update'"/>
 			</p>

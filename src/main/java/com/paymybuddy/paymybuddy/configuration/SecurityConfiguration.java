@@ -42,6 +42,10 @@ public class SecurityConfiguration  {
 					.loginPage("/login")
 					.defaultSuccessUrl("/user/home", true)
 					.permitAll())
+			.rememberMe(conf -> conf
+					.rememberMeParameter("remember")
+					.rememberMeCookieName("rememberlogin")
+					.tokenValiditySeconds(300))
 			.logout(logout -> logout.permitAll());
 		return http.build();
 	}
