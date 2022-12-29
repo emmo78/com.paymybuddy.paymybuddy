@@ -50,7 +50,7 @@
 			</tbody>
 		</table>
 		<div th:if="${pageInterval}" th:with="index = ${transactions.getNumber()}">
-			<div th:unless="(${index}<=0)">
+			<div th:unless="${index}<=0">
 				<a th:href="@{/user/home/transfer(pageNumber=(${index}-1))}">
 					<button type="button">-</button>
 				</a>
@@ -60,12 +60,12 @@
 					<a th:href="@{/user/home/transfer(pageNumber=(${pageNum}-1))}">
 						<button type="button">
 							<span th:text="${pageNum}"></span>
-							<span th:if="(${pageNum}eq(${index}+1))">*</span>
+							<span th:if="${pageNum}eq(${index}+1)">*</span>
 						</button>
 					</a>
 				</li>
 			</ul>
-			<div th:if="(${index}lt(${transactions.getTotalPages()}-1))">
+			<div th:if="${index}lt(${transactions.getTotalPages()}-1)">
 				<a th:href="@{/user/home/transfer(pageNumber=(${index}+1))}">
 					<button type="button">+</button>
 				</a>
