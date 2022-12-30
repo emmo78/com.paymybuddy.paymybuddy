@@ -6,74 +6,76 @@
         <title>Transfer</title>
     </head>
 	<body>
-		<div id="main_wrapper">		
-			<header th:replace="~{header::header('transfer')}"></header>
-			
-			<p>
-				<a th:href="@{/user/home/profile/add}">
-						<button type="button">Add</button>
-				</a>
-			</p>
-			<p th:if="${param.errorMessage}" th:text="${param.errorMessage}"></p>
-		    <form method="POST" th:action="@{/createtransfer}" th:object="${transactionDTO}">
-				<fieldset>
-				<legend>Send Money, balance = <span th:text="${user.balance}"></span></legend>
-			    	<p>
-			    		<input type="hidden" th:field="*{emailSender}">
-			    		<select th:field="*{emailReceiver}" required>
-			    			<option th:if="${allAddBy.empty}" value="">No people added</option>
-			    			<option th:unless="${allAddBy.empty}" value="">Select a connection</option>
-		 					<option th:each="email : ${allAddBy}" th:value="${email}" th:text="${email}"></option>
-						</select>
-						<input th:unless="${allAddBy.empty}" type="text" th:field="*{description}" size=25 maxlength="25" placeholder="Description max 25 caracters"/>				
-						<!-- fee = 0.5 % so to have 1 cent need min transfer amount : 0.01/0.005 = 2 -->
-						<input th:unless="${allAddBy.empty}" type="number" min="2.00" step="0.01" th:field="*{amount}" placeholder="min 2.00"/>
-						<input th:unless="${allAddBy.empty}" type="submit" th:value="'Create'"/>
-					</p>
-				</fieldset>			
-			</form>
-			<h2>My Transactions</h2>
-			<table>
-				<thead>
-					<tr>
-						<th>Connections</th>
-						<th>Description</th>
-						<th>Amount</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr th:if="${transactions.empty}">
-						<td colspan="3">No sent or received transaction</td>
-					</tr>
-					<tr th:each="transaction : ${transactions}">
-						<td th:text="${transaction.getEmail()}!=null?${transaction.getEmail()}:'user has unsubscribed from  application'">Connections</td>
-						<td th:text="${transaction.description}">Description</td>
-						<td th:text="${transaction.amount}">Amount</td>
-					</tr>
-				</tbody>
-			</table>
-			<div th:if="${pageInterval}" th:with="index = ${transactions.getNumber()}">
-				<div th:unless="${index}<=0">
-					<a th:href="@{/user/home/transfer(pageNumber=(${index}-1))}">
-						<button type="button">-</button>
+		<div id="main_wrapper" th:with="page='Transfer'">		
+			<header th:replace="~{header::header(${page})}"></header>
+			<div th:replace="~{header::subheader(${page})}"></div>
+			<section>
+				<div id="transfersection">
+					<div>Send Money - balance = <span th:text="${user.balance}"></span></div>
+					<a th:href="@{/user/home/profile/add}">
+							<button class="button" type="button">Add Connection</button>
 					</a>
 				</div>
-				<ul>
-					<li th:each="pageNum : ${pageInterval}">
-						<a th:href="@{/user/home/transfer(pageNumber=(${pageNum}-1))}">
-							<button type="button">
-								<span th:text="${pageNum}"></span>
-								<span th:if="${pageNum}eq(${index}+1)">*</span>
-							</button>
+			    <form method="POST" th:action="@{/createtransfer}" th:object="${transactionDTO}">
+					<div class="paramerror" th:if="${param.errorMessage}" th:text="${param.errorMessage}"></div>
+			    	<div>
+				    		<input type="hidden" th:field="*{emailSender}">
+				    		<select th:field="*{emailReceiver}" required>
+				    			<option th:if="${allAddBy.empty}" value="">No people added</option>
+				    			<option th:unless="${allAddBy.empty}" value="">Select a connection</option>
+			 					<option th:each="email : ${allAddBy}" th:value="${email}" th:text="${email}"></option>
+							</select>
+							<input th:unless="${allAddBy.empty}" type="text" th:field="*{description}" size=25 maxlength="25" placeholder="Description max 25 caracters"/>				
+							<!-- fee = 0.5 % so to have 1 cent need min transfer amount : 0.01/0.005 = 2 -->
+							<input th:unless="${allAddBy.empty}" type="number" min="2.00" step="0.01" th:field="*{amount}" placeholder="min 2.00"/>
+							<input class="buttongreen" th:unless="${allAddBy.empty}" type="submit" th:value="'Pay'"/>
+					</div>
+				</form>
+			</section>
+			<section>
+				<div>My Transactions</div>
+				<table>
+					<thead>
+						<tr>
+							<th>Connections</th>
+							<th>Description</th>
+							<th>Amount</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${transactions.empty}">
+							<td colspan="3">No sent or received transaction</td>
+						</tr>
+						<tr th:each="transaction : ${transactions}">
+							<td th:text="${transaction.getEmail()}!=null?${transaction.getEmail()}:'user has unsubscribed from  application'">Connections</td>
+							<td th:text="${transaction.description}">Description</td>
+							<td th:text="${transaction.amount}">Amount</td>
+						</tr>
+					</tbody>
+				</table>
+				<div th:if="${pageInterval}" th:with="index = ${transactions.getNumber()}">
+					<div th:unless="${index}<=0">
+						<a th:href="@{/user/home/transfer(pageNumber=(${index}-1))}">
+							<button type="button">-</button>
 						</a>
-					</li>
-				</ul>
-				<div th:if="${index}lt(${transactions.getTotalPages()}-1)">
-					<a th:href="@{/user/home/transfer(pageNumber=(${index}+1))}">
-						<button type="button">+</button>
-					</a>
+					</div>
+					<ul>
+						<li th:each="pageNum : ${pageInterval}">
+							<a th:href="@{/user/home/transfer(pageNumber=(${pageNum}-1))}">
+								<button type="button">
+									<span th:text="${pageNum}"></span>
+									<span th:if="${pageNum}eq(${index}+1)">*</span>
+								</button>
+							</a>
+						</li>
+					</ul>
+					<div th:if="${index}lt(${transactions.getTotalPages()}-1)">
+						<a th:href="@{/user/home/transfer(pageNumber=(${index}+1))}">
+							<button type="button">+</button>
+						</a>
+					</div>
 				</div>
-			</div>
+			</section>
 		</div>
 	</body>
 </html>

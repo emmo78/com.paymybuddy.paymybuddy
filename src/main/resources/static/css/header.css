@@ -31,17 +31,6 @@ nav li {
 	padding: 0 0 16px 0;
 }
 
-input[type=submit] {
-	font-family: verdana, serif;
-	font-size: 1em;
-	color: #181818;
-	cursor: pointer;
-	padding:0; 
-	margin:0;
-	border:0;
-	background-color:transparent;
-}
-
 nav a {
 	color: #181818;
 	text-decoration: none;
@@ -51,6 +40,11 @@ nav a:hover {
 	color: #760001;
 }
 
+
 .athis {
 	color: #0275D8;
+}
+
+.color {
+	color: #181818;
 }

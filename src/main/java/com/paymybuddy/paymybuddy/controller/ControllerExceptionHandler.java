@@ -43,7 +43,7 @@ public class ControllerExceptionHandler {
 				((ServletWebRequest) request).getHttpMethod(),
 				errorMessage);
 		attributes.addAttribute("errorMessage", errorMessage);
-        return "redirect:/user/home/transfert";
+        return "redirect:/user/home/transfer";
     }
 	
 	@ExceptionHandler(WithdrawException.class)

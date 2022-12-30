@@ -10,17 +10,16 @@
 	   		<div class="paymybuddy">Pay My Buddy</div>
 	   		<nav>
 	   			<ul>
-	   				<li><a th:class="${#strings.equals(page, 'userhome')}?'athis'" href="/user/home" th:href="@{/user/home}">Home</a></li>
-	   				<li><a th:class="${#strings.equals(page, 'transfer')}?'athis'" href="/user/home/transfer" th:href="@{/user/home/transfer}">Transfer</a></li>
-	   				<li><a th:class="${#strings.equals(page, 'profile')}?'athis'" href="/user/home/profile" th:href="@{/user/home/profile}">Profile</a></li>
-	   				<li><a th:class="${#strings.equals(page, 'contact')}?'athis'" href="/user/home/contact" th:href="@{/user/home/contact}">Contact</a></li>
-	   				<li>
-						<form th:action="@{/logout}" method="post">
-								<input type="submit" value="Log Off"/>
-						</form>	   				
-	   				</li>
+	   				<li><a th:class="${#strings.equals(page, 'Userhome')}?'athis'" href="/user/home" th:href="@{/user/home}">Home</a></li>
+	   				<li><a th:class="${#strings.equals(page, 'Transfer')}?'athis'" href="/user/home/transfer" th:href="@{/user/home/transfer}">Transfer</a></li>
+	   				<li><a th:class="${#strings.equals(page, 'Profile')}?'athis'" href="/user/home/profile" th:href="@{/user/home/profile}">Profile</a></li>
+	   				<li><a th:class="${#strings.equals(page, 'Contact')}?'athis'" href="/user/home/contact" th:href="@{/user/home/contact}">Contact</a></li>
+	   				<li><a href="/user/logoff" th:href="@{/user/logoff}">Log&nbsp;Off</a></li>
 	   			</ul>
 	   		</nav>
 	   	</header>
+	   	<div class="athis" th:fragment="subheader(page)">
+	   		Home / <span class="color" th:text="${page}"></span>
+	   	</div>
 	</body>
 </html>
