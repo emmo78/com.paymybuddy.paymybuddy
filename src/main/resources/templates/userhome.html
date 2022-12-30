@@ -6,13 +6,18 @@
         <title>Home</title>
     </head>
 	<body>
-		<h1><span th:text="${user.firstName}+' '+${user.lastName}+', '"></span>Welcome !</h1>		
-
+		<header th:replcae="~{header::header(${'userhome'})}">
+		</header>
 		<form th:action="@{/logout}" method="post">
 			<p>
 				<input type="submit" value="Log Off"/>
 			</p>
 		</form>
+
+
+
+		<h1><span th:text="${user.firstName}+' '+${user.lastName}+', '"></span>Welcome !</h1>		
+
 		
 		<div>
 			<a th:href="@{/user/home/transfer}"><button type="button">Transfer</button></a>

@@ -1,11 +1,10 @@
 @charset "UTF-8";
 
-@import url("login.css");
-
-#main_wrapper {
-	width: 500px;
-	border: none;
+body {
+	font-family: verdana, serif;
+	font-size: 1.3em;
 }
+
 header {
 	display: flex;
 	justify-content: space-between;
@@ -32,6 +31,17 @@ nav li {
 	padding: 0 0 16px 0;
 }
 
+input[type=submit] {
+	font-family: verdana, serif;
+	font-size: 1em;
+	color: #181818;
+	cursor: pointer;
+	padding:0; 
+	margin:0;
+	border:0;
+	background-color:transparent;
+}
+
 nav a {
 	color: #181818;
 	text-decoration: none;
@@ -43,10 +53,4 @@ nav a:hover {
 
 .athis {
 	color: #0275D8;
-}
-
-input[type=text], input[type=password] {
-	margin-bottom: 1em;
-	width:80%;
-	box-sizing: border-box;
 }
