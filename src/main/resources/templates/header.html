@@ -18,8 +18,8 @@
 	   			</ul>
 	   		</nav>
 	   	</header>
-	   	<div class="athis" th:fragment="subheader(page)">
-	   		Home / <span class="color" th:text="${page}"></span>
+	   	<div th:fragment="subheader(page)">
+	   		<a class="athis" href="/user/home" th:href="@{/user/home}">Home</a> / <span class="color" th:text="${page}"></span>
 	   	</div>
 	</body>
 </html>

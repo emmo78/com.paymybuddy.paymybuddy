@@ -11,7 +11,7 @@
 			<div th:replace="~{header::subheader(${page})}"></div>
 			<section>
 				<div id="transfersection">
-					<div>Send Money - balance = <span th:text="${user.balance}"></span></div>
+					<div class="sectiontitle">Send Money - balance = <span th:text="${user.balance}"></span></div>
 					<a th:href="@{/user/home/profile/add}">
 							<button class="button" type="button">Add Connection</button>
 					</a>
@@ -33,7 +33,7 @@
 				</form>
 			</section>
 			<section>
-				<div>My Transactions</div>
+				<div class="sectiontitle">My Transactions</div>
 				<table>
 					<thead>
 						<tr>
@@ -46,34 +46,27 @@
 						<tr th:if="${transactions.empty}">
 							<td colspan="3">No sent or received transaction</td>
 						</tr>
-						<tr th:each="transaction : ${transactions}">
-							<td th:text="${transaction.getEmail()}!=null?${transaction.getEmail()}:'user has unsubscribed from  application'">Connections</td>
+						<tr th:each="transaction, iterstat : ${transactions}" th:class="${iterstat.odd}?'odd'" th:classappend="!${transaction.isReceiver}?'colorred'">
+							<td th:text="${transaction.getEmail()}!=null?${transaction.getEmail()}:'unsubscribed'">Connections</td>
 							<td th:text="${transaction.description}">Description</td>
 							<td th:text="${transaction.amount}">Amount</td>
 						</tr>
 					</tbody>
 				</table>
 				<div th:if="${pageInterval}" th:with="index = ${transactions.getNumber()}">
-					<div th:unless="${index}<=0">
-						<a th:href="@{/user/home/transfer(pageNumber=(${index}-1))}">
-							<button type="button">-</button>
-						</a>
-					</div>
-					<ul>
+					<ul id="legendbuttons">
+						<li th:unless="${index}<=0">
+							<a th:href="@{/user/home/transfer(pageNumber=(${index}-1))}">&laquo;</a>
+						</li>
 						<li th:each="pageNum : ${pageInterval}">
 							<a th:href="@{/user/home/transfer(pageNumber=(${pageNum}-1))}">
-								<button type="button">
-									<span th:text="${pageNum}"></span>
-									<span th:if="${pageNum}eq(${index}+1)">*</span>
-								</button>
+									<span th:class="${pageNum}eq(${index}+1)?'currentpage'"th:text="${pageNum}"></span>
 							</a>
 						</li>
+						<li th:if="${index}lt(${transactions.getTotalPages()}-1)">
+							<a th:href="@{/user/home/transfer(pageNumber=(${index}+1))}">&raquo;</a>
+						</li>
 					</ul>
-					<div th:if="${index}lt(${transactions.getTotalPages()}-1)">
-						<a th:href="@{/user/home/transfer(pageNumber=(${index}+1))}">
-							<button type="button">+</button>
-						</a>
-					</div>
 				</div>
 			</section>
 		</div>

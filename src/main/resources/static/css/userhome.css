@@ -43,12 +43,13 @@ nav a {
 	text-decoration: none;
 }
 
-nav a:hover {
-	color: #760001;
-}
-
 .athis {
 	color: #0275D8;
+	text-decoration: none;
+}
+
+nav a:hover, .athis:hover {
+	color: #760001;
 }
 
 .color {
