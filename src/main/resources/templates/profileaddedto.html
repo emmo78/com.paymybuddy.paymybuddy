@@ -2,57 +2,56 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<!-- <link rel="stylesheet" type="text/css" href="/css/myFile.css" th:href="@{/css/myFile.css}" /> -->
+		<link rel="stylesheet" type="text/css" href="/css/profileadd.css" th:href="@{/css/profileadd.css}" />
         <title>Profile Added To</title>
     </head>
 	<body>
-		<h2>Remove</h2>
-		<table>
-			<thead>
-				<tr>
-					<th>Email</th>
-					<th>LastName</th>
-					<th>FirstName</th>
-					<th>Action</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:if="${allAddedTo.empty}">
-					<td colspan="4">No one added you !</td>
-				</tr>
-				<tr th:each="registered : ${allAddedTo}">
-					<td th:text="${registered.email}">Email</td>
-					<td th:text="${registered.lastName}">LastName</td>
-					<td th:text="${registered.firstName}">FirstName</td>
-					<td>
-						<a th:href="@{/user/home/profile/addedto(removeEmail=${registered.email})}">
-							<button type="button">Remove From</button>				
-						</a>
-					</td> 
-				</tr>
-			</tbody>
-		</table>
-		<div th:if="${pageInterval}" th:with="index = ${allAddedTo.getNumber()}">
-			<div th:unless="(${index}<=0)">
-				<a th:href="@{/user/home/profile/addedto(pageNumber=(${index}-1))}">
-					<button type="button">-</button>
-				</a>
-			</div>
-			<ul>
-				<li th:each="pageNum : ${pageInterval}">
-					<a th:href="@{/user/home/profile/addedto(pageNumber=(${pageNum}-1))}">
-						<button type="button">
-							<span th:text="${pageNum}"></span>
-							<span th:if="(${pageNum}eq(${index}+1))">*</span>
-						</button>
-					</a>
-				</li>
-			</ul>
-			<div th:if="(${index}lt(${allAddedTo.getTotalPages()}-1))">
-				<a th:href="@{/user/home/profile/addedto(pageNumber=(${index}+1))}">
-					<button type="button">+</button>
-				</a>
-			</div>
+		<div id="main_wrapper" th:with="page='Profile'">		
+			<header th:replace="~{header::header(${page})}"></header>
+			<div th:replace="~{header::subheader(${page})}"></div>
+			<section>
+				<div class="sectiontitle">Contacts who added me</div>
+				<table>
+					<thead>
+						<tr>
+							<th>Email</th>
+							<th>LastName</th>
+							<th>FirstName</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${allAddedTo.empty}">
+							<td colspan="4">No one added you !</td>
+						</tr>
+						<tr th:each="registered, iterstat : ${allAddedTo}" th:class="${iterstat.odd}?'odd'">
+							<td th:text="${registered.email}">Email</td>
+							<td th:text="${registered.lastName}">LastName</td>
+							<td th:text="${registered.firstName}">FirstName</td>
+							<td>
+								<a th:href="@{/user/home/profile/addedto(removeEmail=${registered.email})}">
+									<button class="button" type="button">Remove</button>				
+								</a>
+							</td> 
+						</tr>
+					</tbody>
+				</table>
+				<div th:if="${pageInterval}" th:with="index = ${allAddedTo.getNumber()}">
+					<ul id="legendbuttons">
+						<li th:unless="(${index}<=0)">
+							<a th:href="@{/user/home/profile/addedto(pageNumber=(${index}-1))}">&laquo;</a>
+						</li>
+						<li th:each="pageNum : ${pageInterval}">
+							<a th:href="@{/user/home/profile/addedto(pageNumber=(${pageNum}-1))}">
+									<span th:class="${pageNum}eq(${index}+1)?'currentpage'" th:text="${pageNum}"></span>
+							</a>
+						</li>
+						<li th:if="(${index}lt(${allAddedTo.getTotalPages()}-1))">
+							<a th:href="@{/user/home/profile/addedto(pageNumber=(${index}+1))}">&raquo;</a>
+						</li>
+					</ul>
+				</div>
+			</section>
 		</div>
 	</body>
 </html>
