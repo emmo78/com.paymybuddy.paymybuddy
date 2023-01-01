@@ -2,53 +2,53 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<!-- <link rel="stylesheet" type="text/css" href="/css/myFile.css" th:href="@{/css/myFile.css}" /> -->
+		<link rel="stylesheet" type="text/css" href="/css/profile.css" th:href="@{/css/profile.css}" />
         <title>Profile</title>
     </head>
 
     <body>
-    	<div>
-    		<a th:href="@{/user/home/profile/add}">
-							<button type="button">Add Connection</button>				
-			</a>
-	  		<a th:href="@{/user/home/profile/addby}">
-							<button type="button">Manage My Added Connections</button>				
-			</a>
-			<a th:href="@{/user/home/profile/addedto}">
-							<button type="button">Manage Added To Me Connections</button>				
-			</a>
-			<a th:href="@{/user/home/bank}">
-							<button type="button">Transfer money to/from bank</button>				
-			</a>
+		<div id="main_wrapper" th:with="page='Profile'">		
+			<header th:replace="~{header::header(${page})}"></header>
+			<div th:replace="~{header::subheader(${page})}"></div>
+			<section>
+		    	<form method="POST" th:action="@{/user/updateregistered}" th:object="${user}">
+					<div class="paramerror" th:if="${param.errorMessage}" th:text="${param.errorMessage}"></div>
+					<div>
+						<input type="hidden" th:field="*{email}">
+		
+						<label for="firstName">First name</label><br/> 
+						<input type="text" th:field="*{firstName}" placeholder="Firstname up to 30 characters"/><br/>
+		
+						<label for="lastName">Last name</label><br/>
+						<input type="text" th:field="*{lastName}" placeholder="Lastname up to 30 characters"/><br/>
+						
+						<label for="birthDate">Birth date</label><br/>
+						<input type="text" th:field="*{birthDate}" placeholder="MM/dd/yyyy"/><br/>
+						
+						<label for="iban">Iban</label><br/>
+						<input type="text" th:field="*{iban}" placeholder="FR76012345678901234567890123456789"/><br/>			
+			
+						<input class="button" type="submit" th:value="'Update'"/>
+			    		<a th:href="@{/user/removeregistered}"><button class="button" type="button">Delete account</button></a>
+					</div>
+				</form>
+			   	<ul id="profilenav">
+			    	<li>
+			    		<a th:href="@{/user/home/profile/add}">Add Connection</a>
+					</li>
+					<li>
+				  		<a th:href="@{/user/home/profile/addby}">Manage My Added Connections</a>
+					</li>
+					<li>
+						<a th:href="@{/user/home/profile/addedto}">Manage Added To Me Connections</a>
+					</li>
+					<li>
+						<a th:href="@{/user/home/bank}">Transfer money to/from bank</a>
+					</li>
+		    	</ul>
+			
+			</section>
     	</div>
-    	
-    	<p th:if="${param.errorMessage}"><span th:text="${param.errorMessage}"></span></p>
-    	
-    	<form method="POST" th:action="@{/user/updateregistered}" th:object="${user}">
-			<p>
-				<input type="hidden" th:field="*{email}">
-
-				<label for="firstName">First name</label><br/> 
-				<input type="text" th:field="*{firstName}" placeholder="Firstname up to 30 characters"/><br/>
-
-				<label for="lastName">Last name</label><br/>
-				<input type="text" th:field="*{lastName}" placeholder="Lastname up to 30 characters"/><br/>
-				
-				<label for="birthDate">Birth date</label><br/>
-				<input type="text" th:field="*{birthDate}" placeholder="MM/dd/yyyy"/><br/>
-				
-				<label for="iban">Iban</label><br/>
-				<input type="text" th:field="*{iban}" placeholder="FR76012345678901234567890123456789"/><br/>			
-	
-				<input type="submit" th:value="'Update'"/>
-			</p>
-		</form>
-		<div>
-    		<a th:href="@{/user/removeregistered}">
-				<button type="button">Delete account</button>				
-			</a>
-		</div>
-    
 	</body>  
 		
 </html>
