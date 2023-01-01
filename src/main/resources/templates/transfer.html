@@ -60,7 +60,7 @@
 						</li>
 						<li th:each="pageNum : ${pageInterval}">
 							<a th:href="@{/user/home/transfer(pageNumber=(${pageNum}-1))}">
-									<span th:class="${pageNum}eq(${index}+1)?'currentpage'"th:text="${pageNum}"></span>
+									<span th:class="${pageNum}eq(${index}+1)?'currentpage'" th:text="${pageNum}"></span>
 							</a>
 						</li>
 						<li th:if="${index}lt(${transactions.getTotalPages()}-1)">
