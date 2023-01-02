@@ -1,0 +1,57 @@
+@charset "UTF-8";
+
+body {
+	font-family: verdana, serif;
+	color: black;
+	font-size: 1.3em;
+}
+
+#main_wrapper {
+	width: 700px;
+	margin: auto;
+	border: none;
+}
+
+header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+	margin-bottom: 1em;
+}
+
+.paymybuddy {
+	width: 250px;
+	text-align: center;
+	font-size: 1.3em;
+	color: white;
+	background-color: #5CB85C;
+	padding: 12px 0 16px 0;
+	border-radius: 10px;
+}
+
+nav ul {
+	list-style-type: none;
+	display: flex;
+}
+
+nav li {
+	margin-right: 15px;
+}
+
+nav a {
+	color: #181818;
+	text-decoration: none;
+}
+
+.athis {
+	color: #0275D8;
+	text-decoration: none;
+}
+
+nav a:hover, .athis:hover {
+	color: #760001;
+}
+
+.color {
+	color: #181818;
+}

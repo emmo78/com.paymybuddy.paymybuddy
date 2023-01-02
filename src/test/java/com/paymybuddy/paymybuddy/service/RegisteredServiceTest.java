@@ -50,6 +50,7 @@ import com.paymybuddy.paymybuddy.configuration.DateTimePatternProperties;
 import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.dto.service.RegisteredDTOService;
+import com.paymybuddy.paymybuddy.exception.NoIbanProvidedException;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.exception.WithdrawException;
 import com.paymybuddy.paymybuddy.model.Registered;
@@ -1220,6 +1221,51 @@ public class RegisteredServiceTest {
 		
 		@Test
 		@Tag("RegisteredServiceTest")
+		@DisplayName("test depositFromBank if null iban should throw NoIbanProvidedException")
+		public void depositFromBankTestIfNullIbanShouldThrowNoIbanProvidedException() {
+			//GIVEN
+			registeredA.setIban(null);
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(NoIbanProvidedException.class,
+					() -> registeredService.depositFromBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("For bank transfer provide an iban !");
+		}
+
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test depositFromBank if empty iban should throw NoIbanProvidedException")
+		public void depositFromBankTestIfEmptyIbanShouldThrowNoIbanProvidedException() {
+			//GIVEN
+			registeredA.setIban("");
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(NoIbanProvidedException.class,
+					() -> registeredService.depositFromBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("For bank transfer provide an iban !");
+		}
+
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test depositFromBank if blank iban should throw NoIbanProvidedException")
+		public void depositFromBankTestIfBlankIbanShouldThrowNoIbanProvidedException() {
+			//GIVEN
+			registeredA.setIban("         ");
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(NoIbanProvidedException.class,
+					() -> registeredService.depositFromBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("For bank transfer provide an iban !");
+		}
+				
+		@Test
+		@Tag("RegisteredServiceTest")
 		@DisplayName("test depositFromBank should throw UnexpectedRollbackException on ResourceNotFoundException")
 		public void depositFromBankTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
 			//GIVEN
@@ -1317,8 +1363,8 @@ public class RegisteredServiceTest {
 		
 		@Test
 		@Tag("RegisteredServiceTest")
-		@DisplayName("test withdrawToBank should sum balance and amount")
-		public void withdrawToBankTestShouldSumBalanceAndAmount() {
+		@DisplayName("test withdrawToBank should subtract amount from balance")
+		public void withdrawToBankTestShouldSubtractAmountFromBalance() {
 			//GIVEN
 			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
 			ArgumentCaptor<Registered> registeredResultCapt = ArgumentCaptor.forClass(Registered.class);
@@ -1329,6 +1375,51 @@ public class RegisteredServiceTest {
 			//THEN
 			verify(registeredRepository, times(1)).save(registeredResultCapt.capture());
 			assertThat(registeredResultCapt.getValue().getBalance()).isEqualTo(10d);
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test withdrawToBank if null iban should throw NoIbanProvidedException")
+		public void withdrawToBankTestIfNullIbanShouldThrowNoIbanProvidedException() {
+			//GIVEN
+			registeredA.setIban(null);
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(NoIbanProvidedException.class,
+					() -> registeredService.withdrawToBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("For bank transfer provide an iban !");
+		}
+
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test withdrawToBank if empty iban should throw NoIbanProvidedException")
+		public void withdrawToBankTestIfEmptyIbanShouldThrowNoIbanProvidedException() {
+			//GIVEN
+			registeredA.setIban("");
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(NoIbanProvidedException.class,
+					() -> registeredService.withdrawToBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("For bank transfer provide an iban !");
+		}
+
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test withdrawToBank if blank iban should throw NoIbanProvidedException")
+		public void withdrawToBankTestIfBlankIbanShouldThrowNoIbanProvidedException() {
+			//GIVEN
+			registeredA.setIban("         ");
+			when(registeredRepository.findById(anyString())).thenReturn(Optional.of(registeredA));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(NoIbanProvidedException.class,
+					() -> registeredService.withdrawToBank("aaa@aaa.com", 110.0, request))
+					.getMessage()).isEqualTo("For bank transfer provide an iban !");
 		}
 		
 		@Test

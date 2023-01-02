@@ -1,0 +1,58 @@
+@charset "UTF-8";
+
+@import url("userhome.css");
+
+section {
+	margin-top: 2em;
+	display: flex;
+}
+
+.paramerror {
+	font-size: 0.8em;
+	color: red;
+	margin-bottom: 1em;
+}
+
+form {
+	flex: 3;
+}
+
+input[type=text] {
+	margin-bottom: 1em;
+	font-size: 1em;
+	border: 2px solid gray;
+	border-radius: 4px;
+	width:80%;
+	box-sizing: border-box;
+}
+
+.button {
+	font-size: 1em;
+	margin-top: 2em;
+	margin-left: 10px;
+	margin-right: 10px;
+	background-color: #0275D8;
+	border: none;
+	color: white;
+	padding: 16px 32px;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+#profilenav {
+	flex: 1;
+	list-style-type: none;
+	display: flex;
+	flex-direction: column;
+}
+
+#profilenav a {
+	font-size: .8em;	
+	color: #0275D8;
+	text-decoration: none;
+	border: 1px #e0e0e0 solid;	
+}
+
+#profilenav a:hover {
+	color: #760001;
+}

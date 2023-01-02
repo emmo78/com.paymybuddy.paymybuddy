@@ -1,5 +1,6 @@
 package com.paymybuddy.paymybuddy.configuration;
 
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,13 +36,18 @@ public class SecurityConfiguration  {
 		http
 			.authorizeHttpRequests(authz -> authz
 					.requestMatchers("/","/register", "/createregistered").permitAll()
+					.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 					.requestMatchers("/user/**").hasRole("USER")
 					.requestMatchers("/admin/*").hasRole("ADMIN")
-	                .anyRequest().authenticated())
+					.anyRequest().authenticated())
 			.formLogin(form -> form
 					.loginPage("/login")
 					.defaultSuccessUrl("/user/home", true)
 					.permitAll())
+			.rememberMe(conf -> conf
+					.rememberMeParameter("remember")
+					.rememberMeCookieName("rememberlogin")
+					.tokenValiditySeconds(300))
 			.logout(logout -> logout.permitAll());
 		return http.build();
 	}

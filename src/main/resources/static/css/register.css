@@ -1,0 +1,53 @@
+@charset "UTF-8";
+
+@import url("login.css");
+
+#main_wrapper {
+	width: 500px;
+	border: none;
+}
+
+header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+}
+
+.paymybuddy {
+	width: 250px;
+	text-align: center;
+	font-size: 1.3em;
+	color: white;
+	background-color: #5CB85C;
+	padding: 12px 0 16px 0;
+	border-radius: 10px;
+}
+
+nav ul {
+	list-style-type: none;
+	display: flex;
+}
+
+nav li {
+	margin-right: 15px;
+	padding: 0 0 16px 0;
+}
+
+nav a {
+	color: #181818;
+	text-decoration: none;
+}
+
+nav a:hover {
+	color: #760001;
+}
+
+.athis {
+	color: #0275D8;
+}
+
+input[type=text], input[type=password] {
+	margin-bottom: 1em;
+	width:80%;
+	box-sizing: border-box;
+}

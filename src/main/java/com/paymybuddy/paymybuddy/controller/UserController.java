@@ -78,6 +78,16 @@ public class UserController {
 		return "redirect:/";
 	}
 
+	@GetMapping("/user/logoff")
+	public String logoff(Principal user, WebRequest request) throws ServletException {
+		log.info("{} : {} : registered={} log off",
+				requestService.requestToString(request),
+				((ServletWebRequest) request).getHttpMethod(),
+				user.getName());
+		((ServletWebRequest) request).getRequest().logout();
+		return "redirect:/";
+	}
+	
 	@GetMapping("/user/home")
 	public String welcomePage(Principal user, Model model, WebRequest request) {
 		RegisteredDTO registeredDTO = registeredService.getRegistered(user.getName(), request);

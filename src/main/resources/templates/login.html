@@ -2,36 +2,27 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<!-- <link rel="stylesheet" type="text/css" href="/css/myFile.css" th:href="@{/css/myFile.css}" /> -->
+		<link  rel="stylesheet" type="text/css" href="/css/login.css" th:href="@{/css/login.css}" />
         <title>Log In</title>
     </head>
 
     <body>
-		<h1>Please Log In</h1>
-		
-		<div th:if="${param.error}">
-			Wrong user or password.
+		<div id="main_wrapper">			
+			<div class="paymybuddy">Pay My Buddy</div>
+			<form  method="post" th:action="@{/login}">
+				<div class="form">
+					<input type="text" name="username" th:placeholder="${param.error}==null?'Email':'Wrong email'"/><br/>
+					<input type="password" name="password" th:placeholder="${param.error}==null?'Password':'or password'" id="password"/><br/>
+	        		<input type="checkbox" name="remember" id="remember"/>
+	        		<label for="remember">Remember me</label><br/>
+					<input class="button" type="submit" value="Log in" />
+					<a th:href="@{/register}"><button class="button" type="button">Register</button></a>
+				</div>
+			</form>
+			<div class="paramerror">
+				<span th:if="${param.logout}">You have been logged out.</span>
+			</div>
+			
 		</div>
-		
-		<div th:if="${param.logout}">
-			You have been logged out.
-		</div>
-
-		<form th:action="@{/login}" method="post">
-			<p>
-				<label for="username">Enter your email</label><br/>
-				<input type="text" name="username" placeholder="Email" id="username"/><br/>
-	
-				<label for="password">Enter your password</label><br/>
-				<input type="password" name="password" placeholder="Password" id="password"/><br/>
-	
-				<input type="submit" value="Log in" />
-			</p>
-		</form>
-		
-		<div>
-		<a th:href="@{/register}"><button type="button">Register</button></a>
-		</div>
-
 	</body>
 </html>

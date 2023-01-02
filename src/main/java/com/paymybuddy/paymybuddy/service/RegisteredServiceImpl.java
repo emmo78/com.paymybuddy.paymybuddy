@@ -13,6 +13,7 @@ import org.springframework.web.context.request.WebRequest;
 import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 import com.paymybuddy.paymybuddy.dto.RegisteredForListDTO;
 import com.paymybuddy.paymybuddy.dto.service.RegisteredDTOService;
+import com.paymybuddy.paymybuddy.exception.NoIbanProvidedException;
 import com.paymybuddy.paymybuddy.exception.ResourceConflictException;
 import com.paymybuddy.paymybuddy.exception.ResourceNotFoundException;
 import com.paymybuddy.paymybuddy.exception.WithdrawException;
@@ -280,14 +281,24 @@ public class RegisteredServiceImpl implements RegisteredService {
 
 	@Override
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
-	public void depositFromBank(String email, double amount, WebRequest request) throws UnexpectedRollbackException {
+	public void depositFromBank(String email, double amount, WebRequest request) throws NoIbanProvidedException, UnexpectedRollbackException {
 		try {		
 			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
+			Optional.ofNullable(registered.getIban()).ifPresentOrElse(iban -> {
+				if (iban.isEmpty()||iban.isBlank()) {
+					throw new NoIbanProvidedException("For bank transfer provide an iban !");
+				}
+			}, () -> {
+				throw new NoIbanProvidedException("For bank transfer provide an iban !");
+			});
 			registered.setBalance(registered.getBalance()+amount);
 			registeredRepository.save(registered);
 		} catch(IllegalArgumentException | OptimisticLockingFailureException | ResourceNotFoundException re) {
 			log.error("{} : {} ", requestService.requestToString(request), re.toString());
 			throw new UnexpectedRollbackException("Error while deposit money from bank. Canceled");
+		} catch (NoIbanProvidedException nipe) {
+			log.error("{} : {}", requestService.requestToString(request), nipe.toString());
+			throw new NoIbanProvidedException(nipe.getMessage());
 		} catch(Exception e) {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while deposit money from bank. Canceled");
@@ -297,9 +308,16 @@ public class RegisteredServiceImpl implements RegisteredService {
 
 	@Override
 	@Transactional(rollbackFor = {UnexpectedRollbackException.class, WithdrawException.class})
-	public void withdrawToBank(String email, double amount, WebRequest request) throws UnexpectedRollbackException, WithdrawException {
+	public void withdrawToBank(String email, double amount, WebRequest request) throws UnexpectedRollbackException, WithdrawException, NoIbanProvidedException {
 		try {		
 			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
+			Optional.ofNullable(registered.getIban()).ifPresentOrElse(iban -> {
+				if (iban.isEmpty()||iban.isBlank()) {
+					throw new NoIbanProvidedException("For bank transfer provide an iban !");
+				}
+			}, () -> {
+				throw new NoIbanProvidedException("For bank transfer provide an iban !");
+			});
 			double total = registered.getBalance() - amount;
 			if (total<0d) {
 				throw new WithdrawException("Insufficient funds for withdraw to bank");
@@ -312,6 +330,9 @@ public class RegisteredServiceImpl implements RegisteredService {
 		} catch (WithdrawException we) {
 			log.error("{} : {}", requestService.requestToString(request), we.toString());
 			throw new WithdrawException(we.getMessage());
+		} catch (NoIbanProvidedException nipe) {
+			log.error("{} : {}", requestService.requestToString(request), nipe.toString());
+			throw new NoIbanProvidedException(nipe.getMessage());
 		} catch(Exception e) {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while withdraw to bank. Canceled");
