@@ -1,0 +1,42 @@
+@charset "UTF-8";
+
+body {
+	font-family: verdana, serif;
+	color: black;
+	font-size: 1.3em;
+}
+
+#main_wrapper {
+	width: 500px;
+	margin: auto;
+	text-align: center;
+	padding: 20px;
+}
+
+.paymybuddy {
+	width: 80%;
+	margin: auto;
+	font-size: 1.3em;
+	color: white;
+	background-color: #5CB85C;
+	margin-bottom: 1em;
+	padding: 12px 0 16px 0;
+	border-radius: 10px;
+}
+
+.button {
+	font-size: 1em;
+	margin-top: 2em;
+	margin-left: 10px;
+	margin-right: 10px;
+	background-color: #0275D8;
+	border: none;
+	color: white;
+	padding: 16px 32px;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.error {
+	color: red;
+}

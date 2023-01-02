@@ -2,11 +2,16 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<!-- <link rel="stylesheet" type="text/css" href="/css/myFile.css" th:href="@{/css/myFile.css}" /> -->
+		<link rel="stylesheet" type="text/css" href="/css/error.css" th:href="@{/css/error.css}" />
         <title>Error page</title>
     </head>
     <body>
-        <h1 th:text="${errorMessage}">INTERNAL SERVER ERROR</h1>
-        <p><a th:href="@{/}"><button type="button">Back to Home Page</button></a></p>
+    	<div id="main_wrapper">			
+	    	<header>
+	    		<div class="paymybuddy">Pay My Buddy</div>
+	    	</header>
+	        <div class="error" th:text="${errorMessage}">INTERNAL SERVER ERROR</div>
+	        <p><a th:href="@{/}"><button class="button" type="button">Back to Home Page</button></a></p>
+    	</div>
     </body>
 </html>
