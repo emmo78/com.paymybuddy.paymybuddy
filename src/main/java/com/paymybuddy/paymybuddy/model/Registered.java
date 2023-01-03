@@ -25,6 +25,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Model Entity for registered
+ * @author Olivier MOREL
+ *
+ */
 @Entity
 @Table(name = "registered")
 @DynamicInsert
@@ -60,6 +65,11 @@ public class Registered implements Serializable {
 	@Column(name = "balance")
 	private double balance;
 
+	/**
+	 * Field for contacts added by this.
+	 * contact = add column
+	 * this = added (by this) column 
+	 */
 	@ManyToMany(cascade = CascadeType.MERGE)
 	@JoinTable(name = "connection", joinColumns = @JoinColumn(name = "email_added", referencedColumnName = "email", nullable = false), inverseJoinColumns = @JoinColumn(name = "email_add", referencedColumnName = "email", nullable = false))
 	private Set<Registered> addConnections = new HashSet<>();
