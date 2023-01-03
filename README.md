@@ -1,5 +1,5 @@
 # com.paymybuddy.paymybuddy
-The purpose of this application is to 
+The purpose of this application is to facilitate the transfer of money between contacts. 
 
 ## Model Class Diagram UML
 
@@ -133,13 +133,18 @@ ALTER TABLE `paymybuddy`.`transaction` AUTO_INCREMENT = 1;
 
 ### What things you need to install the software
 
-- Java 11
+- Java 17
 - apache Maven
-- Spring Boot
+- Spring Boot 3.0.0
 
 ### Properties : ./src/main/resources/application.properties :
 
-does not contain SGBD login and passwd saved in "./db.properties" put in "./.gitignore" 
+Does not contain SGBD properties : 
+ - spring.datasource.url
+ - spring.datasource.username
+ - spring.datasource.password
+
+These are saved in "./db.properties" writted in "./.gitignore"
 
 ### Log4J2 : ./src/main/resources/log4j2-spring.xml
 log file  = ./logs/PayMyBuddy-log4j2.log with RollBack
@@ -150,7 +155,7 @@ A step by step series of examples that tell you how to get a development env run
 
 1.Install Java:
 
-https://adoptium.net/temurin/releases?version=11
+https://adoptium.net/temurin/releases?version=17
 
 2.Install Maven:
 
@@ -171,7 +176,7 @@ To run the tests from maven, go to the folder that contains the pom.xml file and
 - $ mvn test		→ run Unit Tests
 - $ mvn verify		→ run Unit Tests, SIT and AIT
 - $ mvn package		→ build .jar + Jacoco report in ./target/site/jacoco/index.html  
-					(run : $ java -jar target/alerts-0.0.1-SNAPSHOT.jar)
+					(run : $ java -jar target/paymybuddy-0.0.1-SNAPSHOT.jar)
 - $ mvn site 		→ put project reports in ./target/site/index.html  
 					( JavaDocs, SpotBugs, Surefire & Failsafe Reports, Jacoco & JaCoCo IT Reports)
 - $ mvn surefire-report:report → surefire report in	./target/site/ surefire-report
