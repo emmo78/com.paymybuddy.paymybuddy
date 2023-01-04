@@ -6,6 +6,11 @@ import org.springframework.context.annotation.Configuration;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Configuration property date time pattern and local for DTO services 
+ * @author Olivier MOREL
+ *
+ */
 @Getter
 @Setter
 @Configuration

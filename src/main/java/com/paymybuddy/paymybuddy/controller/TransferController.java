@@ -15,6 +15,11 @@ import com.paymybuddy.paymybuddy.service.TransactionService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Controller to interface transfer use cases with service
+ * @author olivi
+ *
+ */
 @Controller
 @Slf4j
 @AllArgsConstructor

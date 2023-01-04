@@ -35,6 +35,11 @@ import jakarta.servlet.ServletException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Controller to interface user use cases with DAL service
+ * @author Olivier MOREL
+ *
+ */
 @Controller
 @Slf4j
 @AllArgsConstructor
@@ -46,6 +51,15 @@ public class UserController {
 
 	private final RequestService requestService;
 	
+	/** 
+	 * try to create registered from ModelAttribute
+	 * 
+	 * @param registeredDTO
+	 * @param request
+	 * @return
+	 * @throws ResourceConflictException
+	 * @throws UnexpectedRollbackException
+	 */
 	@PostMapping("/createregistered")
 	public String createRegistered(@ModelAttribute RegisteredDTO registeredDTO, WebRequest request) throws ResourceConflictException, UnexpectedRollbackException {
 		RegisteredDTO registeredDTOCreated = registeredService.createRegistered(registeredDTO, request);
@@ -55,7 +69,14 @@ public class UserController {
 				registeredDTOCreated.getEmail());
 		return "redirect:/";
 	}
-	
+	/**
+	 * update registered from ModelAttribute
+	 * 
+	 * @param registeredDTO
+	 * @param request
+	 * @return
+	 * @throws UnexpectedRollbackException
+	 */
 	@PostMapping("/user/updateregistered")
 	public String updateRegistered(@ModelAttribute RegisteredDTO registeredDTO, WebRequest request) throws UnexpectedRollbackException {
 		RegisteredDTO registeredDTOUpdated = registeredService.updateRegistered(registeredDTO, request);
@@ -66,6 +87,13 @@ public class UserController {
 		return "redirect:/user/home/profile";
 	}
 	
+	/**
+	 * Delete current user
+	 * @param user
+	 * @param request
+	 * @return
+	 * @throws ServletException
+	 */
 	@GetMapping("/user/removeregistered")
 	public String removeRegistered(Principal user, WebRequest request) throws ServletException {
 		String email = user.getName();
@@ -78,6 +106,13 @@ public class UserController {
 		return "redirect:/";
 	}
 
+	/**
+	 * Log Out current user. Don't use any service
+	 * @param user
+	 * @param request
+	 * @return
+	 * @throws ServletException
+	 */
 	@GetMapping("/user/logoff")
 	public String logoff(Principal user, WebRequest request) throws ServletException {
 		log.info("{} : {} : registered={} log off",
@@ -88,6 +123,13 @@ public class UserController {
 		return "redirect:/";
 	}
 	
+	/**
+	 * return success login page and home of user
+	 * @param user
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@GetMapping("/user/home")
 	public String welcomePage(Principal user, Model model, WebRequest request) {
 		RegisteredDTO registeredDTO = registeredService.getRegistered(user.getName(), request);
@@ -99,6 +141,14 @@ public class UserController {
 		return "userhome";
 	}
 	
+	/**
+	 * return transfer page
+	 * @param pageNumberOpt
+	 * @param user
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@GetMapping("/user/home/transfer")
 	public String transfertPage(@RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
 		String email = user.getName();
@@ -116,6 +166,13 @@ public class UserController {
 		return "transfer";
 	}
 	
+	/**
+	 * return profile page 
+	 * @param user
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@GetMapping("/user/home/profile")
 	public String profilePage(Principal user, Model model, WebRequest request) {
 		RegisteredDTO registeredDTO = registeredService.getRegistered(user.getName(), request);
@@ -123,6 +180,15 @@ public class UserController {
 		return "profile";
 	}
 	
+	/**
+	 * return contact to add page and if emailToAdd present, add him to user's contacts
+	 * @param emailToAddOpt
+	 * @param pageNumberOpt
+	 * @param user
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@GetMapping("/user/home/profile/add")
 	public String profileAddPage(@RequestParam(name = "addEmail") Optional<String> emailToAddOpt, @RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
 		String email = user.getName();
@@ -143,6 +209,15 @@ public class UserController {
 		return "profileadd";
 	}
 	
+	/**
+	 * return all added by user contact page and if emailToRemove present remove it from user's contacts
+	 * @param emailToRemoveOpt
+	 * @param pageNumberOpt
+	 * @param user
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@GetMapping("/user/home/profile/addby")
 	public String profilAddByPage(@RequestParam(name = "removeEmail") Optional<String> emailToRemoveOpt, @RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
 		String email = user.getName();
@@ -163,6 +238,15 @@ public class UserController {
 		return "profileaddby";
 	}
 	
+	/**
+	 * return all that added user to their contact page and if emailToRemove present remove user from its contact)
+	 * @param emailToRemoveOpt
+	 * @param pageNumberOpt
+	 * @param user
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@GetMapping("/user/home/profile/addedto")
 	public String profilAddedToPage(@RequestParam(name = "removeEmail") Optional<String> emailToRemoveOpt, @RequestParam(name = "pageNumber") Optional<String> pageNumberOpt, Principal user, Model model, WebRequest request) {
 		String email = user.getName();
@@ -183,6 +267,13 @@ public class UserController {
 		return "profileaddedto";
 	}
 	
+	/**
+	 * return transfer money from and to bank page
+	 * @param user
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@GetMapping("/user/home/bank")
 	public String profilTransferMoneyBank(Principal user, Model model, WebRequest request) {
 		RegisteredDTO registeredDTO = registeredService.getRegistered(user.getName(), request);
@@ -190,6 +281,14 @@ public class UserController {
 		return "profilbank";
 	}
 	
+	/**
+	 * manage money transfer from and to bank
+	 * @param amountS
+	 * @param action
+	 * @param user
+	 * @param request
+	 * @return
+	 */
 	@PostMapping("/user/home/bank")
 	public String transferMoneyBank(@RequestParam(name = "amount") String amountS, @RequestParam(name = "action") String action, Principal user, WebRequest request) {
 		String email = user.getName();
@@ -202,6 +301,13 @@ public class UserController {
 		return "redirect:/user/home/bank";
 	}
 	
+	/**
+	 * return contact page
+	 * @param user
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@GetMapping("/user/home/contact")
 	public String contact(Principal user, Model model, WebRequest request) {
 		String email = user.getName();
@@ -209,12 +315,24 @@ public class UserController {
 		return "contact";
 	}
 	
+	/**
+	 * Manage contact post
+	 * @param attributes
+	 * @param contact
+	 * @return
+	 */
 	@PostMapping("/user/home/contact")
 	public String contactProcessing(RedirectAttributes attributes, @RequestParam(name = "contact") String contact) {
 		attributes.addAttribute("contact", contact);
 		return "redirect:/user/home/contact";
 	}
 	
+	/**
+	 * Calculation of the parameters for the creation of the page interval
+	 * @param index
+	 * @param lastPage
+	 * @return
+	 */
 	private List<Integer> pageInterval(int index, int lastPage) {
 		if (lastPage>=0) {
 			if (index-2 <= 0) {
@@ -233,6 +351,12 @@ public class UserController {
 		}
 	}
 	
+	/**
+	 * Create page interval
+	 * @param min
+	 * @param max
+	 * @return
+	 */
 	private List<Integer> createInterval(int min, int max) {
 		List<Integer> interval = new ArrayList<>();
 		for (int i = min, j=0; i <= max && j<5; i++,j++) {

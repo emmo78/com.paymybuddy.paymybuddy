@@ -14,6 +14,11 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * Spring Security Configuration
+ * @author Olivier MOREL
+ *
+ */
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor

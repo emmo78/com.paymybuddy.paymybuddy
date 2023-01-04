@@ -10,7 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 public interface RequestService {
 
 	/**
-	 * To string all the parmeters of a Web request
+	 * To string all the parameters of a Web request
 	 * @param request to String
 	 * @return String of parameters
 	 */

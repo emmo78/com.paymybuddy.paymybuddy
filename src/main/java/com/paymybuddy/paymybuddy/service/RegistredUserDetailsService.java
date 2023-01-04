@@ -19,6 +19,13 @@ import com.paymybuddy.paymybuddy.repository.RegisteredRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Spring security - UserDetailService interface implementation
+ * try to find registered from email and return a userDetail
+ * 
+ * @author Olivier MOREL
+ *
+ */
 @Service
 @Slf4j
 @AllArgsConstructor

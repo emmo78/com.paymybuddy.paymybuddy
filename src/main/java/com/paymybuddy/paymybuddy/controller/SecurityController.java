@@ -10,6 +10,11 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.paymybuddy.paymybuddy.dto.RegisteredDTO;
 
+/**
+ * Controller for login form
+ * @author olivi
+ *
+ */
 @Controller
 public class SecurityController {
 	

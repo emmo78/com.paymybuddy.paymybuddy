@@ -104,9 +104,9 @@ class RegisteredRepositoryIT {
 
 	@Test
 	@Tag("RegisteredRepositoryIT")
-	@DisplayName("registeredA connects B and C should fill their sets")
+	@DisplayName("registeredA connects B and C should fill the A set")
 	@Transactional
-	public void registeredAconnectsBandCShouldFillTheirSets() {
+	public void registeredAconnectsBandCShouldFillTheASet() {
 		// GIVEN
 		Set<Registered> addConnectionsExpectedA = new HashSet<>();
 		addConnectionsExpectedA.add(registeredB);
@@ -131,9 +131,9 @@ class RegisteredRepositoryIT {
 
 	@Test
 	@Tag("RegisteredRepositoryIT")
-	@DisplayName("registeredA disconnects B and C should empty their sets")
+	@DisplayName("registeredA disconnects B and C should empty the A set")
 	@Transactional
-	public void registeredADisconnectsBandCShouldEmptyTheirSets() {
+	public void registeredADisconnectsBandCShouldEmptyTheASet() {
 		// GIVEN
 		registeredA.addConnection(registeredB);
 		registeredA.addConnection(registeredC);
