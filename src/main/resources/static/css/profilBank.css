@@ -32,4 +32,13 @@ form {
 	background-color: #e0e0e0;
 }
 
+input[type=number] {
+	margin-bottom: 1em;
+	font-size: 1em;
+	border: 2px solid gray;
+	border-radius: 4px;
+	width:80%;
+	box-sizing: border-box;
+}
+
 

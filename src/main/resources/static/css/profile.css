@@ -46,13 +46,15 @@ input[type=text] {
 	flex-direction: column;
 }
 
-#profilenav a {
-	font-size: .8em;	
-	color: #0275D8;
+#profilenav button  {
+	font-size: 0.8em;
+	margin-bottom: 0.2em;
+	margin-left: 10px;
+	margin-right: 10px;
+	background-color: #0275D8;
+	border: none;
+	color: white;
+	padding: 16px 32px;
 	text-decoration: none;
-	border: 1px #e0e0e0 solid;	
-}
-
-#profilenav a:hover {
-	color: #760001;
+	cursor: pointer;
 }

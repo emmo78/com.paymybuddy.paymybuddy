@@ -143,7 +143,7 @@ public class UserController {
 	
 	/**
 	 * return transfer page
-	 * @param pageNumberOpt
+	 * @param pageNumberOpt : the current page number for transaction pages
 	 * @param user
 	 * @param model
 	 * @param request
@@ -181,9 +181,9 @@ public class UserController {
 	}
 	
 	/**
-	 * return contact to add page and if emailToAdd present, add him to user's contacts
+	 * return contact to add page and if emailToAdd present, add it to user's contacts
 	 * @param emailToAddOpt
-	 * @param pageNumberOpt
+	 * @param pageNumberOpt : the current page number for free contact to add pages
 	 * @param user
 	 * @param model
 	 * @param request
@@ -212,7 +212,7 @@ public class UserController {
 	/**
 	 * return all added by user contact page and if emailToRemove present remove it from user's contacts
 	 * @param emailToRemoveOpt
-	 * @param pageNumberOpt
+	 * @param pageNumberOpt : the current page number for all added contacts pages
 	 * @param user
 	 * @param model
 	 * @param request
@@ -241,7 +241,7 @@ public class UserController {
 	/**
 	 * return all that added user to their contact page and if emailToRemove present remove user from its contact)
 	 * @param emailToRemoveOpt
-	 * @param pageNumberOpt
+	 * @param pageNumberOpt : the current page number for all person that added user pages 
 	 * @param user
 	 * @param model
 	 * @param request

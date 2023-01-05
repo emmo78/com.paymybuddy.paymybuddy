@@ -130,6 +130,7 @@ public class RegisteredServiceImpl implements RegisteredService {
 	public void removeRegistered(String email, WebRequest request) throws UnexpectedRollbackException {
 		try {		
 			Registered registered = registeredRepository.findById(email).orElseThrow(() -> new ResourceNotFoundException("Registered not found"));
+			//Need to remove all the users connect to user before remove user 
 			registeredRepository.findAllAddedToEmail(email, Pageable.unpaged())
 				.forEach(added -> registeredRepository.findById(added.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Registered added not found"))
 				.removeConnection(registered));

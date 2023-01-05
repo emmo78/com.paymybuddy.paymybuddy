@@ -15,10 +15,14 @@ public class TransactionDTO  {
 	private String emailSender;
 	private String emailReceiver;
 	private boolean receiver;
+
+	// To create a transaction first construct a DTO One with email sender before give it (model) to Thymeleaf template form "create"  
 	public TransactionDTO(String emailSender) {
 		this.emailSender=emailSender;
 		amount="0.00";
 	}
+	
+	// For Transaction List to show the contact who sent or received the transaction
 	public String getEmail() {
 		if (receiver) {
 			return emailSender;

@@ -99,6 +99,7 @@ public class TransactionServiceImpl implements TransactionService {
 	public Page<TransactionDTO> getRegisteredAllTransaction(String email, Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
 		Page<TransactionDTO> pageTransactionDTO = null;
 		try {
+			// for Thymeleaf showing transactionDTO sended in red with "-" amount, it maps transaction to DTO Sender or Receiver converter
 			pageTransactionDTO = transactionRepository.findAllTransactionsByEmailSenderOrReceiver(email, pageRequest)
 					.map(transaction -> {
 						if(email.equals(Optional.ofNullable(transaction.getSender()).orElseGet(() -> new Registered()).getEmail())) {
