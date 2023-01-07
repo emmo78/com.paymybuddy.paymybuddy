@@ -52,7 +52,7 @@ public class SecurityConfiguration  {
 			.rememberMe(conf -> conf
 					.rememberMeParameter("remember")
 					.rememberMeCookieName("rememberlogin")
-					.tokenValiditySeconds(300))
+					.tokenValiditySeconds(1200))
 			.logout(logout -> logout.permitAll());
 		return http.build();
 	}
