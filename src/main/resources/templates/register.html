@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link  rel="stylesheet" type="text/css" href="/css/register.css" th:href="@{/css/register.css}" />
+        <title>Register</title>
+    </head>
+
+    <body>
+		<div id="main_wrapper">			
+	    	<header>
+	    		<div class="paymybuddy">Pay My Buddy</div>
+	    		<nav>
+	    			<ul>
+	    				<li><a href="/">Home</a></li>
+	    				<li><a href="/login">Login</a></li>
+	    				<Li><a class="athis" href="/register">Register</a></Li>
+	    			</ul>
+	    		</nav>
+	    	</header>
+	 		<section>	
+		    	<div class="paramerror" th:if="${param.errorMessage}">Try another email
+		    		<span th:text="' : '+${param.errorMessage}"></span>
+		    	</div>
+		    	<form method="POST" th:action="@{/createregistered}" th:object="${registeredDTO}">
+					<div class="form">
+						<label for="email">Email</label><br/>
+						<input type="text" th:field="*{email}" required placeholder="alias@domain up to 64@255 characters"/><br/>
+		
+						<label for="firstName">First name</label><br/> 
+						<input type="text" th:field="*{firstName}" required placeholder="Firstname up to 30 characters"/><br/>
+		
+						<label for="lastName">Last name</label><br/>
+						<input type="text" th:field="*{lastName}" required placeholder="Lastname up to 30 characters"/><br/>
+						
+						<label for="birthDate">Birth date</label><br/>
+						<input type="text" th:field="*{birthDate}" required placeholder="MM/dd/yyyy"/><br/>
+						
+						<label for="iban">Iban</label><br/>
+						<input type="text" th:field="*{iban}" placeholder="FR76012345678901234567890123456789"/><br/>			
+			
+						<!-- https://www.usenix.org/legacy/events/usenix99/provos/provos_html/node4.html -->
+						<!-- Finally, the key argument is a secret encryption key, which can be a user-chosen password of up to 56 bytes (including a terminating zero byte when the key is an ASCII string). -->
+						<!-- UTF8 encode up to 4 bytes so 55/4 = 13 -->
+						<label for="password">Password</label><br/>
+						<input type="password" th:field="*{password}" required placeholder="up to 13 characters UTF8"/><br/>
+		
+						<input class="button" type="submit" th:value="'Create'"/>
+					</div>
+				</form>
+			</section>
+    	</div>
+	</body>  	
+</html>

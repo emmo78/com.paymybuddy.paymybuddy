@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet" type="text/css" href="/css/userhome.css" th:href="@{/css/userhome.css}" />
+        <title>Home</title>
+    </head>
+	<body>
+		<div id="main_wrapper">		
+			<header th:replace="~{header::header('Userhome')}"></header>
+			<h1><span th:text="${user.firstName}+' '+${user.lastName}+', '"></span>Welcome !</h1>		
+		</div>
+	</body>
+</html>

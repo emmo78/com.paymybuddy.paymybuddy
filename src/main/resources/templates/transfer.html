@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet" type="text/css" href="/css/transfer.css" th:href="@{/css/transfer.css}" />
+        <title>Transfer</title>
+    </head>
+	<body>
+		<div id="main_wrapper" th:with="page='Transfer'">		
+			<header th:replace="~{header::header(${page})}"></header>
+			<div th:replace="~{header::subheader(${page})}"></div>
+			<section>
+				<div id="transfersection">
+					<div class="sectiontitle">Send Money - balance = <span th:text="${user.balance}"></span></div>
+					<a th:href="@{/user/home/profile/add}">
+							<button class="button" type="button">Add Connection</button>
+					</a>
+				</div>
+			    <form method="POST" th:action="@{/createtransfer}" th:object="${transactionDTO}">
+					<div class="paramerror" th:if="${param.errorMessage}" th:text="${param.errorMessage}"></div>
+			    	<div>
+				    		<input type="hidden" th:field="*{emailSender}">
+				    		<select th:field="*{emailReceiver}" required>
+				    			<option th:if="${allAddBy.empty}" value="">No people added</option>
+				    			<option th:unless="${allAddBy.empty}" value="">Select a connection</option>
+			 					<option th:each="email : ${allAddBy}" th:value="${email}" th:text="${email}"></option>
+							</select>
+							<input th:unless="${allAddBy.empty}" type="text" th:field="*{description}" size=25 maxlength="25" placeholder="Description max 25 caracters"/>				
+							<!-- fee = 0.5 % so to have 1 cent need min transfer amount : 0.01/0.005 = 2 -->
+							<input th:unless="${allAddBy.empty}" type="number" min="2.00" step="0.01" th:field="*{amount}" placeholder="min 2.00"/>
+							<input class="buttongreen" th:unless="${allAddBy.empty}" type="submit" th:value="'Pay'"/>
+					</div>
+				</form>
+			</section>
+			<section>
+				<div class="sectiontitle">My Transactions</div>
+				<table>
+					<thead>
+						<tr>
+							<th>Connections</th>
+							<th>Description</th>
+							<th>Amount</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${transactions.empty}">
+							<td colspan="3">No sent or received transaction</td>
+						</tr>
+						<tr th:each="transaction, iterstat : ${transactions}" th:class="${iterstat.odd}?'odd'" th:classappend="!${transaction.isReceiver}?'colorred'">
+							<td th:text="${transaction.getEmail()}!=null?${transaction.getEmail()}:'unsubscribed'">Connections</td>
+							<td th:text="${transaction.description}">Description</td>
+							<td th:text="${transaction.amount}">Amount</td>
+						</tr>
+					</tbody>
+				</table>
+				<div th:if="${pageInterval}" th:with="index = ${transactions.getNumber()}">
+					<ul id="legendbuttons">
+						<li th:unless="${index}<=0">
+							<a th:href="@{/user/home/transfer(pageNumber=(${index}-1))}">&laquo;</a>
+						</li>
+						<li th:each="pageNum : ${pageInterval}">
+							<a th:href="@{/user/home/transfer(pageNumber=(${pageNum}-1))}">
+									<span th:class="${pageNum}eq(${index}+1)?'currentpage'" th:text="${pageNum}"></span>
+							</a>
+						</li>
+						<li th:if="${index}lt(${transactions.getTotalPages()}-1)">
+							<a th:href="@{/user/home/transfer(pageNumber=(${index}+1))}">&raquo;</a>
+						</li>
+					</ul>
+				</div>
+			</section>
+		</div>
+	</body>
+</html>
