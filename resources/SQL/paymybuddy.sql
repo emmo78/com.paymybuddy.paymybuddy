@@ -47,8 +47,8 @@ CREATE TABLE registered_role(
 	FOREIGN KEY(email_role) REFERENCES registered(email) 
 );
 
-INSERT INTO 'role'('role_name')
-VALUES ('ROLE_USER'); 
+INSERT INTO `paymybuddy`.`role` (`role_id`, `role_name`)
+VALUES ('1', 'ROLE_USER'); 
 
  
 --------------For Testing---------------
