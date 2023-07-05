@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<link rel="stylesheet" type="text/css" href="/css/profilBank.css" th:href="@{/css/profilBank.css}" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css" href="../static/css/profilBank.css" th:href="@{/css/profilBank.css}">
         <title>Contact</title>
     </head>
 	<body>
@@ -13,10 +13,10 @@
 				<div class="sectiontitle">Send a message to admin</div>
 				<form th:action="@{/user/home/contact}" method="post">
 					<div>
-						<label for="contact">Message</label><br/>
+						<label for="contact">Message</label><br>
 						<textarea name="contact" id="contact" th:text="${param.contact}"></textarea>
-						<br/>
-						<input class="buttongreen" type="submit" value="Send"/>
+						<br>
+						<input class="buttongreen" type="submit" value="Send">
 					</div>
 				</form>
 			</section>
